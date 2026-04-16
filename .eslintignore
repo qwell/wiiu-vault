@@ -1,0 +1,13 @@
+dist/
+packages/*/dist/
+
+**/*.d.ts
+
+# npm
+node_modules/
+
+# Yarn
+.yarn/
+.pnp.cjs
+.pnp.loader.mjs
+vitest.config.ts

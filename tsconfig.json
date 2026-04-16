@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@tsconfig/node24/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src/",
+    "outDir": "dist/",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": true,
+    "isolatedModules": true,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "incremental": true,
+    "strictNullChecks": true,
+    "listEmittedFiles": true,
+    "tsBuildInfoFile": ".cache/.tsbuildinfo",
+    "types": ["vitest/importMeta", "node"]
+  },
+  "compileOnSave": true,
+  "plugins": [
+    {
+      "name": "typescript-eslint-language-service"
+    }
+  ],
+  "include": ["src/**/*.ts"]
+}

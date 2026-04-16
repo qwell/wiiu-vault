@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "yarn: build",
+      "detail": "tsc -p tsconfig.json",
+      "presentation": {
+        "reveal": "silent",
+        "close": true
+      }
+    }
+  ]
+}

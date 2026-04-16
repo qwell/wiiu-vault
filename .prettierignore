@@ -1,0 +1,12 @@
+dist/
+
+**/*.d.ts
+.eslintcache
+
+# npm
+node_modules/
+
+# Yarn
+.yarn/
+.pnp.cjs
+.pnp.loader.mjs
