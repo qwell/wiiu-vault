@@ -1,15 +1,8 @@
-# Sample Repo for Yarn v2+, TypeScript, ESLint, Prettier, and VS Code
+# Wii U Vault
 
-This repository demonstrates a simple setup using:
+Wii U Vault is a web-based application that allows users to manage and organize their Wii U game library. It provides features such as game categorization, search and filter functionality, and the ability to track game statuses (e.g., complete, incomplete, etc.). The application is built using TypeScript for the client-side, and Node.js for the server-side.
 
-- VS Code
-- TypeScript
-- ESLint
-- Prettier
-- Yarn
-  - Plug'n'Play (PnP)
-  - editor SDKs
-- Vitest
+Work in Progress
 
 ## Table of Contents
 
@@ -22,22 +15,21 @@ This repository demonstrates a simple setup using:
 
 ## Prerequisites
 
-- [Visual Studio Code](https://code.visualstudio.com/)
-- [Node 20](https://nodejs.org/)
+- [Node 24](https://nodejs.org/)
 - [Yarn](https://yarnpkg.com/)
 
 ## Setup
 
-Clone the repository and navigate to the directory.
+Clone the repository.
 
 ```bash
-git clone https://github.com/qwell/happy-ts.git
+git clone https://github.com/qwell/wiiu-vault.git
 ```
 
 Navigate to the repo directory.
 
 ```bash
-cd happy-ts
+cd wiiu-vault
 ```
 
 Install dependencies using Yarn.
@@ -93,5 +85,3 @@ If you'd like to contribute, pull requests and issues are always appreciated.
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 ## TODO
-
-- Add Yarn workspaces/monorepo support (written, not yet committed).

@@ -1,0 +1,14 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "dist",
+        "tsBuildInfoFile": ".cache/.tsbuildinfo.client",
+        "module": "ES2022",
+        "moduleResolution": "bundler",
+        "lib": ["ES2022", "DOM"],
+        "types": ["vitest/importMeta"]
+    },
+    "include": ["src/client/**/*.ts", "src/shared/**/*.ts"]
+}

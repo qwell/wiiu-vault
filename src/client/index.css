@@ -1,0 +1,236 @@
+body {
+    margin: 16px;
+    font-family: sans-serif;
+}
+
+.library-controls {
+    display: grid;
+    grid-template-columns: 24px max-content max-content minmax(220px, 420px);
+    grid-template-rows: auto auto;
+    column-gap: 8px;
+    row-gap: 2px;
+    align-items: end;
+    margin: 0 0 8px;
+}
+
+.library-refresh {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+}
+
+.library-label {
+    line-height: 1;
+    margin: 0;
+    align-self: end;
+}
+
+.library-label-region {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.library-label-status {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.library-label-search {
+    grid-column: 4;
+    grid-row: 1;
+}
+
+.library-field-region {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.library-field-status {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.library-field-search {
+    grid-column: 4;
+    grid-row: 2;
+}
+
+.library-search,
+.library-select {
+    font: inherit;
+    margin: 0;
+}
+
+.refresh-button {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #777;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.refresh-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.library-loading {
+    min-height: 1.25em;
+    margin: 0 0 8px;
+}
+
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+}
+
+.title-group {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        'icon header'
+        'badges badges';
+    gap: 8px 8px;
+    align-items: start;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 6px;
+    background: transparent;
+}
+
+.title-group-missing {
+    border-color: #b00020;
+}
+
+.title-group-missing .title-group-header {
+    color: #b00020;
+}
+
+.title-group-incomplete {
+    border-color: #b8860b;
+}
+
+.title-group-incomplete .title-group-header {
+    color: #b8860b;
+}
+
+.title-group-complete {
+    border-color: #2e8b57;
+}
+
+.title-group-complete .title-group-header {
+    color: #2e8b57;
+}
+
+.title-group-unknown {
+    border-color: #7b3fb3;
+}
+
+.title-group-unknown .title-group-header {
+    color: #7b3fb3;
+}
+
+.title-icon,
+.title-icon-placeholder {
+    grid-area: icon;
+    width: 64px;
+    height: 64px;
+    display: block;
+    border-radius: 6px;
+}
+
+.title-icon {
+    object-fit: cover;
+}
+
+.title-icon-placeholder {
+    background: #333;
+}
+
+.title-group-header {
+    grid-area: header;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.title-slot-badges {
+    grid-area: badges;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    min-width: 0;
+    font-size: 9px;
+}
+
+.title-slot-badge-list {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 3px;
+    align-items: center;
+    min-width: 0;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.title-slot-badge-list::-webkit-scrollbar,
+.title-slot-badges::-webkit-scrollbar {
+    display: none;
+}
+
+.title-slot-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    white-space: nowrap;
+    background: transparent;
+    flex: 0 0 auto;
+}
+
+.title-slot-badge-complete {
+    color: #2e8b57;
+}
+
+.title-slot-badge-incomplete {
+    color: #b8860b;
+}
+
+.title-slot-badge-missing {
+    color: #b00020;
+}
+
+.title-slot-badge-na {
+    color: #808080;
+    border-style: dashed;
+}
+
+.title-slot-badge-unknown {
+    color: #7b3fb3;
+}
+
+.title-region {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    padding: 1px 4px;
+    border: 1px solid #777;
+    background: transparent;
+    flex: 0 0 auto;
+    font-family: 'Noto Color Emoji', system-ui, sans-serif;
+}
