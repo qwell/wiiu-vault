@@ -28,6 +28,7 @@ type LocalTitleEntry = TitleEntry & {
     family: string;
     localPath: string;
     sizeBytes: number;
+    matchedDatabase: boolean;
 };
 
 const TITLE_TIK = 'title.tik';
@@ -287,6 +288,7 @@ async function readTitleEntry(
         iconUrl: databaseEntry?.iconUrl ?? null,
         localPath: dirPath,
         sizeBytes: await getDirectorySizeBytes(dirPath),
+        matchedDatabase: databaseEntry !== undefined,
     };
 }
 
@@ -417,6 +419,8 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
             groups.set(entry.family, group);
         }
 
+        group.titleInDatabase ||= entry.matchedDatabase;
+
         const publicEntry: TitleEntry = {
             titleId: entry.titleId,
             kind: entry.kind,
@@ -485,8 +489,6 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
 
         if (parentEntry) {
             group.parentMissing = false;
-            group.titleInDatabase =
-                parentEntry.region !== null || parentEntry.iconUrl !== null || parentEntry.titleName !== 'Unknown';
             group.name = parentEntry.titleName;
             group.region = parentEntry.region;
             group.iconUrl = parentEntry.iconUrl;

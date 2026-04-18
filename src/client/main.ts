@@ -45,7 +45,7 @@ function formatTooltip(group: TitleGroup): string {
 }
 
 function getGroupStatus(group: TitleGroup): GroupStatus {
-    if (!group.titleInDatabase || (!group.region && !group.iconUrl)) {
+    if (!group.titleInDatabase) {
         return 'unknown';
     }
 
@@ -64,7 +64,7 @@ function getGroupStatus(group: TitleGroup): GroupStatus {
 }
 
 function getGameBadgeState(group: TitleGroup): SlotBadgeState {
-    if (!group.titleInDatabase || (!group.region && !group.iconUrl)) {
+    if (!group.titleInDatabase) {
         return 'unknown';
     }
 

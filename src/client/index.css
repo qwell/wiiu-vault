@@ -73,7 +73,6 @@ body {
     background: transparent;
     cursor: pointer;
     font-size: 14px;
-    line-height: 1;
 }
 
 .refresh-button:disabled {
