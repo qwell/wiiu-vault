@@ -1,86 +1,47 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 
-import type { TitleEntry, TitleGroup, TitleKind, TitleSlot } from '../shared/shared.js';
+import {
+    type TitleEntry,
+    type TitleGroup,
+    type TitleKind,
+    type ChildKind,
+    CHILD_KINDS,
+    PARENT_KINDS,
+    ParentKind,
+} from '../shared/shared.js';
+import { readTmd } from './metadata.js';
 
 type RawTitleDatabaseEntry = {
-    titleID?: string;
-    name?: string;
-    region?: string;
-    iconUrl?: string;
+    titleID: string;
+    name: string;
+    region: string;
+    iconUrl: string;
 };
 
 type TitleDatabaseEntry = {
     titleID: string;
-    family: string;
-    kind: TitleKind;
     name: string;
     region: string | null;
     iconUrl: string | null;
-};
 
-type ParsedMetadata = {
-    titleId: string;
-    version: number | null;
+    kind: TitleKind;
+    family: string;
 };
 
 type LocalTitleEntry = TitleEntry & {
     family: string;
-    localPath: string;
-    sizeBytes: number;
     matchedDatabase: boolean;
 };
 
-const TITLE_TIK = 'title.tik';
-const TITLE_TMD = 'title.tmd';
-
-const TIK_TITLE_ID_OFFSET = 0x1dc;
-const TIK_TITLE_ID_LENGTH = 8;
-const TIK_VERSION_OFFSET = 0x1e6;
-const TIK_VERSION_LENGTH = 2;
-
-const TMD_TITLE_ID_OFFSET = 0x18c;
-const TMD_TITLE_ID_LENGTH = 8;
-const TMD_VERSION_OFFSET = 0x1dc;
-const TMD_VERSION_LENGTH = 2;
-
-function parseTitleId(buffer: Buffer, offset: number, length: number): string | null {
-    if (buffer.length < offset + length) {
-        return null;
-    }
-
-    return buffer
-        .subarray(offset, offset + length)
-        .toString('hex')
-        .toLowerCase();
-}
-
-function parseUnsignedIntegerBE(buffer: Buffer, offset: number, length: number): number | null {
-    if (buffer.length < offset + length) {
-        return null;
-    }
-
-    switch (length) {
-        case 1:
-            return buffer.readUInt8(offset);
-
-        case 2:
-            return buffer.readUInt16BE(offset);
-
-        case 4:
-            return buffer.readUInt32BE(offset);
-
-        default:
-            throw new Error(`Unsupported integer length: ${length}`);
-    }
-}
-
 function normalizeTitleName(name: string): string {
-    return name
-        .replace(/([^\s])\s*\n\s*([^\s])/g, '$1 $2')
-        .replace(/\s*\n\s*/g, ' ')
-        .replace(/ {2,}/g, ' ')
-        .trim();
+    const normalized =
+        name
+            ?.replace(/([^\s])\s*\n\s*([^\s])/g, '$1 $2')
+            ?.replace(/\s*\n\s*/g, ' ')
+            ?.replace(/ {2,}/g, ' ')
+            ?.trim() ?? 'Unknown';
+    return normalized;
 }
 
 function cleanDirectoryName(dirname: string): string {
@@ -102,7 +63,7 @@ function getTitleName(dirname: string, databaseName: string | null): string {
 }
 
 function classifyTitleId(titleId: string): { family: string; kind: TitleKind } {
-    const normalized = titleId.toLowerCase();
+    const normalized = titleId?.toLowerCase() ?? '';
 
     if (normalized.length !== 16) {
         return { family: normalized, kind: 'Unknown' };
@@ -148,36 +109,28 @@ function classifyTitleId(titleId: string): { family: string; kind: TitleKind } {
 }
 
 function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
-    const parsed = JSON.parse(jsonText) as unknown;
+    const json = JSON.parse(jsonText) as unknown;
 
-    if (!Array.isArray(parsed)) {
+    if (!Array.isArray(json)) {
         throw new Error('titles.json must contain an array');
     }
 
-    return parsed.flatMap((entry) => {
-        if (typeof entry !== 'object' || entry === null) {
-            return [];
+    return (json as RawTitleDatabaseEntry[]).map((entry) => {
+        if (typeof entry.titleID !== 'string') {
+            throw new Error(`invalid titleID in titles.json: ${JSON.stringify(entry)}`);
         }
 
-        const value = entry as RawTitleDatabaseEntry;
+        const { family, kind } = classifyTitleId(entry.titleID);
 
-        if (typeof value.titleID !== 'string' || typeof value.name !== 'string') {
-            return [];
-        }
+        return {
+            titleID: entry.titleID.toLowerCase(),
+            name: normalizeTitleName(entry.name),
+            region: entry.region?.length > 0 ? entry.region : null,
+            iconUrl: entry.iconUrl?.length > 0 ? entry.iconUrl : null,
 
-        const titleID = value.titleID.toLowerCase();
-        const { family, kind } = classifyTitleId(titleID);
-
-        return [
-            {
-                titleID,
-                family,
-                kind,
-                name: normalizeTitleName(value.name),
-                region: typeof value.region === 'string' && value.region.length > 0 ? value.region : null,
-                iconUrl: typeof value.iconUrl === 'string' && value.iconUrl.length > 0 ? value.iconUrl : null,
-            },
-        ];
+            family,
+            kind,
+        };
     });
 }
 
@@ -190,42 +143,6 @@ async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
     } catch (error) {
         console.error(`[wiiu] failed to read titles DB at ${titlesJsonPath}:`, error);
         return new Map();
-    }
-}
-
-async function readFromTmd(dirPath: string): Promise<ParsedMetadata | null> {
-    try {
-        const buffer = await readFile(path.join(dirPath, TITLE_TMD));
-        const titleId = parseTitleId(buffer, TMD_TITLE_ID_OFFSET, TMD_TITLE_ID_LENGTH);
-
-        if (!titleId) {
-            return null;
-        }
-
-        return {
-            titleId,
-            version: parseUnsignedIntegerBE(buffer, TMD_VERSION_OFFSET, TMD_VERSION_LENGTH),
-        };
-    } catch {
-        return null;
-    }
-}
-
-async function readFromTik(dirPath: string): Promise<ParsedMetadata | null> {
-    try {
-        const buffer = await readFile(path.join(dirPath, TITLE_TIK));
-        const titleId = parseTitleId(buffer, TIK_TITLE_ID_OFFSET, TIK_TITLE_ID_LENGTH);
-
-        if (!titleId) {
-            return null;
-        }
-
-        return {
-            titleId,
-            version: parseUnsignedIntegerBE(buffer, TIK_VERSION_OFFSET, TIK_VERSION_LENGTH),
-        };
-    } catch {
-        return null;
     }
 }
 
@@ -267,38 +184,26 @@ async function readTitleEntry(
 ): Promise<LocalTitleEntry | null> {
     const dirPath = path.join(root, dirname);
 
-    const tmdData = await readFromTmd(dirPath);
-    const tikData = await readFromTik(dirPath);
-    const metadata = tmdData ?? tikData;
-
-    if (!metadata) {
+    const tmd = readTmd(dirPath);
+    if (!tmd) {
         return null;
     }
 
-    const { family, kind } = classifyTitleId(metadata.titleId);
-    const databaseEntry = titleDatabase.get(metadata.titleId);
+    const titleId = Buffer.from(tmd.header.titleId).toString('hex');
+    const { family, kind } = classifyTitleId(titleId);
+    const databaseEntry = titleDatabase.get(titleId);
 
     return {
-        titleId: metadata.titleId,
-        family,
-        kind,
-        version: metadata.version,
+        titleId,
+        version: tmd.header.titleVersion,
         titleName: getTitleName(dirname, databaseEntry?.name ?? null),
-        region: databaseEntry?.region ?? null,
+        region: databaseEntry?.region ?? tmd.header.region,
         iconUrl: databaseEntry?.iconUrl ?? null,
-        localPath: dirPath,
+
+        kind,
+        family,
         sizeBytes: await getDirectorySizeBytes(dirPath),
         matchedDatabase: databaseEntry !== undefined,
-    };
-}
-
-function createEmptySlot(kind: 'Update' | 'DLC'): TitleSlot {
-    return {
-        kind,
-        titleId: null,
-        version: null,
-        available: false,
-        existsLocally: false,
     };
 }
 
@@ -308,85 +213,15 @@ function createEmptyGroup(family: string): TitleGroup {
         name: 'Unknown',
         region: null,
         iconUrl: null,
-        parentMissing: true,
         titleInDatabase: false,
+        expectedChildren: [],
 
-        base: null,
-        update: null,
-        dlc: [],
-
-        demo: null,
-        fct: null,
-        systemApplet: null,
-        systemApp: null,
-        systemData: null,
-        vWii: null,
-        unknown: [],
-
-        updateSlot: createEmptySlot('Update'),
-        dlcSlot: createEmptySlot('DLC'),
-
-        gameTitleId: null,
-        updateTitleId: null,
-        dlcTitleId: null,
-
-        gameSizeBytes: null,
-        updateSizeBytes: null,
-        dlcSizeBytes: null,
+        entries: [],
     };
 }
 
-function getParentEntry(group: TitleGroup): TitleEntry | null {
-    return (
-        group.base ??
-        group.demo ??
-        group.fct ??
-        group.systemApplet ??
-        group.systemApp ??
-        group.systemData ??
-        group.vWii ??
-        null
-    );
-}
-
-function getDatabaseParentEntry(entries: TitleDatabaseEntry[]): TitleDatabaseEntry | null {
-    const kinds: TitleKind[] = ['Base', 'Demo', 'FCT', 'System Applet', 'System App', 'System Data', 'vWii'];
-
-    for (const kind of kinds) {
-        const entry = entries.find((candidate) => candidate.kind === kind);
-        if (entry) {
-            return entry;
-        }
-    }
-
-    return null;
-}
-
-function buildTitleSlot(kind: 'Update' | 'DLC', group: TitleGroup, familyEntries: TitleDatabaseEntry[]): TitleSlot {
-    const dbEntry = familyEntries.find((entry) => entry.kind === kind);
-
-    switch (kind) {
-        case 'Update':
-            return {
-                kind,
-                titleId: dbEntry?.titleID ?? null,
-                version: group.update?.version ?? null,
-                available: dbEntry !== undefined,
-                existsLocally: group.update !== null,
-            };
-
-        case 'DLC': {
-            const localDlc = group.dlc[0] ?? null;
-
-            return {
-                kind,
-                titleId: dbEntry?.titleID ?? null,
-                version: localDlc?.version ?? null,
-                available: dbEntry !== undefined,
-                existsLocally: localDlc !== null,
-            };
-        }
-    }
+function getParentByKind<T extends { kind: TitleKind }>(entries: T[]): T | null {
+    return entries.find((candidate) => PARENT_KINDS.includes(candidate.kind as ParentKind)) ?? null;
 }
 
 export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
@@ -423,99 +258,40 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
 
         const publicEntry: TitleEntry = {
             titleId: entry.titleId,
-            kind: entry.kind,
             version: entry.version,
             titleName: entry.titleName,
             region: entry.region,
+
             iconUrl: entry.iconUrl,
+            kind: entry.kind,
+            sizeBytes: entry.sizeBytes,
         };
-
-        switch (entry.kind) {
-            case 'Base':
-                group.base = publicEntry;
-                group.gameSizeBytes = entry.sizeBytes;
-                break;
-
-            case 'Update':
-                group.update = publicEntry;
-                group.updateSizeBytes = entry.sizeBytes;
-                break;
-
-            case 'DLC':
-                group.dlc.push(publicEntry);
-                group.dlcSizeBytes = (group.dlcSizeBytes ?? 0) + entry.sizeBytes;
-                break;
-
-            case 'Demo':
-                group.demo = publicEntry;
-                group.gameSizeBytes = entry.sizeBytes;
-                break;
-
-            case 'FCT':
-                group.fct = publicEntry;
-                group.gameSizeBytes = entry.sizeBytes;
-                break;
-
-            case 'System Applet':
-                group.systemApplet = publicEntry;
-                group.gameSizeBytes = entry.sizeBytes;
-                break;
-
-            case 'System App':
-                group.systemApp = publicEntry;
-                group.gameSizeBytes = entry.sizeBytes;
-                break;
-
-            case 'System Data':
-                group.systemData = publicEntry;
-                group.gameSizeBytes = entry.sizeBytes;
-                break;
-
-            case 'vWii':
-                group.vWii = publicEntry;
-                group.gameSizeBytes = entry.sizeBytes;
-                break;
-
-            case 'Unknown':
-                group.unknown.push(publicEntry);
-                break;
-        }
+        group.entries.push(publicEntry);
     }
 
     for (const group of groups.values()) {
         const familyEntries = databaseByFamily.get(group.family) ?? [];
-        const parentEntry = getParentEntry(group);
-        const databaseParent = getDatabaseParentEntry(familyEntries);
+        const parentEntry = getParentByKind(group.entries);
+        const databaseParent = getParentByKind(familyEntries);
+        group.expectedChildren = CHILD_KINDS.filter((kind) => familyEntries.some((entry) => entry.kind === kind));
 
         if (parentEntry) {
-            group.parentMissing = false;
             group.name = parentEntry.titleName;
             group.region = parentEntry.region;
             group.iconUrl = parentEntry.iconUrl;
-            group.gameTitleId = parentEntry.titleId;
         } else if (databaseParent) {
-            group.parentMissing = true;
             group.titleInDatabase = true;
             group.name = databaseParent.name;
             group.region = databaseParent.region;
             group.iconUrl = databaseParent.iconUrl;
-            group.gameTitleId = databaseParent.titleID;
         } else {
-            const firstLocal = group.update ?? group.dlc[0] ?? group.unknown[0] ?? null;
+            const firstLocalChild = group.entries.find((entry) => CHILD_KINDS.includes(entry.kind as ChildKind));
 
-            group.parentMissing = true;
             group.titleInDatabase = false;
-            group.name = firstLocal?.titleName ?? 'Unknown';
-            group.region = firstLocal?.region ?? null;
-            group.iconUrl = firstLocal?.iconUrl ?? null;
-            group.gameTitleId = null;
+            group.name = firstLocalChild?.titleName ?? 'Unknown';
+            group.region = firstLocalChild?.region ?? null;
+            group.iconUrl = firstLocalChild?.iconUrl ?? null;
         }
-
-        group.updateSlot = buildTitleSlot('Update', group, familyEntries);
-        group.dlcSlot = buildTitleSlot('DLC', group, familyEntries);
-
-        group.updateTitleId = group.updateSlot.titleId;
-        group.dlcTitleId = group.dlcSlot.titleId;
     }
 
     return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name));

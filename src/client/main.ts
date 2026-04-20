@@ -1,7 +1,14 @@
-import type { LibraryResponse, TitleEntry, TitleGroup, TitleSlot } from '../shared/shared.js';
+import {
+    type LibraryResponse,
+    type TitleGroup,
+    type TitleEntry,
+    type TitleKind,
+    type ChildKind,
+    PARENT_KINDS,
+} from '../shared/shared.js';
 
-type GroupStatus = 'missing' | 'incomplete' | 'complete' | 'unknown';
-type SlotBadgeState = 'complete' | 'incomplete' | 'missing' | 'na' | 'unknown';
+type GroupStatus = 'complete' | 'incomplete' | 'unknown';
+type SlotBadgeState = 'complete' | 'incomplete' | 'na' | 'unknown';
 
 let refreshLibrary: (() => Promise<void>) | null = null;
 
@@ -13,6 +20,8 @@ function formatRegion(region: string | null): string {
             return '🇪🇺 EUR';
         case 'JPN':
             return '🇯🇵 JPN';
+        case 'UNK':
+            return '🏴‍☠️ UNK';
         default:
             return region ?? '';
     }
@@ -36,11 +45,34 @@ function formatSize(sizeBytes: number | null): string {
     return `${value.toFixed(digits)} ${units[unitIndex]}`;
 }
 
+function getHighestVersionChildEntry(group: TitleGroup, kind: ChildKind) {
+    return getEntry(
+        {
+            ...group,
+            entries: [...group.entries].sort((a, b) => b.version - a.version),
+        },
+        kind
+    );
+}
+
+function getEntry(group: TitleGroup, kinds: TitleKind | readonly TitleKind[]): TitleEntry | null {
+    const kindList = Array.isArray(kinds) ? kinds : [kinds];
+    return group.entries.find((entry) => kindList.includes(entry.kind)) ?? null;
+}
+
+function isChildExpected(group: TitleGroup, childKind: ChildKind): boolean {
+    return group.expectedChildren.includes(childKind);
+}
+
 function formatTooltip(group: TitleGroup): string {
+    const parentEntry = getEntry(group, PARENT_KINDS);
+    const updateEntry = getHighestVersionChildEntry(group, 'Update');
+    const dlcEntry = getHighestVersionChildEntry(group, 'DLC');
+
     return [
-        `Game: ${group.gameSizeBytes !== null ? `${formatSize(group.gameSizeBytes)} (${group.gameTitleId ?? '-'})` : '-'}`,
-        `Update: ${group.updateTitleId ? `${formatSize(group.updateSizeBytes)} (${group.updateTitleId})` : '-'}`,
-        `DLC: ${group.dlcTitleId ? `${formatSize(group.dlcSizeBytes)} (${group.dlcTitleId})` : '-'}`,
+        `Game: ${parentEntry ? `${formatSize(parentEntry.sizeBytes)} (${parentEntry.titleId})` : '-'}`,
+        `Update: ${updateEntry ? `${formatSize(updateEntry.sizeBytes)} (${updateEntry.titleId})` : '-'}`,
+        `DLC: ${dlcEntry ? `${formatSize(dlcEntry.sizeBytes)} (${dlcEntry.titleId})` : '-'}`,
     ].join('\n');
 }
 
@@ -49,14 +81,11 @@ function getGroupStatus(group: TitleGroup): GroupStatus {
         return 'unknown';
     }
 
-    if (group.parentMissing) {
-        return 'missing';
-    }
-
-    const updateExpected = Boolean(group.updateSlot.titleId);
-    const dlcExpected = Boolean(group.dlcSlot.titleId);
-
-    if ((updateExpected && !group.updateSlot.existsLocally) || (dlcExpected && !group.dlcSlot.existsLocally)) {
+    if (
+        !getEntry(group, PARENT_KINDS) ||
+        (isChildExpected(group, 'Update') && !getHighestVersionChildEntry(group, 'Update')) ||
+        (isChildExpected(group, 'DLC') && !getHighestVersionChildEntry(group, 'DLC'))
+    ) {
         return 'incomplete';
     }
 
@@ -68,23 +97,21 @@ function getGameBadgeState(group: TitleGroup): SlotBadgeState {
         return 'unknown';
     }
 
-    if (group.base) {
+    if (getEntry(group, 'Base')) {
         return 'complete';
-    }
-
-    if (group.updateSlot.existsLocally || group.dlcSlot.existsLocally) {
-        return 'missing';
     }
 
     return 'incomplete';
 }
 
-function getSlotBadgeState(slot: TitleSlot): SlotBadgeState {
-    if (!slot.titleId) {
+function getSlotBadgeState(group: TitleGroup, childKind: ChildKind): SlotBadgeState {
+    const entry = getHighestVersionChildEntry(group, childKind);
+
+    if (!isChildExpected(group, childKind)) {
         return 'na';
     }
 
-    return slot.existsLocally ? 'complete' : 'incomplete';
+    return entry ? 'complete' : 'incomplete';
 }
 
 function renderSlotBadge(label: string, state: SlotBadgeState): HTMLElement {
@@ -94,7 +121,11 @@ function renderSlotBadge(label: string, state: SlotBadgeState): HTMLElement {
     return badge;
 }
 
-function renderGroup(group: TitleGroup): HTMLElement {
+function renderGroup(group: TitleGroup): HTMLElement | null {
+    if (!group.name) {
+        return null;
+    }
+
     const status = getGroupStatus(group);
 
     const root = document.createElement('div');
@@ -125,8 +156,8 @@ function renderGroup(group: TitleGroup): HTMLElement {
     badgeList.className = 'title-slot-badge-list';
     badgeList.append(
         renderSlotBadge('Game', getGameBadgeState(group)),
-        renderSlotBadge('DLC', getSlotBadgeState(group.dlcSlot)),
-        renderSlotBadge('Update', getSlotBadgeState(group.updateSlot))
+        renderSlotBadge('Update', getSlotBadgeState(group, 'Update')),
+        renderSlotBadge('DLC', getSlotBadgeState(group, 'DLC'))
     );
     badges.append(badgeList);
 
@@ -151,34 +182,18 @@ function groupMatchesSearch(group: TitleGroup, search: string): boolean {
         return true;
     }
 
-    const entries = [
-        group.base,
-        group.update,
-        ...group.dlc,
-        group.demo,
-        group.fct,
-        group.systemApplet,
-        group.systemApp,
-        group.systemData,
-        group.vWii,
-        ...group.unknown,
-    ].filter((entry): entry is TitleEntry => entry !== null);
-
     const haystacks = [
         group.name,
         group.family,
         group.region,
-        group.gameTitleId,
-        group.updateTitleId,
-        group.dlcTitleId,
-        ...entries.flatMap((entry) => [entry.titleId, entry.titleName, entry.kind, entry.region]),
+        ...group.entries.flatMap((entry) => [entry.titleId, entry.titleName, entry.kind, entry.region]),
     ];
 
     return haystacks.some((value) => normalizeSearchText(value).includes(search));
 }
 
 function compareGroups(a: TitleGroup, b: TitleGroup): number {
-    const nameCompare = a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    const nameCompare = (a.name ?? '').localeCompare(b.name ?? '', undefined, { sensitivity: 'base' });
     if (nameCompare !== 0) {
         return nameCompare;
     }
@@ -224,7 +239,12 @@ function renderGroups(
     grid.replaceChildren();
 
     for (const group of filteredGroups) {
-        grid.append(renderGroup(group));
+        const render = renderGroup(group);
+        if (!render) {
+            continue;
+        }
+
+        grid.append(render);
     }
 }
 
@@ -276,7 +296,6 @@ function buildControls(groups: TitleGroup[], grid: HTMLElement, loading = false)
         { value: 'all', label: 'All' },
         { value: 'complete', label: 'Complete' },
         { value: 'incomplete', label: 'Incomplete' },
-        { value: 'missing', label: 'Missing Base' },
         { value: 'unknown', label: 'Unknown' },
     ];
 

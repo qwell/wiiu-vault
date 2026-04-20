@@ -1,62 +1,31 @@
-export type TitleKind =
-    | 'vWii'
-    | 'Base'
-    | 'Demo'
-    | 'FCT'
-    | 'DLC'
-    | 'Update'
-    | 'System App'
-    | 'System Data'
-    | 'Unknown'
-    | 'System Applet';
+export const PARENT_KINDS = ['vWii', 'Base', 'Demo', 'FCT', 'System App', 'System Data', 'System Applet'] as const;
+export const CHILD_KINDS = ['DLC', 'Update'] as const;
+
+export type TitleKind = ParentKind | ChildKind | 'Unknown';
+export type ParentKind = (typeof PARENT_KINDS)[number];
+export type ChildKind = (typeof CHILD_KINDS)[number];
 
 export type TitleEntry = {
     titleId: string;
-    kind: TitleKind;
-    version: number | null;
+    version: number;
     titleName: string;
     region: string | null;
-    iconUrl: string | null;
-};
 
-export type TitleSlot = {
-    kind: 'Update' | 'DLC';
-    titleId: string | null;
-    version: number | null;
-    available: boolean;
-    existsLocally: boolean;
+    iconUrl: string | null;
+    kind: TitleKind;
+    sizeBytes: number;
 };
 
 export type TitleGroup = {
-    family: string;
     name: string;
     region: string | null;
     iconUrl: string | null;
-    parentMissing: boolean;
+
+    entries: TitleEntry[];
+
+    family: string;
     titleInDatabase: boolean;
-
-    base: TitleEntry | null;
-    update: TitleEntry | null;
-    dlc: TitleEntry[];
-
-    demo: TitleEntry | null;
-    fct: TitleEntry | null;
-    systemApplet: TitleEntry | null;
-    systemApp: TitleEntry | null;
-    systemData: TitleEntry | null;
-    vWii: TitleEntry | null;
-    unknown: TitleEntry[];
-
-    updateSlot: TitleSlot;
-    dlcSlot: TitleSlot;
-
-    gameTitleId: string | null;
-    updateTitleId: string | null;
-    dlcTitleId: string | null;
-
-    gameSizeBytes: number | null;
-    updateSizeBytes: number | null;
-    dlcSizeBytes: number | null;
+    expectedChildren: ChildKind[];
 };
 
 export type LibraryResponse = {
