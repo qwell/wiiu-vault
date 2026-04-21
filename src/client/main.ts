@@ -45,16 +45,6 @@ function formatSize(sizeBytes: number | null): string {
     return `${value.toFixed(digits)} ${units[unitIndex]}`;
 }
 
-function getHighestVersionChildEntry(group: TitleGroup, kind: ChildKind) {
-    return getEntry(
-        {
-            ...group,
-            entries: [...group.entries].sort((a, b) => b.version - a.version),
-        },
-        kind
-    );
-}
-
 function getEntry(group: TitleGroup, kinds: TitleKind | readonly TitleKind[]): TitleEntry | null {
     const kindList = Array.isArray(kinds) ? kinds : [kinds];
     return group.entries.find((entry) => kindList.includes(entry.kind)) ?? null;
@@ -66,8 +56,8 @@ function isChildExpected(group: TitleGroup, childKind: ChildKind): boolean {
 
 function formatTooltip(group: TitleGroup): string {
     const parentEntry = getEntry(group, PARENT_KINDS);
-    const updateEntry = getHighestVersionChildEntry(group, 'Update');
-    const dlcEntry = getHighestVersionChildEntry(group, 'DLC');
+    const updateEntry = getEntry(group, 'Update');
+    const dlcEntry = getEntry(group, 'DLC');
 
     return [
         `Game: ${parentEntry ? `${formatSize(parentEntry.sizeBytes)} (${parentEntry.titleId})` : '-'}`,
@@ -83,8 +73,8 @@ function getGroupStatus(group: TitleGroup): GroupStatus {
 
     if (
         !getEntry(group, PARENT_KINDS) ||
-        (isChildExpected(group, 'Update') && !getHighestVersionChildEntry(group, 'Update')) ||
-        (isChildExpected(group, 'DLC') && !getHighestVersionChildEntry(group, 'DLC'))
+        (isChildExpected(group, 'Update') && !getEntry(group, 'Update')) ||
+        (isChildExpected(group, 'DLC') && !getEntry(group, 'DLC'))
     ) {
         return 'incomplete';
     }
@@ -97,7 +87,7 @@ function getGameBadgeState(group: TitleGroup): SlotBadgeState {
         return 'unknown';
     }
 
-    if (getEntry(group, 'Base')) {
+    if (getEntry(group, PARENT_KINDS)) {
         return 'complete';
     }
 
@@ -105,11 +95,11 @@ function getGameBadgeState(group: TitleGroup): SlotBadgeState {
 }
 
 function getSlotBadgeState(group: TitleGroup, childKind: ChildKind): SlotBadgeState {
-    const entry = getHighestVersionChildEntry(group, childKind);
-
     if (!isChildExpected(group, childKind)) {
         return 'na';
     }
+
+    const entry = getEntry(group, childKind);
 
     return entry ? 'complete' : 'incomplete';
 }
@@ -193,12 +183,11 @@ function groupMatchesSearch(group: TitleGroup, search: string): boolean {
 }
 
 function compareGroups(a: TitleGroup, b: TitleGroup): number {
-    const nameCompare = (a.name ?? '').localeCompare(b.name ?? '', undefined, { sensitivity: 'base' });
-    if (nameCompare !== 0) {
-        return nameCompare;
-    }
-
-    return (a.region ?? '').localeCompare(b.region ?? '', undefined, { sensitivity: 'base' });
+    const options: Intl.CollatorOptions = { sensitivity: 'base' };
+    return (
+        a.name.localeCompare(b.name, undefined, options) ||
+        (a.region ?? '').localeCompare(b.region ?? '', undefined, options)
+    );
 }
 
 function collectRegions(groups: TitleGroup[]): string[] {
@@ -367,6 +356,11 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
         }
 
         const data = (await response.json()) as LibraryResponse;
+
+        for (const group of data.groups) {
+            group.entries.sort((a, b) => b.version - a.version);
+        }
+
         const groups = [...data.groups].sort(compareGroups);
 
         output.replaceChildren(buildLibraryContent(groups, false));

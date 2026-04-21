@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { getAppRoot } from './paths.js';
+
 type ServerConfig = {
     server: {
         host: string;
@@ -45,7 +47,7 @@ function assertConfig(value: unknown): asserts value is ServerConfig {
 }
 
 export function loadConfig(): ServerConfig {
-    const configPath = path.resolve(process.cwd(), 'config.json');
+    const configPath = path.join(getAppRoot(), 'config.json');
     const raw = readFileSync(configPath, 'utf8');
     const parsed = JSON.parse(raw) as unknown;
 

@@ -20,11 +20,6 @@ async function main() {
             outDir: path.join(root, 'dist/server'),
             emptyOutDir: true,
             sourcemap: true,
-            target: 'node18',
-            rollupOptions: {
-                // Add packages here if they should stay external at runtime
-                external: [],
-            },
         },
     });
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'node:path';
 
+import { getAppRoot } from './paths.js';
 import { loadConfig } from './config.js';
 import { scanWiiUTitles } from './wiiu.js';
 
@@ -11,7 +12,7 @@ const host = config.server.host;
 const port = config.server.port;
 const romRoot = config.roms.wiiuRoot;
 
-const clientDir = path.resolve(import.meta.dirname, '../client');
+const clientDir = path.join(getAppRoot(), 'client');
 
 app.use((req, _res, next) => {
     console.log(`[server] ${req.method} ${req.url}`);

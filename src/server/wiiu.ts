@@ -1,14 +1,15 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { getAppRoot } from './paths.js';
 
 import {
     type TitleEntry,
     type TitleGroup,
     type TitleKind,
     type ChildKind,
+    type ParentKind,
     CHILD_KINDS,
     PARENT_KINDS,
-    ParentKind,
 } from '../shared/shared.js';
 import { readTmd } from './metadata.js';
 
@@ -31,7 +32,6 @@ type TitleDatabaseEntry = {
 
 type LocalTitleEntry = TitleEntry & {
     family: string;
-    matchedDatabase: boolean;
 };
 
 function normalizeTitleName(name: string): string {
@@ -135,7 +135,7 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
 }
 
 async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
-    const titlesJsonPath = path.resolve(import.meta.dirname, '../titles.json');
+    const titlesJsonPath = path.join(getAppRoot(), 'titles.json');
     try {
         const jsonText = await readFile(titlesJsonPath, 'utf8');
         const entries = parseTitleDatabaseEntries(jsonText);
@@ -203,7 +203,6 @@ async function readTitleEntry(
         kind,
         family,
         sizeBytes: await getDirectorySizeBytes(dirPath),
-        matchedDatabase: databaseEntry !== undefined,
     };
 }
 
@@ -254,8 +253,6 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
             groups.set(entry.family, group);
         }
 
-        group.titleInDatabase ||= entry.matchedDatabase;
-
         const publicEntry: TitleEntry = {
             titleId: entry.titleId,
             version: entry.version,
@@ -269,10 +266,17 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
         group.entries.push(publicEntry);
     }
 
+    for (const family of databaseByFamily.keys()) {
+        if (!groups.has(family)) {
+            groups.set(family, createEmptyGroup(family));
+        }
+    }
+
     for (const group of groups.values()) {
         const familyEntries = databaseByFamily.get(group.family) ?? [];
         const parentEntry = getParentByKind(group.entries);
         const databaseParent = getParentByKind(familyEntries);
+        group.titleInDatabase = familyEntries.length > 0;
         group.expectedChildren = CHILD_KINDS.filter((kind) => familyEntries.some((entry) => entry.kind === kind));
 
         if (parentEntry) {
@@ -280,19 +284,21 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
             group.region = parentEntry.region;
             group.iconUrl = parentEntry.iconUrl;
         } else if (databaseParent) {
-            group.titleInDatabase = true;
             group.name = databaseParent.name;
             group.region = databaseParent.region;
             group.iconUrl = databaseParent.iconUrl;
         } else {
             const firstLocalChild = group.entries.find((entry) => CHILD_KINDS.includes(entry.kind as ChildKind));
 
-            group.titleInDatabase = false;
             group.name = firstLocalChild?.titleName ?? 'Unknown';
             group.region = firstLocalChild?.region ?? null;
             group.iconUrl = firstLocalChild?.iconUrl ?? null;
         }
+
+        group.entries.sort((a, b) => b.version - a.version);
     }
 
-    return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name));
+    return [...groups.values()]
+        .filter((group) => group.entries.length > 0)
+        .sort((a, b) => a.name.localeCompare(b.name));
 }

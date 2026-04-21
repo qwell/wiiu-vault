@@ -18,8 +18,8 @@
         "lint": "eslint --cache --cache-strategy metadata --cache-location ./.cache/eslint src/ tests/",
         "format": "prettier --write --cache --cache-strategy metadata --cache-location ./.cache/prettier .",
         "clean": "rimraf dist/ .cache/",
-        "build": "tsx build.ts",
-        "start": "node dist/server/index.js",
+        "build": "tsx scripts/build.ts",
+        "start": "tsx scripts/start.ts",
         "test": "vitest run"
     },
     "devDependencies": {
