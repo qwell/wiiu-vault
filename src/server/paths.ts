@@ -7,5 +7,5 @@ export function getAppRoot(): string {
         return path.resolve(appRoot);
     }
 
-    return path.dirname(process.execPath);
+    return process.cwd();
 }

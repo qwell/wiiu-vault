@@ -1,5 +1,6 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
 import { getAppRoot } from './paths.js';
 
 import {
@@ -160,19 +161,35 @@ async function getDirectorySizeBytes(targetPath: string): Promise<number> {
     const entries = await readdir(targetPath, { withFileTypes: true });
     let total = 0;
 
-    for (const entry of entries) {
-        const childPath = path.join(targetPath, entry.name);
+    const queue = [...entries];
+    const cpuCount = os.cpus()?.length ?? 4;
+    const concurrency = Math.min(cpuCount * 2, queue.length);
 
-        if (entry.isDirectory()) {
-            total += await getDirectorySizeBytes(childPath);
-            continue;
-        }
+    const workers = new Array(concurrency).fill(null).map(async () => {
+        while (queue.length > 0) {
+            const entry = queue.shift();
+            if (!entry) break;
 
-        if (entry.isFile()) {
-            const childInfo = await stat(childPath);
-            total += childInfo.size;
+            const childPath = path.join(targetPath, entry.name);
+
+            try {
+                if (entry.isDirectory()) {
+                    const size = await getDirectorySizeBytes(childPath);
+                    total += size;
+                    continue;
+                }
+
+                if (entry.isFile()) {
+                    const childInfo = await stat(childPath);
+                    total += childInfo.size;
+                }
+            } catch {
+                // ignore individual errors while scanning
+            }
         }
-    }
+    });
+
+    await Promise.all(workers);
 
     return total;
 }
@@ -183,8 +200,7 @@ async function readTitleEntry(
     titleDatabase: Map<string, TitleDatabaseEntry>
 ): Promise<LocalTitleEntry | null> {
     const dirPath = path.join(root, dirname);
-
-    const tmd = readTmd(dirPath);
+    const tmd = await readTmd(dirPath);
     if (!tmd) {
         return null;
     }

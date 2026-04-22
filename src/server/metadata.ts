@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs';
+import { readFile } from 'node:fs/promises';
 
 export type Tmd = {
     header: TmdHeader;
@@ -107,13 +107,9 @@ const TMD_CONTENT_SIZE = 48; // 0x30
 const TMD_CERTIFICATE_1_SIZE = 1024; // 0x400
 const TMD_CERTIFICATE_2_SIZE = 768; // 0x300
 
-export function readTikHeader(dirPath: string): Tik | null {
-    if (!fs.existsSync(path.join(dirPath, TITLE_TIK))) {
-        return null;
-    }
-
+export async function readTikHeader(dirPath: string): Promise<Tik | null> {
     try {
-        const buffer = fs.readFileSync(path.join(dirPath, TITLE_TIK));
+        const buffer = await readFile(path.join(dirPath, TITLE_TIK));
         const titleId = buffer.subarray(TIK_TITLE_ID_OFFSET, TIK_TITLE_ID_OFFSET + TIK_TITLE_ID_SIZE);
 
         return {
@@ -125,13 +121,9 @@ export function readTikHeader(dirPath: string): Tik | null {
     }
 }
 
-export function readTmd(dirPath: string): Tmd | null {
-    if (!fs.existsSync(path.join(dirPath, TITLE_TMD))) {
-        return null;
-    }
-
+export async function readTmd(dirPath: string): Promise<Tmd | null> {
     try {
-        const buffer = fs.readFileSync(path.join(dirPath, TITLE_TMD));
+        const buffer = await readFile(path.join(dirPath, TITLE_TMD));
 
         const tmdHeader = readTmdHeader(buffer.subarray(0, TMD_CONTENT_OFFSET));
         if (!tmdHeader) {
