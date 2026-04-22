@@ -12,18 +12,18 @@ type SlotBadgeState = 'complete' | 'incomplete' | 'na' | 'unknown';
 
 let refreshLibrary: (() => Promise<void>) | null = null;
 
-function formatRegion(region: string | null): string {
+function formatRegion(region: string | null): { text: string; flag: string; class?: string } {
     switch (region) {
         case 'USA':
-            return '🇺🇸 USA';
+            return { text: 'USA', flag: '🇺🇸', class: 'distress' };
         case 'EUR':
-            return '🇪🇺 EUR';
+            return { text: 'EUR', flag: '🇪🇺' };
         case 'JPN':
-            return '🇯🇵 JPN';
+            return { text: 'JPN', flag: '🇯🇵' };
         case 'UNK':
-            return '🏴‍☠️ UNK';
+            return { text: 'UNK', flag: '🏴‍☠️', class: 'arrr' };
         default:
-            return region ?? '';
+            return { text: region ?? '', flag: '' };
     }
 }
 
@@ -152,10 +152,21 @@ function renderGroup(group: TitleGroup): HTMLElement | null {
     badges.append(badgeList);
 
     if (group.region) {
-        const region = document.createElement('div');
-        region.className = 'title-region';
-        region.textContent = formatRegion(group.region);
-        badges.append(region);
+        const formattedRegion = formatRegion(group.region);
+
+        const regionParent = document.createElement('div');
+        regionParent.className = 'title-region';
+
+        const flag = document.createElement('span');
+        flag.className = formattedRegion.class ?? '';
+        flag.textContent = formattedRegion.flag;
+
+        const region = document.createElement('span');
+        region.className = 'region';
+        region.textContent = formattedRegion.text;
+
+        regionParent.append(flag, region);
+        badges.append(regionParent);
     }
 
     root.append(badges);
@@ -327,16 +338,16 @@ function buildControls(groups: TitleGroup[], grid: HTMLElement, loading = false)
 function buildLibraryContent(groups: TitleGroup[], loading = false): DocumentFragment {
     const fragment = document.createDocumentFragment();
 
-    const loadingLine = document.createElement('div');
-    loadingLine.className = 'library-loading';
-    loadingLine.textContent = loading ? 'Loading...' : '';
-    fragment.append(loadingLine);
-
     const grid = document.createElement('div');
     grid.className = 'library-grid';
 
     const controls = buildControls(groups, grid, loading);
     fragment.append(controls, grid);
+
+    const loadingLine = document.createElement('div');
+    loadingLine.className = 'library-loading';
+    loadingLine.textContent = loading ? 'Loading...' : '';
+    fragment.append(loadingLine);
 
     if (!loading && groups.length > 0) {
         renderGroups(groups, grid, 'all', 'all', '');

@@ -2,27 +2,27 @@
     color-scheme: light dark;
     --bg: #ffffff;
     --fg: #111111;
-    --border: #444;
-    --border-muted: #777;
-    --placeholder-bg: #333;
+    --border: #444444;
+    --border-muted: #777777;
+    --placeholder-bg: #333333;
     --complete: #2e8b57;
     --incomplete: #b8860b;
     --na: #808080;
     --unknown: #7b3fb3;
+    --footer: #d0d0d0;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #111111;
-        --fg: #f3f3f3;
-        --border: #666;
-        --border-muted: #999;
-        --placeholder-bg: #2a2a2a;
-        --complete: #57b87a;
-        --incomplete: #d1a93a;
-        --na: #a0a0a0;
-        --unknown: #b07cff;
-    }
+:root[data-theme='dark'] {
+    --bg: #111111;
+    --fg: #f3f3f3;
+    --border: #666666;
+    --border-muted: #999999;
+    --placeholder-bg: #2a2a2a;
+    --complete: #57b87a;
+    --incomplete: #d1a93a;
+    --na: #a0a0a0;
+    --unknown: #b07cff;
+    --footer: #222222;
 }
 
 body {
@@ -30,6 +30,40 @@ body {
     font-family: sans-serif;
     background: var(--bg);
     color: var(--fg);
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+h1 {
+    margin: 0px;
+}
+
+input,
+input::placeholder,
+select {
+    background-color: var(--bg);
+    color: var(--border);
+}
+
+#theme-toggle {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 1001;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+#theme-toggle img:not([hidden]) {
+    display: block;
+    border-radius: 8px;
 }
 
 .library-controls {
@@ -243,4 +277,29 @@ body {
     background: transparent;
     flex: 0 0 auto;
     font-family: 'Noto Color Emoji', system-ui, sans-serif;
+}
+
+.title-region .region {
+    padding: 0px 0px 0px 4px;
+}
+
+.title-region .distress {
+    transform: rotate(180deg);
+}
+
+footer {
+    position: fixed;
+    display: flex;
+    padding: 2px 4px 0px 2px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: var(--footer);
+    color: var(--fg);
+    font-size: 10px;
+}
+
+footer > div:last-child {
+    margin-left: auto;
 }
