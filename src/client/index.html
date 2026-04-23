@@ -7,23 +7,40 @@
 
         <link href="/assets/index.css" rel="stylesheet" />
 
-        <link rel="icon" href="/assets/logo-64x64.png" type="image/png" sizes="64x64" />
+        <link
+            rel="icon"
+            href="/assets/logo-64x64.png"
+            type="image/png"
+            sizes="64x64"
+        />
         <!-- this is fucking stupid, follow specs, Apple -->
-        <link rel="apple-touch-icon" href="/assets/logo-64x64.png" sizes="64x64" />
+        <link
+            rel="apple-touch-icon"
+            href="/assets/logo-64x64.png"
+            sizes="64x64"
+        />
 
         <script>
             document.documentElement.setAttribute(
                 'data-theme',
                 localStorage.getItem('theme') ||
-                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                    (window.matchMedia('(prefers-color-scheme: dark)').matches
+                        ? 'dark'
+                        : 'light')
             );
         </script>
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap"
+            rel="stylesheet"
+        />
 
-        <script src="https://kit.fontawesome.com/436cc24d87.js" crossorigin="anonymous"></script>
+        <script
+            src="https://kit.fontawesome.com/436cc24d87.js"
+            crossorigin="anonymous"
+        ></script>
     </head>
     <body>
         <header>
@@ -32,8 +49,20 @@
         </header>
 
         <button id="theme-toggle" type="button" aria-label="Toggle theme">
-            <img id="theme-icon-light" src="/assets/light-mode-64x64.png" alt="" width="24" height="24" />
-            <img id="theme-icon-dark" src="/assets/dark-mode-64x64.png" alt="" width="24" height="24" />
+            <img
+                id="theme-icon-light"
+                src="/assets/light-mode-64x64.png"
+                alt=""
+                width="24"
+                height="24"
+            />
+            <img
+                id="theme-icon-dark"
+                src="/assets/dark-mode-64x64.png"
+                alt=""
+                width="24"
+                height="24"
+            />
         </button>
 
         <div id="output">Waiting...</div>
@@ -55,20 +84,31 @@
                 }
             }
 
-            matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                if (!localStorage.theme) {
-                    setTheme(e.matches);
+            matchMedia('(prefers-color-scheme: dark)').addEventListener(
+                'change',
+                (e) => {
+                    if (!localStorage.theme) {
+                        setTheme(e.matches);
+                    }
                 }
-            });
+            );
 
-            document.getElementById('theme-toggle').addEventListener('click', () => {
-                setTheme(document.documentElement.dataset.theme !== 'dark', true);
-            });
+            document
+                .getElementById('theme-toggle')
+                .addEventListener('click', () => {
+                    setTheme(
+                        document.documentElement.dataset.theme !== 'dark',
+                        true
+                    );
+                });
         </script>
     </body>
     <footer>
         <div>
-            Created by Jason Parker -- <a href="https://ꩰ.com/@north" rel="noopener" target="_blank">@north@ꩰ.com</a>
+            Created by Jason Parker --
+            <a href="https://ꩰ.com/@north" rel="noopener" target="_blank"
+                >@north@ꩰ.com</a
+            >
             <i class="fa-solid fa-xs fa-up-right-from-square"></i>
         </div>
     </footer>

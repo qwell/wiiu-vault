@@ -49,7 +49,10 @@ function formatSize(sizeBytes: number | null): string {
     return `${value.toFixed(digits)} ${units[unitIndex]}`;
 }
 
-function getEntry(group: TitleGroup, kinds: TitleKinds | readonly TitleKinds[]): TitleEntry | null {
+function getEntry(
+    group: TitleGroup,
+    kinds: TitleKinds | readonly TitleKinds[]
+): TitleEntry | null {
     const kindList = Array.isArray(kinds) ? kinds : [kinds];
     return group.entries.find((entry) => kindList.includes(entry.kind)) ?? null;
 }
@@ -77,8 +80,10 @@ function getGroupStatus(group: TitleGroup): GroupStatus {
 
     if (
         !getEntry(group, PARENT_KINDS) ||
-        (isChildExpected(group, TitleKinds.Update) && !getEntry(group, TitleKinds.Update)) ||
-        (isChildExpected(group, TitleKinds.DLC) && !getEntry(group, TitleKinds.DLC))
+        (isChildExpected(group, TitleKinds.Update) &&
+            !getEntry(group, TitleKinds.Update)) ||
+        (isChildExpected(group, TitleKinds.DLC) &&
+            !getEntry(group, TitleKinds.DLC))
     ) {
         return 'incomplete';
     }
@@ -98,7 +103,10 @@ function getGameBadgeState(group: TitleGroup): SlotBadgeState {
     return 'incomplete';
 }
 
-function getSlotBadgeState(group: TitleGroup, childKind: ChildKind): SlotBadgeState {
+function getSlotBadgeState(
+    group: TitleGroup,
+    childKind: ChildKind
+): SlotBadgeState {
     if (!isChildExpected(group, childKind)) {
         return 'na';
     }
@@ -150,8 +158,14 @@ function renderGroup(group: TitleGroup): HTMLElement | null {
     badgeList.className = 'title-slot-badge-list';
     badgeList.append(
         renderSlotBadge(TitleKinds.Base, getGameBadgeState(group)),
-        renderSlotBadge(TitleKinds.Update, getSlotBadgeState(group, TitleKinds.Update)),
-        renderSlotBadge(TitleKinds.DLC, getSlotBadgeState(group, TitleKinds.DLC))
+        renderSlotBadge(
+            TitleKinds.Update,
+            getSlotBadgeState(group, TitleKinds.Update)
+        ),
+        renderSlotBadge(
+            TitleKinds.DLC,
+            getSlotBadgeState(group, TitleKinds.DLC)
+        )
     );
     badges.append(badgeList);
 
@@ -191,10 +205,17 @@ function groupMatchesSearch(group: TitleGroup, search: string): boolean {
         group.name,
         group.family,
         group.region,
-        ...group.entries.flatMap((entry) => [entry.titleId, entry.titleName, entry.kind, entry.region]),
+        ...group.entries.flatMap((entry) => [
+            entry.titleId,
+            entry.titleName,
+            entry.kind,
+            entry.region,
+        ]),
     ];
 
-    return haystacks.some((value) => normalizeSearchText(value).includes(search));
+    return haystacks.some((value) =>
+        normalizeSearchText(value).includes(search)
+    );
 }
 
 function compareGroups(a: TitleGroup, b: TitleGroup): number {
@@ -214,7 +235,9 @@ function collectRegions(groups: TitleGroup[]): string[] {
         }
     }
 
-    return [...seen].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+    return [...seen].sort((a, b) =>
+        a.localeCompare(b, undefined, { sensitivity: 'base' })
+    );
 }
 
 function renderGroups(
@@ -252,7 +275,11 @@ function renderGroups(
     }
 }
 
-function buildControls(groups: TitleGroup[], grid: HTMLElement, loading = false): HTMLElement {
+function buildControls(
+    groups: TitleGroup[],
+    grid: HTMLElement,
+    loading = false
+): HTMLElement {
     const controls = document.createElement('div');
     controls.className = 'library-controls';
 
@@ -317,7 +344,13 @@ function buildControls(groups: TitleGroup[], grid: HTMLElement, loading = false)
     searchInput.disabled = loading || groups.length === 0;
 
     const update = (): void => {
-        renderGroups(groups, grid, statusSelect.value, regionSelect.value, searchInput.value);
+        renderGroups(
+            groups,
+            grid,
+            statusSelect.value,
+            regionSelect.value,
+            searchInput.value
+        );
     };
 
     searchInput.addEventListener('input', update);
@@ -330,7 +363,15 @@ function buildControls(groups: TitleGroup[], grid: HTMLElement, loading = false)
         }
     });
 
-    controls.append(refreshButton, regionText, statusText, searchText, regionSelect, statusSelect, searchInput);
+    controls.append(
+        refreshButton,
+        regionText,
+        statusText,
+        searchText,
+        regionSelect,
+        statusSelect,
+        searchInput
+    );
 
     if (groups.length > 0) {
         update();
@@ -339,7 +380,10 @@ function buildControls(groups: TitleGroup[], grid: HTMLElement, loading = false)
     return controls;
 }
 
-function buildLibraryContent(groups: TitleGroup[], loading = false): DocumentFragment {
+function buildLibraryContent(
+    groups: TitleGroup[],
+    loading = false
+): DocumentFragment {
     const fragment = document.createDocumentFragment();
 
     const grid = document.createElement('div');

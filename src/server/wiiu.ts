@@ -49,7 +49,9 @@ function normalizeTitleName(name: string): string {
 
 function cleanDirectoryName(dirname: string): string {
     const base = path.basename(dirname);
-    return base.replace(/\[(Game|Update|DLC)\]\s*\[[0-9a-fA-F]{16}\]$/, '').trim();
+    return base
+        .replace(/\[(Game|Update|DLC)\]\s*\[[0-9a-fA-F]{16}\]$/, '')
+        .trim();
 }
 
 function getTitleName(dirname: string, databaseName: string | null): string {
@@ -66,7 +68,10 @@ function getTitleName(dirname: string, databaseName: string | null): string {
     return 'Unknown';
 }
 
-function classifyTitleId(titleId: string): { family: string; kind: TitleKinds } {
+function classifyTitleId(titleId: string): {
+    family: string;
+    kind: TitleKinds;
+} {
     const normalized = titleId?.toLowerCase() ?? '';
 
     if (normalized.length !== 16) {
@@ -121,7 +126,9 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
 
     return (json as RawTitleDatabaseEntry[]).map((entry) => {
         if (typeof entry.titleID !== 'string') {
-            throw new Error(`invalid titleID in titles.json: ${JSON.stringify(entry)}`);
+            throw new Error(
+                `invalid titleID in titles.json: ${JSON.stringify(entry)}`
+            );
         }
 
         const { family, kind } = classifyTitleId(entry.titleID);
@@ -145,7 +152,10 @@ async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
         const entries = parseTitleDatabaseEntries(jsonText);
         return new Map(entries.map((entry) => [entry.titleID, entry]));
     } catch (error) {
-        console.error(`[wiiu] failed to read titles DB at ${titlesJsonPath}:`, error);
+        console.error(
+            `[wiiu] failed to read titles DB at ${titlesJsonPath}:`,
+            error
+        );
         return new Map();
     }
 }
@@ -238,8 +248,14 @@ function createEmptyGroup(family: string): TitleGroup {
     };
 }
 
-function getParentByKind<T extends { kind: TitleKinds }>(entries: T[]): T | null {
-    return entries.find((candidate) => PARENT_KINDS.includes(candidate.kind as ParentKind)) ?? null;
+function getParentByKind<T extends { kind: TitleKinds }>(
+    entries: T[]
+): T | null {
+    return (
+        entries.find((candidate) =>
+            PARENT_KINDS.includes(candidate.kind as ParentKind)
+        ) ?? null
+    );
 }
 
 export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
@@ -253,7 +269,10 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
     }
 
     // Recursively find directories that contain a title.tmd file.
-    async function findTitleDirs(currentPath: string, relative = ''): Promise<string[]> {
+    async function findTitleDirs(
+        currentPath: string,
+        relative = ''
+    ): Promise<string[]> {
         const found: string[] = [];
         let entries: Dirent[];
         try {
@@ -269,7 +288,9 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
 
         for (const entry of entries) {
             if (entry.isDirectory()) {
-                const subRel = relative ? `${relative}/${entry.name}` : entry.name;
+                const subRel = relative
+                    ? `${relative}/${entry.name}`
+                    : entry.name;
                 const childPath = path.join(currentPath, entry.name);
                 const childFound = await findTitleDirs(childPath, subRel);
                 found.push(...childFound);
@@ -279,10 +300,16 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
         return found;
     }
 
-    const directories = (await findTitleDirs(root)).sort((a, b) => a.localeCompare(b));
+    const directories = (await findTitleDirs(root)).sort((a, b) =>
+        a.localeCompare(b)
+    );
 
     const scanned = (
-        await Promise.all(directories.map(async (dirname) => readTitleEntry(root, dirname, titleDatabase)))
+        await Promise.all(
+            directories.map(async (dirname) =>
+                readTitleEntry(root, dirname, titleDatabase)
+            )
+        )
     ).filter((entry): entry is LocalTitleEntry => entry !== null);
 
     const groups = new Map<string, TitleGroup>();
@@ -319,7 +346,9 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
         const parentEntry = getParentByKind(group.entries);
         const databaseParent = getParentByKind(familyEntries);
         group.titleInDatabase = familyEntries.length > 0;
-        group.expectedChildren = CHILD_KINDS.filter((kind) => familyEntries.some((entry) => entry.kind === kind));
+        group.expectedChildren = CHILD_KINDS.filter((kind) =>
+            familyEntries.some((entry) => entry.kind === kind)
+        );
 
         if (parentEntry) {
             group.name = parentEntry.titleName;
@@ -330,7 +359,9 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
             group.region = databaseParent.region;
             group.iconUrl = databaseParent.iconUrl;
         } else {
-            const firstLocalChild = group.entries.find((entry) => CHILD_KINDS.includes(entry.kind as ChildKind));
+            const firstLocalChild = group.entries.find((entry) =>
+                CHILD_KINDS.includes(entry.kind as ChildKind)
+            );
 
             group.name = firstLocalChild?.titleName ?? 'Unknown';
             group.region = firstLocalChild?.region ?? null;

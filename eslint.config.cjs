@@ -5,7 +5,15 @@ const prettierRecommended = require('eslint-plugin-prettier/recommended');
 
 module.exports = defineConfig(
     {
-        ignores: ['dist/', '**/*.d.ts', 'node_modules/', '.yarn/', '.pnp.cjs', '.pnp.loader.mjs', 'vitest.config.ts'],
+        ignores: [
+            'dist/',
+            '**/*.d.ts',
+            'node_modules/',
+            '.yarn/',
+            '.pnp.cjs',
+            '.pnp.loader.mjs',
+            'vitest.config.ts',
+        ],
     },
 
     js.configs.recommended,
@@ -13,7 +21,11 @@ module.exports = defineConfig(
 
     {
         files: ['**/*.ts'],
-        extends: [tseslint.configs.recommended, tseslint.configs.recommendedTypeChecked, prettierRecommended],
+        extends: [
+            tseslint.configs.recommended,
+            tseslint.configs.recommendedTypeChecked,
+            prettierRecommended,
+        ],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {

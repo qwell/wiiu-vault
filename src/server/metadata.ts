@@ -48,7 +48,10 @@ type CertificateSignatureType =
     | typeof CERT_SIGNATURE_RSA_2048
     | typeof CERT_SIGNATURE_ECC;
 
-type CertificateKeyType = typeof CERT_KEY_RSA_4096 | typeof CERT_KEY_RSA_2048 | typeof CERT_KEY_ECC;
+type CertificateKeyType =
+    | typeof CERT_KEY_RSA_4096
+    | typeof CERT_KEY_RSA_2048
+    | typeof CERT_KEY_ECC;
 
 export type Tik = {
     titleId: Uint8Array;
@@ -68,7 +71,10 @@ const REGION_ALL_NAME = 'ALL';
 const REGION_KOR_NAME = 'KOR';
 const REGION_UNK_NAME = 'UNK';
 
-type SYSTEM_TYPE = typeof SYSTEM_TYPE_WIIU | typeof SYSTEM_TYPE_WII | typeof SYSTEM_TYPE_UNKNOWN;
+type SYSTEM_TYPE =
+    | typeof SYSTEM_TYPE_WIIU
+    | typeof SYSTEM_TYPE_WII
+    | typeof SYSTEM_TYPE_UNKNOWN;
 
 const SYSTEM_TYPE_WIIU = 'wiiu';
 const SYSTEM_TYPE_WII = 'wii';
@@ -109,11 +115,17 @@ const TMD_CERTIFICATE_2_SIZE = 768; // 0x300
 export async function readTikHeader(dirPath: string): Promise<Tik | null> {
     try {
         const buffer = await readFile(path.join(dirPath, TITLE_TIK));
-        const titleId = buffer.subarray(TIK_TITLE_ID_OFFSET, TIK_TITLE_ID_OFFSET + TIK_TITLE_ID_SIZE);
+        const titleId = buffer.subarray(
+            TIK_TITLE_ID_OFFSET,
+            TIK_TITLE_ID_OFFSET + TIK_TITLE_ID_SIZE
+        );
 
         return {
             titleId,
-            titleVersion: buffer.readUintBE(TIK_VERSION_OFFSET, TIK_VERSION_SIZE),
+            titleVersion: buffer.readUintBE(
+                TIK_VERSION_OFFSET,
+                TIK_VERSION_SIZE
+            ),
         };
     } catch {
         return null;
@@ -129,10 +141,16 @@ export async function readTmd(dirPath: string): Promise<Tmd | null> {
             return null;
         }
 
-        const tmdContents = readTmdContents(buffer.subarray(TMD_CONTENT_OFFSET), tmdHeader.contentCount);
+        const tmdContents = readTmdContents(
+            buffer.subarray(TMD_CONTENT_OFFSET),
+            tmdHeader.contentCount
+        );
 
-        const certificateOffset = TMD_CONTENT_OFFSET + tmdHeader.contentCount * TMD_CONTENT_SIZE;
-        const certificates = readTmdCertificates(buffer.subarray(certificateOffset));
+        const certificateOffset =
+            TMD_CONTENT_OFFSET + tmdHeader.contentCount * TMD_CONTENT_SIZE;
+        const certificates = readTmdCertificates(
+            buffer.subarray(certificateOffset)
+        );
 
         return {
             header: tmdHeader,
@@ -149,10 +167,20 @@ export function readTmdHeader(buffer: Buffer): TmdHeader | null {
         return null;
     }
 
-    const titleId = new Uint8Array(buffer.subarray(TMD_TITLE_ID_OFFSET, TMD_TITLE_ID_OFFSET + TMD_TITLE_ID_SIZE));
-    const titleVersion = buffer.readUintBE(TMD_VERSION_OFFSET, TMD_VERSION_SIZE);
+    const titleId = new Uint8Array(
+        buffer.subarray(
+            TMD_TITLE_ID_OFFSET,
+            TMD_TITLE_ID_OFFSET + TMD_TITLE_ID_SIZE
+        )
+    );
+    const titleVersion = buffer.readUintBE(
+        TMD_VERSION_OFFSET,
+        TMD_VERSION_SIZE
+    );
 
-    const region = getRegionName(buffer.readUintBE(TMD_REGION_OFFSET, TMD_REGION_SIZE));
+    const region = getRegionName(
+        buffer.readUintBE(TMD_REGION_OFFSET, TMD_REGION_SIZE)
+    );
 
     const systemType = getSystemType(titleId);
 
@@ -162,7 +190,10 @@ export function readTmdHeader(buffer: Buffer): TmdHeader | null {
             titleVersion,
             region,
             systemType,
-            contentCount: buffer.readUIntBE(TMD_CONTENT_COUNT_OFFSET, TMD_CONTENT_COUNT_SIZE),
+            contentCount: buffer.readUIntBE(
+                TMD_CONTENT_COUNT_OFFSET,
+                TMD_CONTENT_COUNT_SIZE
+            ),
         };
         return header;
     }
@@ -180,7 +211,9 @@ function readTmdContents(buffer: Buffer, contentCount: number): TmdContent[] {
     let offset = 0;
 
     for (let i = 0; i < contentCount; i += 1) {
-        const content: TmdContent = readTmdContent(buffer.subarray(offset, offset + TMD_CONTENT_SIZE));
+        const content: TmdContent = readTmdContent(
+            buffer.subarray(offset, offset + TMD_CONTENT_SIZE)
+        );
         contents.push(content);
 
         offset += TMD_CONTENT_SIZE;
@@ -214,9 +247,14 @@ function readTmdCertificates(buffer: Buffer): TmdCertificates {
         };
     }
 
-    const certificate1Raw = new Uint8Array(buffer.subarray(0, TMD_CERTIFICATE_1_SIZE));
+    const certificate1Raw = new Uint8Array(
+        buffer.subarray(0, TMD_CERTIFICATE_1_SIZE)
+    );
     const certificate2Raw = new Uint8Array(
-        buffer.subarray(TMD_CERTIFICATE_1_SIZE, TMD_CERTIFICATE_1_SIZE + TMD_CERTIFICATE_2_SIZE)
+        buffer.subarray(
+            TMD_CERTIFICATE_1_SIZE,
+            TMD_CERTIFICATE_1_SIZE + TMD_CERTIFICATE_2_SIZE
+        )
     );
 
     return {
@@ -264,11 +302,15 @@ export function readTmdCertificate(buffer: Buffer): TmdCertificate | null {
         return null;
     }
 
-    const signature = new Uint8Array(buffer.subarray(signatureOffset, signatureOffset + signatureSize));
+    const signature = new Uint8Array(
+        buffer.subarray(signatureOffset, signatureOffset + signatureSize)
+    );
     const issuer = buffer.toString('ascii', issuerOffset, issuerOffset + 64);
     const name = buffer.toString('ascii', nameOffset, nameOffset + 64);
     const keyId = buffer.readUInt32BE(keyIdOffset);
-    const publicKey = new Uint8Array(buffer.subarray(publicKeyOffset, publicKeyOffset + publicKeySize));
+    const publicKey = new Uint8Array(
+        buffer.subarray(publicKeyOffset, publicKeyOffset + publicKeySize)
+    );
 
     return {
         signatureType,
@@ -292,7 +334,9 @@ function getCertificatePublicKeySize(keyType: CertificateKeyType): number {
     }
 }
 
-function getCertificateSignatureSize(signatureType: CertificateSignatureType): number {
+function getCertificateSignatureSize(
+    signatureType: CertificateSignatureType
+): number {
     switch (signatureType) {
         case CERT_SIGNATURE_RSA_4096:
             return 0x200;
@@ -303,12 +347,22 @@ function getCertificateSignatureSize(signatureType: CertificateSignatureType): n
     }
 }
 
-function isValidCertificateSignatureType(value: number): value is CertificateSignatureType {
-    return value === CERT_SIGNATURE_RSA_4096 || value === CERT_SIGNATURE_RSA_2048 || value === CERT_SIGNATURE_ECC;
+function isValidCertificateSignatureType(
+    value: number
+): value is CertificateSignatureType {
+    return (
+        value === CERT_SIGNATURE_RSA_4096 ||
+        value === CERT_SIGNATURE_RSA_2048 ||
+        value === CERT_SIGNATURE_ECC
+    );
 }
 
 function isCertificateKeyType(value: number): value is CertificateKeyType {
-    return value === CERT_KEY_RSA_4096 || value === CERT_KEY_RSA_2048 || value === CERT_KEY_ECC;
+    return (
+        value === CERT_KEY_RSA_4096 ||
+        value === CERT_KEY_RSA_2048 ||
+        value === CERT_KEY_ECC
+    );
 }
 
 function getRegionName(region: number): string {
