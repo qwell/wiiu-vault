@@ -444,4 +444,35 @@ refreshLibrary = async (): Promise<void> => {
     await loadLibrary(output);
 };
 
+function setTheme(darkMode: boolean, save = false): void {
+    const lightIcon = document.getElementById('theme-icon-light');
+    const darkIcon = document.getElementById('theme-icon-dark');
+
+    document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
+
+    if (save) {
+        localStorage.theme = document.documentElement.dataset.theme;
+    }
+
+    if (lightIcon) lightIcon.hidden = !darkMode;
+    if (darkIcon) darkIcon.hidden = darkMode;
+}
+
+function setupTheme(): void {
+    const prefers = window.matchMedia('(prefers-color-scheme: dark)');
+
+    setTheme(localStorage.getItem('theme') === 'dark' || prefers.matches);
+
+    prefers.addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            setTheme(e.matches);
+        }
+    });
+
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        setTheme(document.documentElement.dataset.theme !== 'dark', true);
+    });
+}
+
+void setupTheme();
 void refreshLibrary();
