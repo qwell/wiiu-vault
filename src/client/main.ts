@@ -2,7 +2,7 @@ import {
     type LibraryResponse,
     type TitleGroup,
     type TitleEntry,
-    type TitleKind,
+    TitleKinds,
     type ChildKind,
     PARENT_KINDS,
 } from '../shared/shared.js';
@@ -12,7 +12,11 @@ type SlotBadgeState = 'complete' | 'incomplete' | 'na' | 'unknown';
 
 let refreshLibrary: (() => Promise<void>) | null = null;
 
-function formatRegion(region: string | null): { text: string; flag: string; class?: string } {
+function formatRegion(region: string | null): {
+    text: string;
+    flag: string;
+    class?: string;
+} {
     switch (region) {
         case 'USA':
             return { text: 'USA', flag: '🇺🇸', class: 'distress' };
@@ -45,7 +49,7 @@ function formatSize(sizeBytes: number | null): string {
     return `${value.toFixed(digits)} ${units[unitIndex]}`;
 }
 
-function getEntry(group: TitleGroup, kinds: TitleKind | readonly TitleKind[]): TitleEntry | null {
+function getEntry(group: TitleGroup, kinds: TitleKinds | readonly TitleKinds[]): TitleEntry | null {
     const kindList = Array.isArray(kinds) ? kinds : [kinds];
     return group.entries.find((entry) => kindList.includes(entry.kind)) ?? null;
 }
@@ -56,8 +60,8 @@ function isChildExpected(group: TitleGroup, childKind: ChildKind): boolean {
 
 function formatTooltip(group: TitleGroup): string {
     const parentEntry = getEntry(group, PARENT_KINDS);
-    const updateEntry = getEntry(group, 'Update');
-    const dlcEntry = getEntry(group, 'DLC');
+    const updateEntry = getEntry(group, TitleKinds.Update);
+    const dlcEntry = getEntry(group, TitleKinds.DLC);
 
     return [
         `Game: ${parentEntry ? `${formatSize(parentEntry.sizeBytes)} (${parentEntry.titleId})` : '-'}`,
@@ -73,8 +77,8 @@ function getGroupStatus(group: TitleGroup): GroupStatus {
 
     if (
         !getEntry(group, PARENT_KINDS) ||
-        (isChildExpected(group, 'Update') && !getEntry(group, 'Update')) ||
-        (isChildExpected(group, 'DLC') && !getEntry(group, 'DLC'))
+        (isChildExpected(group, TitleKinds.Update) && !getEntry(group, TitleKinds.Update)) ||
+        (isChildExpected(group, TitleKinds.DLC) && !getEntry(group, TitleKinds.DLC))
     ) {
         return 'incomplete';
     }
@@ -145,9 +149,9 @@ function renderGroup(group: TitleGroup): HTMLElement | null {
     const badgeList = document.createElement('div');
     badgeList.className = 'title-slot-badge-list';
     badgeList.append(
-        renderSlotBadge('Game', getGameBadgeState(group)),
-        renderSlotBadge('Update', getSlotBadgeState(group, 'Update')),
-        renderSlotBadge('DLC', getSlotBadgeState(group, 'DLC'))
+        renderSlotBadge(TitleKinds.Base, getGameBadgeState(group)),
+        renderSlotBadge(TitleKinds.Update, getSlotBadgeState(group, TitleKinds.Update)),
+        renderSlotBadge(TitleKinds.DLC, getSlotBadgeState(group, TitleKinds.DLC))
     );
     badges.append(badgeList);
 

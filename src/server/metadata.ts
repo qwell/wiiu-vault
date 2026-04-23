@@ -74,10 +74,9 @@ const SYSTEM_TYPE_WIIU = 'wiiu';
 const SYSTEM_TYPE_WII = 'wii';
 const SYSTEM_TYPE_UNKNOWN = 'unknown';
 
-const TITLE_TIK = 'title.tik';
-const TITLE_TMD = 'title.tmd';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TITLE_CERT = 'title.cert';
+export const TITLE_TIK = 'title.tik';
+export const TITLE_TMD = 'title.tmd';
+export const TITLE_CERT = 'title.cert';
 
 const TIK_TITLE_ID_OFFSET = 0x1dc;
 const TIK_TITLE_ID_SIZE = 8;

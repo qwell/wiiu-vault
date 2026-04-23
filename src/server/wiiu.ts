@@ -1,16 +1,18 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
+import type { Dirent } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { getAppRoot } from './paths.js';
+import { TITLE_TMD } from './metadata.js';
 
 import {
     type TitleEntry,
     type TitleGroup,
-    type TitleKind,
+    TitleKinds,
     type ChildKind,
     type ParentKind,
-    CHILD_KINDS,
     PARENT_KINDS,
+    CHILD_KINDS,
 } from '../shared/shared.js';
 import { readTmd } from './metadata.js';
 
@@ -27,7 +29,7 @@ type TitleDatabaseEntry = {
     region: string | null;
     iconUrl: string | null;
 
-    kind: TitleKind;
+    kind: TitleKinds;
     family: string;
 };
 
@@ -46,7 +48,8 @@ function normalizeTitleName(name: string): string {
 }
 
 function cleanDirectoryName(dirname: string): string {
-    return dirname.replace(/\s*\[(Game|Update|DLC)\]\s*\[[0-9a-fA-F]{16}\]\s*$/, '').trim();
+    const base = path.basename(dirname);
+    return base.replace(/\[(Game|Update|DLC)\]\s*\[[0-9a-fA-F]{16}\]$/, '').trim();
 }
 
 function getTitleName(dirname: string, databaseName: string | null): string {
@@ -63,11 +66,11 @@ function getTitleName(dirname: string, databaseName: string | null): string {
     return 'Unknown';
 }
 
-function classifyTitleId(titleId: string): { family: string; kind: TitleKind } {
+function classifyTitleId(titleId: string): { family: string; kind: TitleKinds } {
     const normalized = titleId?.toLowerCase() ?? '';
 
     if (normalized.length !== 16) {
-        return { family: normalized, kind: 'Unknown' };
+        return { family: normalized, kind: TitleKinds.Unknown };
     }
 
     const prefix = normalized.slice(0, 8);
@@ -75,37 +78,37 @@ function classifyTitleId(titleId: string): { family: string; kind: TitleKind } {
 
     switch (prefix) {
         case '00000007':
-            return { family, kind: 'vWii' };
+            return { family, kind: TitleKinds.vWii };
 
         case '00050000':
-            return { family, kind: 'Base' };
+            return { family, kind: TitleKinds.Base };
 
         case '00050002':
-            return { family, kind: 'Demo' };
+            return { family, kind: TitleKinds.Demo };
 
         case '0005000b':
-            return { family, kind: 'FCT' };
+            return { family, kind: TitleKinds.FCT };
 
         case '0005000c':
-            return { family, kind: 'DLC' };
+            return { family, kind: TitleKinds.DLC };
 
         case '0005000d':
-            return { family, kind: 'Unknown' };
+            return { family, kind: TitleKinds.Unknown };
 
         case '0005000e':
-            return { family, kind: 'Update' };
+            return { family, kind: TitleKinds.Update };
 
         case '00050010':
-            return { family, kind: 'System App' };
+            return { family, kind: TitleKinds.SystemApp };
 
         case '0005001b':
-            return { family, kind: 'System Data' };
+            return { family, kind: TitleKinds.SystemData };
 
         case '00050030':
-            return { family, kind: 'System Applet' };
+            return { family, kind: TitleKinds.SystemApplet };
 
         default:
-            return { family, kind: 'Unknown' };
+            return { family, kind: TitleKinds.Unknown };
     }
 }
 
@@ -235,7 +238,7 @@ function createEmptyGroup(family: string): TitleGroup {
     };
 }
 
-function getParentByKind<T extends { kind: TitleKind }>(entries: T[]): T | null {
+function getParentByKind<T extends { kind: TitleKinds }>(entries: T[]): T | null {
     return entries.find((candidate) => PARENT_KINDS.includes(candidate.kind as ParentKind)) ?? null;
 }
 
@@ -249,11 +252,34 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
         databaseByFamily.set(entry.family, existing);
     }
 
-    const entries = await readdir(root, { withFileTypes: true });
-    const directories = entries
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => entry.name)
-        .sort((a, b) => a.localeCompare(b));
+    // Recursively find directories that contain a title.tmd file.
+    async function findTitleDirs(currentPath: string, relative = ''): Promise<string[]> {
+        const found: string[] = [];
+        let entries: Dirent[];
+        try {
+            entries = await readdir(currentPath, { withFileTypes: true });
+        } catch {
+            return found;
+        }
+
+        const hasTmd = entries.some((e) => e.isFile() && e.name === TITLE_TMD);
+        if (hasTmd) {
+            found.push(relative || '.');
+        }
+
+        for (const entry of entries) {
+            if (entry.isDirectory()) {
+                const subRel = relative ? `${relative}/${entry.name}` : entry.name;
+                const childPath = path.join(currentPath, entry.name);
+                const childFound = await findTitleDirs(childPath, subRel);
+                found.push(...childFound);
+            }
+        }
+
+        return found;
+    }
+
+    const directories = (await findTitleDirs(root)).sort((a, b) => a.localeCompare(b));
 
     const scanned = (
         await Promise.all(directories.map(async (dirname) => readTitleEntry(root, dirname, titleDatabase)))

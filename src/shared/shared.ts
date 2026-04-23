@@ -1,7 +1,28 @@
-export const PARENT_KINDS = ['vWii', 'Base', 'Demo', 'FCT', 'System App', 'System Data', 'System Applet'] as const;
-export const CHILD_KINDS = ['DLC', 'Update'] as const;
+export enum TitleKinds {
+    vWii = 'vWii',
+    Base = 'Base',
+    Demo = 'Demo',
+    FCT = 'FCT',
+    SystemApp = 'System App',
+    SystemData = 'System Data',
+    SystemApplet = 'System Applet',
+    DLC = 'DLC',
+    Update = 'Update',
+    Unknown = 'Unknown',
+}
 
-export type TitleKind = ParentKind | ChildKind | 'Unknown';
+export const PARENT_KINDS = [
+    TitleKinds.vWii,
+    TitleKinds.Base,
+    TitleKinds.Demo,
+    TitleKinds.FCT,
+    TitleKinds.SystemApp,
+    TitleKinds.SystemData,
+    TitleKinds.SystemApplet,
+] as const;
+
+export const CHILD_KINDS = [TitleKinds.DLC, TitleKinds.Update] as const;
+
 export type ParentKind = (typeof PARENT_KINDS)[number];
 export type ChildKind = (typeof CHILD_KINDS)[number];
 
@@ -12,7 +33,7 @@ export type TitleEntry = {
     region: string | null;
 
     iconUrl: string | null;
-    kind: TitleKind;
+    kind: TitleKinds;
     sizeBytes: number;
 };
 
