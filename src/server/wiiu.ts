@@ -48,9 +48,10 @@ function normalizeTitleName(name: string): string {
 }
 
 function cleanDirectoryName(dirname: string): string {
-    const base = path.basename(dirname);
-    return base
-        .replace(/\[(Game|Update|DLC)\]\s*\[[0-9a-fA-F]{16}\]$/, '')
+    // Clear [ and anything after it.
+    return path
+        .basename(dirname)
+        .replace(/\s*\[.*$/, '')
         .trim();
 }
 
