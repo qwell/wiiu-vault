@@ -268,8 +268,9 @@ select {
     grid-area: badges;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     font-size: 9px;
+
+    justify-content: space-between;
 }
 
 .library-grid[data-view='list'] .title-slot-badges {
@@ -289,10 +290,6 @@ select {
     padding: 1px 6px;
     border: 1px solid currentColor;
     border-radius: 8px;
-}
-
-.library-grid[data-view='list'] .title-slot-badge {
-    padding: 0 5px;
 }
 
 .title-slot-badge-complete {
