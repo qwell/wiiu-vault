@@ -21,6 +21,9 @@ type RawTitleDatabaseEntry = {
     name: string;
     region: string;
     iconUrl: string;
+    productCode: string | null;
+    updates: number[];
+    dlc: number[];
 };
 
 type TitleDatabaseEntry = {
@@ -28,8 +31,10 @@ type TitleDatabaseEntry = {
     name: string;
     region: string | null;
     iconUrl: string | null;
+    productCode: string | null;
+    updates: number[];
+    dlc: number[];
 
-    kind: TitleKinds;
     family: string;
 };
 
@@ -126,22 +131,24 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
     }
 
     return (json as RawTitleDatabaseEntry[]).map((entry) => {
-        if (typeof entry.titleID !== 'string') {
+        if (typeof entry.titleID !== 'string' || entry.titleID.length !== 16) {
             throw new Error(
                 `invalid titleID in titles.json: ${JSON.stringify(entry)}`
             );
         }
 
-        const { family, kind } = classifyTitleId(entry.titleID);
+        const { family } = classifyTitleId(entry.titleID);
 
         return {
             titleID: entry.titleID.toLowerCase(),
             name: normalizeTitleName(entry.name),
             region: entry.region?.length > 0 ? entry.region : null,
             iconUrl: entry.iconUrl?.length > 0 ? entry.iconUrl : null,
+            productCode: entry.productCode?.length ? entry.productCode : null,
+            updates: entry.updates,
+            dlc: entry.dlc,
 
             family,
-            kind,
         };
     });
 }
@@ -151,7 +158,7 @@ async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
     try {
         const jsonText = await readFile(titlesJsonPath, 'utf8');
         const entries = parseTitleDatabaseEntries(jsonText);
-        return new Map(entries.map((entry) => [entry.titleID, entry]));
+        return new Map(entries.map((entry) => [entry.family, entry]));
     } catch (error) {
         console.error(
             `[wiiu] failed to read titles DB at ${titlesJsonPath}:`,
@@ -221,7 +228,7 @@ async function readTitleEntry(
 
     const titleId = Buffer.from(tmd.header.titleId).toString('hex');
     const { family, kind } = classifyTitleId(titleId);
-    const databaseEntry = titleDatabase.get(titleId);
+    const databaseEntry = titleDatabase.get(family);
 
     return {
         titleId,
@@ -261,13 +268,6 @@ function getParentByKind<T extends { kind: TitleKinds }>(
 
 export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
     const titleDatabase = await readTitleDatabase();
-    const databaseByFamily = new Map<string, TitleDatabaseEntry[]>();
-
-    for (const entry of titleDatabase.values()) {
-        const existing = databaseByFamily.get(entry.family) ?? [];
-        existing.push(entry);
-        databaseByFamily.set(entry.family, existing);
-    }
 
     // Recursively find directories that contain a title.tmd file.
     async function findTitleDirs(
@@ -336,29 +336,34 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
         group.entries.push(publicEntry);
     }
 
-    for (const family of databaseByFamily.keys()) {
+    for (const family of titleDatabase.keys()) {
         if (!groups.has(family)) {
             groups.set(family, createEmptyGroup(family));
         }
     }
 
     for (const group of groups.values()) {
-        const familyEntries = databaseByFamily.get(group.family) ?? [];
+        const databaseEntry = titleDatabase.get(group.family) ?? null;
         const parentEntry = getParentByKind(group.entries);
-        const databaseParent = getParentByKind(familyEntries);
-        group.titleInDatabase = familyEntries.length > 0;
-        group.expectedChildren = CHILD_KINDS.filter((kind) =>
-            familyEntries.some((entry) => entry.kind === kind)
-        );
+        group.titleInDatabase = databaseEntry !== null;
+        group.expectedChildren = CHILD_KINDS.filter((kind) => {
+            if (!databaseEntry) {
+                return false;
+            }
+
+            return kind === TitleKinds.Update
+                ? databaseEntry.updates.length > 0
+                : databaseEntry.dlc.length > 0;
+        });
 
         if (parentEntry) {
             group.name = parentEntry.titleName;
             group.region = parentEntry.region;
             group.iconUrl = parentEntry.iconUrl;
-        } else if (databaseParent) {
-            group.name = databaseParent.name;
-            group.region = databaseParent.region;
-            group.iconUrl = databaseParent.iconUrl;
+        } else if (databaseEntry) {
+            group.name = databaseEntry.name;
+            group.region = databaseEntry.region;
+            group.iconUrl = databaseEntry.iconUrl;
         } else {
             const firstLocalChild = group.entries.find((entry) =>
                 CHILD_KINDS.includes(entry.kind as ChildKind)

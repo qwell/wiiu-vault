@@ -45,6 +45,7 @@
         "vitest": "^4.1.4"
     },
     "dependencies": {
-        "express": "^5.2.1"
+        "express": "^5.2.1",
+        "fast-xml-parser": "^5.7.1"
     }
 }

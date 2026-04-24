@@ -16,6 +16,7 @@ yarn.lock
 .pnp.loader.mjs
 
 config.json
+common.key
 
 # Build output
 **/dist/
