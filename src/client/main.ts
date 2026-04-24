@@ -9,8 +9,19 @@ import {
 
 type GroupStatus = 'complete' | 'incomplete' | 'unknown';
 type SlotBadgeState = 'complete' | 'incomplete' | 'na' | 'unknown';
+type LibraryViewMode = 'table' | 'list';
 
 let refreshLibrary: (() => Promise<void>) | null = null;
+
+function getViewMode(): LibraryViewMode {
+    return localStorage.getItem('libraryViewMode') === 'list'
+        ? 'list'
+        : 'table';
+}
+
+function saveViewMode(viewMode: LibraryViewMode): void {
+    localStorage.setItem('libraryViewMode', viewMode);
+}
 
 function formatRegion(region: string | null): {
     text: string;
@@ -242,7 +253,7 @@ function collectRegions(groups: TitleGroup[]): string[] {
 
 function renderGroups(
     allGroups: TitleGroup[],
-    grid: HTMLElement,
+    grid: HTMLDivElement,
     statusValue: string,
     regionValue: string,
     searchValue: string
@@ -277,19 +288,11 @@ function renderGroups(
 
 function buildControls(
     groups: TitleGroup[],
-    grid: HTMLElement,
+    grid: HTMLDivElement,
     loading = false
 ): HTMLElement {
     const controls = document.createElement('div');
     controls.className = 'library-controls';
-
-    const refreshButton = document.createElement('button');
-    refreshButton.className = 'refresh-button library-refresh';
-    refreshButton.type = 'button';
-    refreshButton.title = 'Refresh library';
-    refreshButton.setAttribute('aria-label', 'Refresh library');
-    refreshButton.textContent = '↻';
-    refreshButton.disabled = loading;
 
     const regionText = document.createElement('div');
     regionText.className = 'library-label library-label-region';
@@ -343,6 +346,30 @@ function buildControls(
     searchInput.className = 'library-search library-field-search';
     searchInput.disabled = loading || groups.length === 0;
 
+    const viewToggle = buildViewControl(grid);
+
+    const refreshButton = document.createElement('button');
+    refreshButton.className = 'library-field-refresh';
+    refreshButton.type = 'button';
+    refreshButton.title = 'Refresh library';
+    refreshButton.setAttribute('aria-label', 'Refresh library');
+    refreshButton.disabled = loading;
+
+    const refreshIcon = document.createElement('i');
+    refreshIcon.className = 'fa-solid fa-refresh';
+    refreshButton.append(refreshIcon);
+
+    controls.append(
+        regionText,
+        statusText,
+        searchText,
+        regionSelect,
+        statusSelect,
+        searchInput,
+        viewToggle,
+        refreshButton
+    );
+
     const update = (): void => {
         renderGroups(
             groups,
@@ -363,21 +390,68 @@ function buildControls(
         }
     });
 
-    controls.append(
-        refreshButton,
-        regionText,
-        statusText,
-        searchText,
-        regionSelect,
-        statusSelect,
-        searchInput
-    );
-
     if (groups.length > 0) {
         update();
     }
 
     return controls;
+}
+
+function buildViewControl(grid: HTMLDivElement): HTMLDivElement {
+    const viewToggle = document.createElement('div');
+    viewToggle.className = 'library-view-toggle library-field-view';
+    viewToggle.setAttribute('role', 'group');
+    viewToggle.setAttribute('aria-label', 'Library view');
+
+    const tableViewButton = document.createElement('button');
+    tableViewButton.type = 'button';
+    tableViewButton.className = 'library-view-button';
+    tableViewButton.title = 'Table view';
+    tableViewButton.setAttribute('aria-label', 'Table view');
+
+    const tableIcon = document.createElement('i');
+    tableIcon.className = 'fa-solid fa-table';
+    tableViewButton.append(tableIcon);
+
+    const listViewButton = document.createElement('button');
+    listViewButton.type = 'button';
+    listViewButton.className = 'library-view-button';
+    listViewButton.title = 'List view';
+    listViewButton.setAttribute('aria-label', 'List view');
+
+    const listIcon = document.createElement('i');
+    listIcon.className = 'fa-solid fa-list';
+    listViewButton.append(listIcon);
+
+    tableViewButton.addEventListener('click', () => {
+        applyViewMode('table');
+        saveViewMode('table');
+    });
+
+    listViewButton.addEventListener('click', () => {
+        applyViewMode('list');
+        saveViewMode('list');
+    });
+
+    viewToggle.append(tableViewButton, listViewButton);
+
+    const applyViewMode = (viewMode: LibraryViewMode): void => {
+        grid.dataset.view = viewMode;
+        tableViewButton.dataset.active = String(viewMode === 'table');
+        listViewButton.dataset.active = String(viewMode === 'list');
+        tableViewButton.setAttribute(
+            'aria-pressed',
+            String(viewMode === 'table')
+        );
+        listViewButton.setAttribute(
+            'aria-pressed',
+            String(viewMode === 'list')
+        );
+    };
+
+    applyViewMode(getViewMode());
+
+    return viewToggle;
 }
 
 function buildLibraryContent(
