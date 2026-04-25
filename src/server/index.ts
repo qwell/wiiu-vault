@@ -3,7 +3,11 @@ import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
 import { loadConfig } from './config.js';
-import { downloadNusTitleMetadata } from './metadata.js';
+import {
+    downloadNusTitleMetadata,
+    getDlcMetadata,
+    getUpdateMetadata,
+} from './metadata.js';
 import { scanWiiUTitles } from './wiiu.js';
 
 const config = loadConfig();
@@ -76,6 +80,70 @@ app.get('/api/title-metadata', async (req, res) => {
 
         res.status(500).json({
             error: 'Failed to download title metadata',
+            message: error instanceof Error ? error.message : String(error),
+            stage:
+                typeof error === 'object' &&
+                error !== null &&
+                'stage' in error &&
+                typeof error.stage === 'string'
+                    ? error.stage
+                    : null,
+        });
+    }
+});
+
+app.get('/api/title-update', async (req, res) => {
+    const titleId = req.query.titleId as string;
+
+    if (!titleId) {
+        res.status(400).json({
+            error: 'Missing titleId query parameter',
+        });
+        return;
+    }
+
+    try {
+        const metadata = await getUpdateMetadata(titleId);
+        res.json({
+            titleId: metadata.titleId,
+            updateTitleId: metadata.childTitleId,
+            exists: metadata.exists,
+            titleVersion: metadata.titleVersion,
+        });
+    } catch (error) {
+        console.error('[server] Failed to load title update metadata:', error);
+
+        res.status(500).json({
+            error: 'Failed to load title update metadata',
+            message: error instanceof Error ? error.message : String(error),
+        });
+    }
+});
+
+app.get('/api/title-dlc', async (req, res) => {
+    const titleId = req.query.titleId as string;
+
+    if (!titleId) {
+        res.status(400).json({
+            error: 'Missing titleId query parameter',
+        });
+        return;
+    }
+
+    try {
+        const metadata = await getDlcMetadata(titleId);
+        res.json({
+            titleId: metadata.titleId,
+            dlcTitleId: metadata.childTitleId,
+            exists: metadata.exists,
+            titleVersion: metadata.titleVersion,
+        });
+    } catch (error) {
+        console.error('[server] Failed to load title DLC metadata:', error);
+
+        res.status(500).json({
+            error: 'Failed to load title DLC metadata',
+            message: error instanceof Error ? error.message : String(error),
         });
     }
 });

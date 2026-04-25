@@ -84,6 +84,23 @@ export type NusTitleMetadata = {
     metaJson: Record<string, unknown> | null;
 };
 
+export type ChildTitleMetadata = {
+    titleId: string;
+    childTitleId: string;
+    exists: boolean;
+    titleVersion: number | null;
+};
+
+class TitleMetadataError extends Error {
+    stage: string;
+
+    constructor(stage: string, message: string) {
+        super(message);
+        this.name = 'TitleMetadataError';
+        this.stage = stage;
+    }
+}
+
 export type NUSTitleInformation = {
     name: string | null;
     region: string | null;
@@ -171,6 +188,7 @@ const FST_CHANGE_OFFSET_FLAG = 0x0004;
 const HASHED_BLOCK_SIZE = 0x10000;
 const HASHED_BLOCK_DATA_OFFSET = 0x400;
 const HASHED_BLOCK_DATA_SIZE = 0xfc00;
+const NUS_BASE_URL = 'http://ccs.cdn.wup.shop.nintendo.net/ccs/download';
 
 const META_XML_PARSER = new XMLParser({
     ignoreAttributes: true,
@@ -184,28 +202,63 @@ const META_XML_PARSER = new XMLParser({
 export async function downloadNusTitleMetadata(
     titleId: string
 ): Promise<NusTitleMetadata | null> {
-    const baseUrl = 'http://ccs.cdn.wup.shop.nintendo.net/ccs/download';
-    const commonKey = await readCommonKey();
+    const baseUrl = NUS_BASE_URL;
+    const commonKey = await readCommonKey().catch((error: unknown) => {
+        throw new TitleMetadataError(
+            'read_common_key',
+            error instanceof Error ? error.message : 'Failed to read common key'
+        );
+    });
 
     const [tik, tmdBytes] = await Promise.all([
         downloadTicket(baseUrl, titleId).catch((error: unknown) => {
             if (isHttpErrorStatus(error, 404)) {
                 return null;
             }
-            throw error;
+            throw new TitleMetadataError(
+                'download_ticket',
+                error instanceof Error
+                    ? error.message
+                    : `Failed to download ticket for ${titleId}`
+            );
         }),
-        downloadTmd(baseUrl, titleId),
+        downloadTmd(baseUrl, titleId).catch((error: unknown) => {
+            throw new TitleMetadataError(
+                'download_tmd',
+                error instanceof Error
+                    ? error.message
+                    : `Failed to download TMD for ${titleId}`
+            );
+        }),
     ]);
 
     const tmd = readTmdFromBuffer(Buffer.from(tmdBytes));
     if (!tmd) {
-        return null;
+        throw new TitleMetadataError(
+            'parse_tmd',
+            `Failed to parse TMD for ${titleId}`
+        );
     }
 
     const ticket = tik ? readTikFromBuffer(Buffer.from(tik)) : null;
     const fstContent = tmd.contents[0];
+    if (!fstContent) {
+        throw new TitleMetadataError(
+            'missing_fst_content',
+            `TMD has no first content entry for ${titleId}`
+        );
+    }
     const encryptedFst = fstContent
-        ? await downloadContent(baseUrl, titleId, fstContent.id)
+        ? await downloadContent(baseUrl, titleId, fstContent.id).catch(
+              (error: unknown) => {
+                  throw new TitleMetadataError(
+                      'download_fst_content',
+                      error instanceof Error
+                          ? error.message
+                          : `Failed to download FST content for ${titleId}`
+                  );
+              }
+          )
         : null;
 
     const ticketTitleKey =
@@ -239,19 +292,34 @@ export async function downloadNusTitleMetadata(
                   0
               )
             : ticketDecryptedFst;
+    if (!titleKey || !decryptedFst || !looksLikeFst(decryptedFst)) {
+        throw new TitleMetadataError(
+            'decrypt_fst',
+            `No usable title key produced an FST for ${titleId}`
+        );
+    }
 
-    const metaXml =
-        decryptedFst && titleKey
-            ? await extractMetaXmlFromTitle(
-                  decryptedFst,
-                  tmd,
-                  titleKey,
-                  baseUrl,
-                  titleId
-              )
-            : null;
+    const metaXml = await extractMetaXmlFromTitle(
+        decryptedFst,
+        tmd,
+        titleKey,
+        baseUrl,
+        titleId
+    );
+    if (!metaXml) {
+        throw new TitleMetadataError(
+            'extract_meta_xml',
+            `Failed to extract meta.xml for ${titleId}`
+        );
+    }
     const metaJson = metaXml ? readMetaXmlJson(metaXml) : null;
     const meta = metaXml ? readMetaXml(metaXml) : null;
+    if (!metaJson) {
+        throw new TitleMetadataError(
+            'parse_meta_xml',
+            `Failed to parse meta.xml for ${titleId}`
+        );
+    }
 
     return {
         titleId,
@@ -264,6 +332,26 @@ export async function downloadNusTitleMetadata(
         titleKeyPassword: generatedMatch?.password ?? null,
         metaJson,
     };
+}
+
+export function getUpdateTitleId(baseTitleId: string): string {
+    return replaceTitlePrefix(baseTitleId, '0005000e');
+}
+
+export function getDlcTitleId(baseTitleId: string): string {
+    return replaceTitlePrefix(baseTitleId, '0005000c');
+}
+
+export async function getUpdateMetadata(
+    baseTitleId: string
+): Promise<ChildTitleMetadata> {
+    return getChildTitleMetadata(baseTitleId, getUpdateTitleId(baseTitleId));
+}
+
+export async function getDlcMetadata(
+    baseTitleId: string
+): Promise<ChildTitleMetadata> {
+    return getChildTitleMetadata(baseTitleId, getDlcTitleId(baseTitleId));
 }
 
 export function readMetaXml(buffer: Uint8Array): NUSTitleInformation | null {
@@ -983,6 +1071,51 @@ function parseMetaRegion(value: string | null): string | null {
     if (regionMask === 0x4) return 'EUR';
     if (regionMask === 0x7) return 'ALL';
     return value;
+}
+
+async function getChildTitleMetadata(
+    baseTitleId: string,
+    titleId: string
+): Promise<ChildTitleMetadata> {
+    const baseUrl = NUS_BASE_URL;
+
+    try {
+        const tmdBytes = await downloadTmd(baseUrl, titleId);
+        const tmd = readTmdFromBuffer(Buffer.from(tmdBytes));
+
+        return {
+            titleId: baseTitleId,
+            childTitleId: titleId,
+            exists: tmd !== null,
+            titleVersion: tmd?.header.titleVersion ?? null,
+        };
+    } catch (error) {
+        if (isHttpErrorStatus(error, 404)) {
+            return {
+                titleId: baseTitleId,
+                childTitleId: titleId,
+                exists: false,
+                titleVersion: null,
+            };
+        }
+
+        throw error;
+    }
+}
+
+function replaceTitlePrefix(titleId: string, prefix: string): string {
+    const normalizedTitleId = titleId.toLowerCase();
+    const normalizedPrefix = prefix.toLowerCase();
+
+    if (!/^[0-9a-f]{16}$/.test(normalizedTitleId)) {
+        throw new Error(`Invalid titleId: ${titleId}`);
+    }
+
+    if (!/^[0-9a-f]{8}$/.test(normalizedPrefix)) {
+        throw new Error(`Invalid title prefix: ${prefix}`);
+    }
+
+    return `${normalizedPrefix}${normalizedTitleId.slice(8)}`;
 }
 
 function buildDownloadUrl(
