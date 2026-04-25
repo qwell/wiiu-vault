@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
 import { loadConfig } from './config.js';
+import { downloadNusTitleMetadata } from './metadata.js';
 import { scanWiiUTitles } from './wiiu.js';
 
 const config = loadConfig();
@@ -34,6 +35,46 @@ app.get('/api/library', async (_req, res) => {
 
         res.status(500).json({
             error: 'Failed to scan library',
+        });
+    }
+});
+
+app.get('/api/title-metadata', async (req, res) => {
+    const titleId = req.query.titleId as string;
+
+    if (!titleId) {
+        res.status(400).json({
+            error: 'Missing titleId query parameter',
+        });
+        return;
+    }
+
+    try {
+        const metadata = await downloadNusTitleMetadata(titleId);
+
+        if (!metadata) {
+            res.status(404).json({
+                error: 'Failed to parse title metadata',
+            });
+            return;
+        }
+
+        res.json({
+            titleId: metadata.titleId,
+            name: metadata.name,
+            region: metadata.region,
+            productCode: metadata.productCode,
+            companyCode: metadata.companyCode,
+            titleKey: metadata.titleKey
+                ? Buffer.from(metadata.titleKey).toString('hex')
+                : null,
+            titleKeyPassword: metadata.titleKeyPassword,
+        });
+    } catch (error) {
+        console.error('[server] Failed to download title metadata:', error);
+
+        res.status(500).json({
+            error: 'Failed to download title metadata',
         });
     }
 });
