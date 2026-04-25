@@ -17,19 +17,21 @@ import {
 import { readTmd } from './metadata.js';
 
 type RawTitleDatabaseEntry = {
-    titleID: string;
+    titleId: string;
     name: string;
     region: string;
-    iconUrl: string;
+    companyCode?: string | null;
+    iconUrl: string | null;
     productCode: string | null;
     updates: number[];
     dlc: number[];
 };
 
 type TitleDatabaseEntry = {
-    titleID: string;
+    titleId: string;
     name: string;
     region: string | null;
+    companyCode: string | null;
     iconUrl: string | null;
     productCode: string | null;
     updates: number[];
@@ -131,20 +133,21 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
     }
 
     return (json as RawTitleDatabaseEntry[]).map((entry) => {
-        if (typeof entry.titleID !== 'string' || entry.titleID.length !== 16) {
+        if (typeof entry.titleId !== 'string' || entry.titleId.length !== 16) {
             throw new Error(
-                `invalid titleID in titles.json: ${JSON.stringify(entry)}`
+                `invalid titleId in titles.json: ${JSON.stringify(entry)}`
             );
         }
 
-        const { family } = classifyTitleId(entry.titleID);
+        const { family } = classifyTitleId(entry.titleId);
 
         return {
-            titleID: entry.titleID.toLowerCase(),
+            titleId: entry.titleId.toLowerCase(),
             name: normalizeTitleName(entry.name),
             region: entry.region?.length > 0 ? entry.region : null,
-            iconUrl: entry.iconUrl?.length > 0 ? entry.iconUrl : null,
+            companyCode: entry.companyCode?.length ? entry.companyCode : null,
             productCode: entry.productCode?.length ? entry.productCode : null,
+            iconUrl: entry.iconUrl,
             updates: entry.updates,
             dlc: entry.dlc,
 

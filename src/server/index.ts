@@ -65,6 +65,7 @@ app.get('/api/title-metadata', async (req, res) => {
             region: metadata.region,
             productCode: metadata.productCode,
             companyCode: metadata.companyCode,
+            metaJson: metadata.metaJson,
             titleKey: metadata.titleKey
                 ? Buffer.from(metadata.titleKey).toString('hex')
                 : null,

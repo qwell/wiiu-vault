@@ -81,6 +81,7 @@ export type NusTitleMetadata = {
     companyCode: string | null;
     titleKey: Uint8Array | null;
     titleKeyPassword: string | null;
+    metaJson: Record<string, unknown> | null;
 };
 
 export type NUSTitleInformation = {
@@ -249,6 +250,7 @@ export async function downloadNusTitleMetadata(
                   titleId
               )
             : null;
+    const metaJson = metaXml ? readMetaXmlJson(metaXml) : null;
     const meta = metaXml ? readMetaXml(metaXml) : null;
 
     return {
@@ -260,6 +262,7 @@ export async function downloadNusTitleMetadata(
         companyCode: meta?.companyCode ?? null,
         titleKey,
         titleKeyPassword: generatedMatch?.password ?? null,
+        metaJson,
     };
 }
 
