@@ -20,6 +20,7 @@
         "clean": "rimraf dist/ .cache/",
         "build": "tsx scripts/build.ts",
         "start": "tsx scripts/start.ts",
+        "titles:generate": "bash scripts/update-titles.sh",
         "test": "vitest run"
     },
     "devDependencies": {

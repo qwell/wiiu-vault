@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+titles_dir="$(dirname -- "${BASH_SOURCE[0]}")/../titles"
+
 ranges=(
     "0005000010100000:0005000010220000"
     "000500001f600000:000500001f608000"
@@ -18,9 +20,10 @@ trap 'rm -rf "$tmp_dir"' EXIT
 echo "Creating $tmp_dir"
 mkdir -p "$tmp_dir/tmd" "$tmp_dir/meta" "$tmp_dir/updates" "$tmp_dir/dlc"
 
-titles_file="titles.json"
-extra_file="extra.json"
-icons_file="icons.json"
+titles_file="$titles_dir/titles.json"
+extra_file="$titles_dir/extra.json"
+icons_file="$titles_dir/icons.json"
+titledb_file="$titles_dir/titledb.csv"
 
 updates_file="$tmp_dir/updates.json"
 dlc_file="$tmp_dir/dlc.json"
@@ -183,13 +186,13 @@ jq --indent 4 -s \
 
 echo "Title data saved to $titles_file"
 
-if [[ -f "titledb.csv" ]]; then
+if [[ -f "$titledb_file" ]]; then
     if ! command -v mlr >/dev/null 2>&1; then
         echo "Skipping $extra_file: mlr is not installed"
     else
         mkdir -p "$tmp_dir/extra-updates" "$tmp_dir/extra-dlc"
 
-        mlr --icsv --ojson cat titledb.csv |
+        mlr --icsv --ojson cat "$titledb_file" |
         jq --slurpfile titles "$titles_file" '
             ($titles[0]
                 | map(.titleId | tostring | ascii_downcase)

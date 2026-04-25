@@ -8,6 +8,14 @@ async function copyFileIntoDist(name: string) {
     await fs.copyFile(path.join(root, name), path.join(root, 'dist', name));
 }
 
+async function copyTitlesFileIntoDist(name: string) {
+    await fs.mkdir(path.join(root, 'dist', 'titles'), { recursive: true });
+    await fs.copyFile(
+        path.join(root, 'titles', name),
+        path.join(root, 'dist', 'titles', name)
+    );
+}
+
 async function main() {
     await fs.mkdir(path.join(root, 'dist'), { recursive: true });
 
@@ -37,7 +45,7 @@ async function main() {
     });
 
     await copyFileIntoDist('config.json');
-    await copyFileIntoDist('titles.json');
+    await copyTitlesFileIntoDist('titles.json');
 }
 
 main().catch((error) => {

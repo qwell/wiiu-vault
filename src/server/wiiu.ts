@@ -157,7 +157,7 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
 }
 
 async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
-    const titlesJsonPath = path.join(getAppRoot(), 'titles.json');
+    const titlesJsonPath = path.join(getAppRoot(), 'titles', 'titles.json');
     try {
         const jsonText = await readFile(titlesJsonPath, 'utf8');
         const entries = parseTitleDatabaseEntries(jsonText);
