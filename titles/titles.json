@@ -180,36 +180,6 @@
         "dlc": []
     },
     {
-        "titleId": "0005000010102d00",
-        "name": "Hulu",
-        "region": "USA",
-        "productCode": "WUP-N-HNPE",
-        "companyCode": "00XB",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8e4459c2f9c264b285da96da315058fd277e3dbac3ea810c841b105873e77525.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "0005000010102e00",
-        "name": "Amazon Instant Video",
-        "region": "USA",
-        "productCode": "WUP-N-HNQE",
-        "companyCode": "00WD",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1bae55bf549aa908c84f5e94ac776792d7f55da10f7454fc5fb4aaaa6fbcadd9.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "0005000010102f00",
-        "name": "Amazon / LOVEFiLM",
-        "region": "EUR",
-        "productCode": "WUP-N-HNRP",
-        "companyCode": "00WD",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/fbbbc2c7de55ad2a5bf85a8d83eaec0474cb193b71571ab5d437d41a304171de.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
         "titleId": "0005000010104d00",
         "name": "MONSTER HUNTER 3(tri-)G\nHD Ver.",
         "region": "JPN",
@@ -6590,16 +6560,6 @@
         "dlc": [80]
     },
     {
-        "titleId": "0005000010154800",
-        "name": "BBC iPlayer",
-        "region": "EUR",
-        "productCode": "WUP-N-HNSP",
-        "companyCode": "006H",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
         "titleId": "0005000010154900",
         "name": "Angry Bunnies:\nColossal Carrot Crusade",
         "region": "EUR",
@@ -10377,26 +10337,6 @@
         "companyCode": "00ZR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/79a2c1a9a7555926db76462a9acdcd24114d4f197270586488ca705d4371560a.jpg",
         "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "0005000010172a00",
-        "name": "Crunchyroll",
-        "region": "USA",
-        "productCode": "WUP-N-HRLE",
-        "companyCode": "009Z",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f08b2c70133a1d5f3acd5634caff9bc63b342c31a710f3dffe7e7acf9f562a78.jpg",
-        "updates": [49],
-        "dlc": []
-    },
-    {
-        "titleId": "0005000010172b00",
-        "name": "Crunchyroll",
-        "region": "EUR",
-        "productCode": "WUP-N-HRLP",
-        "companyCode": "009Z",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/320c1ccf2505b4f3fa88ed3cefde207c5bd65dffec6c27276835bdf26358afb6.jpg",
-        "updates": [49],
         "dlc": []
     },
     {
@@ -18820,16 +18760,6 @@
         "dlc": []
     },
     {
-        "titleId": "00050000101bca00",
-        "name": "Napster",
-        "region": "EUR",
-        "productCode": "WUP-N-ANAP",
-        "companyCode": "013H",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3b2a94da76e89f3124aa078789c2fcbcb8247554678e8529ec6443a13339f66a.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
         "titleId": "00050000101bcb00",
         "name": "Rhapsody",
         "region": "USA",
@@ -20340,76 +20270,6 @@
         "dlc": []
     },
     {
-        "titleId": "00050000101cb400",
-        "name": "forma.8 Event Preview",
-        "region": "USA",
-        "productCode": "WUP-N-SNBE",
-        "companyCode": "0170",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cb500",
-        "name": "(Event Preview) Freedom Planet",
-        "region": "USA",
-        "productCode": "WUP-N-SNCE",
-        "companyCode": "0167",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cb600",
-        "name": "Event Preview Version Lovely P",
-        "region": "USA",
-        "productCode": "WUP-N-SNDE",
-        "companyCode": "0171",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cb700",
-        "name": "Mutant Mudds\nSuper Challenge (Event Preview)",
-        "region": "USA",
-        "productCode": "WUP-N-SNEE",
-        "companyCode": "00X9",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cb900",
-        "name": "(Event Preview) Runbow",
-        "region": "USA",
-        "productCode": "WUP-N-SNGE",
-        "companyCode": "010P",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cba00",
-        "name": "(Event Preview) Soul Axiom",
-        "region": "USA",
-        "productCode": "WUP-N-SNHE",
-        "companyCode": "009V",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cbb00",
-        "name": "(Event Preview) Typoman",
-        "region": "USA",
-        "productCode": "WUP-N-SNJE",
-        "companyCode": "016J",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
         "titleId": "00050000101cbc00",
         "name": "forma.8",
         "region": "EUR",
@@ -20426,26 +20286,6 @@
         "productCode": "WUP-P-ABCP",
         "companyCode": "016D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/848aae55a787ecabfb7f224e3521aea20af91af921f208647196b0d7a27d1ce6.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cbe00",
-        "name": "Extreme Exorcism\n(Event Preview Version)",
-        "region": "USA",
-        "productCode": "WUP-N-SNKE",
-        "companyCode": "00CY",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cbf00",
-        "name": "RIVE Event Preview",
-        "region": "USA",
-        "productCode": "WUP-N-SNLE",
-        "companyCode": "00TW",
-        "iconUrl": null,
         "updates": [],
         "dlc": []
     },
@@ -20556,126 +20396,6 @@
         "productCode": "WUP-P-BNAE",
         "companyCode": "0173",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3ec2c5ba9d047e7ccf7d2de29fe1c74971ef2cc7a616c5c16395140dffc4ce2a.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd100",
-        "name": "(Event Preview) Soul Axiom ",
-        "region": "EUR",
-        "productCode": "WUP-N-SNHP",
-        "companyCode": "009V",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd200",
-        "name": "Extreme Exorcism\n(Event Preview Version)",
-        "region": "EUR",
-        "productCode": "WUP-N-SNKP",
-        "companyCode": "00CY",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd300",
-        "name": "Mutant Mudds\nSuper Challenge (Event Preview)",
-        "region": "EUR",
-        "productCode": "WUP-N-SNEP",
-        "companyCode": "00X9",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd400",
-        "name": "Typoman Event Preview",
-        "region": "EUR",
-        "productCode": "WUP-N-SNJP",
-        "companyCode": "016J",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd500",
-        "name": "(Event Preview) Freedom Planet",
-        "region": "EUR",
-        "productCode": "WUP-N-SNCP",
-        "companyCode": "0167",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd600",
-        "name": "RIVE Event Preview",
-        "region": "EUR",
-        "productCode": "WUP-N-SNLP",
-        "companyCode": "00TW",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd700",
-        "name": "Event Preview Version Lovely P",
-        "region": "EUR",
-        "productCode": "WUP-N-SNDP",
-        "companyCode": "0171",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd800",
-        "name": "forma.8 Event Preview",
-        "region": "EUR",
-        "productCode": "WUP-N-SNBP",
-        "companyCode": "0170",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cd900",
-        "name": "(Event Preview) Runbow",
-        "region": "EUR",
-        "productCode": "WUP-N-SNGP",
-        "companyCode": "010P",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cdb00",
-        "name": "Splatoon\nPre-Launch Review",
-        "region": "JPN",
-        "productCode": "WUP-P-AGDJ",
-        "companyCode": "0001",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cdc00",
-        "name": "Splatoon\nPre-Launch Review",
-        "region": "USA",
-        "productCode": "WUP-P-AGDE",
-        "companyCode": "0001",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101cdd00",
-        "name": "Splatoon\nPre-Launch Review",
-        "region": "EUR",
-        "productCode": "WUP-P-AGDP",
-        "companyCode": "0001",
-        "iconUrl": null,
         "updates": [],
         "dlc": []
     },
@@ -21620,36 +21340,6 @@
         "dlc": []
     },
     {
-        "titleId": "00050000101d6a00",
-        "name": "Splatoon\nTestfire",
-        "region": "JPN",
-        "productCode": "WUP-P-AGGJ",
-        "companyCode": "0001",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101d6b00",
-        "name": "Splatoon\nTestfire",
-        "region": "USA",
-        "productCode": "WUP-P-AGGE",
-        "companyCode": "0001",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/248fca1cf5bf8126f8451f45630257ba2d778ea6cc7e47957a5f38951bc80171.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101d6c00",
-        "name": "Splatoon\nTestfire",
-        "region": "EUR",
-        "productCode": "WUP-P-AGGP",
-        "companyCode": "0001",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
         "titleId": "00050000101d6d00",
         "name": "Runbow",
         "region": "EUR",
@@ -22246,36 +21936,6 @@
         "productCode": "WUP-P-AVMP",
         "companyCode": "017D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/280b1c9714a0eca6379d79bbcc24b1c0fd064d3fac87573f186a8d75e3066a6e.jpg",
-        "updates": [16],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101dcc00",
-        "name": "Star Fox Guard Special Demo",
-        "region": "JPN",
-        "productCode": "WUP-P-BWGJ",
-        "companyCode": "0001",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ec9bf6666880afa1192721a0e8141a38ae1e22ef8dab49629b01e24f0e23d027.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101dcd00",
-        "name": "Star Fox Guard Special Demo",
-        "region": "USA",
-        "productCode": "WUP-P-BWGE",
-        "companyCode": "0001",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8e156842224c251e28870f74eb66f1750f7974b3775ff0a1ec19fc8daeb52fab.jpg",
-        "updates": [16],
-        "dlc": []
-    },
-    {
-        "titleId": "00050000101dce00",
-        "name": "Star Fox Guard:\nSpecial Demo Version",
-        "region": "EUR",
-        "productCode": "WUP-P-BWGP",
-        "companyCode": "0001",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6a5bddd8067ad9fe624f6bf542966b61dccd593466052644ebe6136aef4ec394.jpg",
         "updates": [16],
         "dlc": []
     },
