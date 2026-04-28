@@ -121,6 +121,17 @@
         "availableOnCdn": "No"
     },
     {
+        "titleId": "0005000010111e00",
+        "name": "Scribblenauts Unlimited",
+        "region": "EUR",
+        "productCode": "WUP-P-ASCX",
+        "companyCode": "00WR",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
         "titleId": "0005000010112100",
         "name": "Know Your Friends",
         "region": "EUR",
@@ -308,6 +319,17 @@
         "availableOnCdn": "No"
     },
     {
+        "titleId": "0005000010134e00",
+        "name": "Sniper Elite V2",
+        "region": "USA",
+        "productCode": "WUP-P-AS8E",
+        "companyCode": "00GT",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
         "titleId": "0005000010136f00",
         "name": "Disney Infinity",
         "region": "USA",
@@ -326,6 +348,17 @@
         "companyCode": "004Q",
         "iconUrl": null,
         "updates": [49],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "0005000010139e00",
+        "name": "JOYSOUND FESTA (1505)",
+        "region": "JPN",
+        "productCode": "WUP-P-ZABJ",
+        "companyCode": "0001",
+        "iconUrl": null,
+        "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
     },
@@ -404,6 +437,17 @@
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a63f0e31da3eae5eb13b58e7d7b898f2ea5892ceef3bed1fa827c05795840b6a.jpg",
         "updates": [112],
         "dlc": [16],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001014e200",
+        "name": "Phineas and Ferb: Quest for Cool Stuff",
+        "region": "EUR",
+        "productCode": "WUP-P-APFP",
+        "companyCode": "00GT",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
         "availableOnCdn": "No"
     },
     {
@@ -709,6 +753,17 @@
         "region": "EUR",
         "productCode": "WUP-P-BR5P",
         "companyCode": "00JX",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "0005000010203e00",
+        "name": "SteamWorld Collection",
+        "region": "USA",
+        "productCode": "WUP-P-AJ8E",
+        "companyCode": "0199",
         "iconUrl": null,
         "updates": [],
         "dlc": [],
