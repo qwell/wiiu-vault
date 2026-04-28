@@ -8,7 +8,7 @@ import {
     decryptContentWithIv,
     decryptContentWithBigIntIv,
     decryptTitleKey,
-    generateTitleKeyCandidates,
+    findGeneratedTitleKey,
 } from './decryption.js';
 import { getAppRoot } from './paths.js';
 
@@ -274,16 +274,15 @@ export async function downloadNusTitleMetadata(
             : null;
     const generatedMatch =
         encryptedFst && !looksLikeFst(ticketDecryptedFst)
-            ? (generateTitleKeyCandidates(tmd.header.titleId, commonKey).find(
-                  (candidate) =>
-                      looksLikeFst(
-                          decryptContentWithBigIntIv(
-                              encryptedFst,
-                              candidate.titleKey,
-                              0
-                          )
+            ? findGeneratedTitleKey(tmd.header.titleId, (candidate) =>
+                  looksLikeFst(
+                      decryptContentWithBigIntIv(
+                          encryptedFst,
+                          candidate.titleKey,
+                          0
                       )
-              ) ?? null)
+                  )
+              )
             : null;
 
     const titleKey = generatedMatch?.titleKey ?? ticketTitleKey;

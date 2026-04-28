@@ -13,6 +13,11 @@ export type TitleKeyCandidate = {
     encryptedKey: Uint8Array;
 };
 
+export type GeneratedTitleKey = {
+    password: string;
+    titleKey: TitleKey;
+};
+
 const AES_BLOCK_SIZE = 16;
 
 const KEYGEN_SECRET = new Uint8Array([
@@ -121,18 +126,33 @@ export function generateTitleKeyCandidate(
     return { password, titleKey, encryptedKey };
 }
 
-export function generateTitleKeyCandidates(
+export function generateTitleKey(
     titleId: Uint8Array,
-    commonKey: Uint8Array,
+    password: string
+): GeneratedTitleKey {
+    return {
+        password,
+        titleKey: deriveTitleKey(titleId, password),
+    };
+}
+
+export function findGeneratedTitleKey(
+    titleId: Uint8Array,
+    isValid: (candidate: GeneratedTitleKey) => boolean,
     passwords: readonly string[] = TITLE_KEY_PASSWORDS
-): TitleKeyCandidate[] {
-    return passwords.map((password) =>
-        generateTitleKeyCandidate(titleId, commonKey, password)
-    );
+): GeneratedTitleKey | null {
+    for (const password of passwords) {
+        const candidate = generateTitleKey(titleId, password);
+
+        if (isValid(candidate)) {
+            return candidate;
+        }
+    }
+
+    return null;
 }
 
 // -- Internal --
-
 function aes128CbcDecrypt(
     input: Uint8Array,
     key: Uint8Array,
