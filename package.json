@@ -22,7 +22,7 @@
         "start": "tsx scripts/start.ts",
         "test": "vitest run",
         "convert:wiiutdb": "tsx scripts/convert.ts",
-        "generate:titles": "bash scripts/update-titles.sh"
+        "generate:titles": "bash scripts/generate-titles.sh"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
