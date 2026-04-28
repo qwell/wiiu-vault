@@ -6,9 +6,7 @@
         "productCode": "WUP-P-AKNJ",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c2c6688bd613e3491f2c0c466392b56b8a8ab086b48acdaa00a6f679d82d063b.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -58,9 +56,7 @@
         "productCode": "WUP-P-APLP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7383a99d05597a83282a0f89def8567509e7c99e561ccdf53390cdbaf84fa611.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -70,12 +66,8 @@
         "productCode": "WUP-P-ARPJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/04a75fbf972a2f8c79c2112f0696e3063eac6eb13f8cdd2487fa23253111f756.jpg",
-        "updates": [
-            65
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [65],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010101d00",
@@ -84,12 +76,8 @@
         "productCode": "WUP-P-ARPE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8402238488cad1130addd480bf7f2febde85c93c341722b89dd3b2571216f4ac.jpg",
-        "updates": [
-            64
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [64],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010101e00",
@@ -98,12 +86,8 @@
         "productCode": "WUP-P-ARPP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cd45ca7dcc78c63c2d1b26f22f262b57019a3ad87fc230ffccf578177213ab09.jpg",
-        "updates": [
-            80
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [80],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010101f00",
@@ -112,9 +96,7 @@
         "productCode": "WUP-P-ALCJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ffc29524f79f0409d819feaee56d31a5b1866639995055136c5d6ebec3865084.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -124,9 +106,7 @@
         "productCode": "WUP-P-ALCE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0eb4b474329cdc6b6d6a5e0c680adbe04c95137114bd411882722bb2003dc7ed.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -136,9 +116,7 @@
         "productCode": "WUP-P-ALCP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9a16e39e7e73dda38a9410423d89d31a2b87be915c4a15ae807173c0a92da0a8.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -148,9 +126,7 @@
         "productCode": "WUP-P-ASTJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2320571ead1db81d7526d3decdc8bdc802c2ee6e7978b6dcf0bffc4bd4ec47da.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -160,9 +136,7 @@
         "productCode": "WUP-P-ASTE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bb3b912d303560164b6f04c2146db804912928e2d4a2774c8f971c46e9b24e37.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -172,9 +146,7 @@
         "productCode": "WUP-P-ASTP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5b9f9ef6d53bf1c0313654b17f03408603c1c3ad36f6e0762d9a490daf7cdd6f.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -244,9 +216,7 @@
         "productCode": "WUP-P-AHDJ",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/918f2db8739710b51122d2a31cd5955df3dba610f08cc60590c9d15654255167.jpg",
-        "updates": [
-            96
-        ],
+        "updates": [96],
         "dlc": []
     },
     {
@@ -266,9 +236,7 @@
         "productCode": "WUP-P-AURJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/16a7538d8d8d0cb7e7460ce0ac525c6fda873044f427d0cdd3a5092c4a345819.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -278,12 +246,8 @@
         "productCode": "WUP-P-ASSE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3fa377d57a5676199d0e3dfffd7c893b55b44cdc745a6523b8589b54f97e9aeb.jpg",
-        "updates": [
-            80
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [80],
+        "dlc": [48]
     },
     {
         "titleId": "0005000010106c00",
@@ -922,12 +886,8 @@
         "productCode": "WUP-P-AJDE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/aa424ed44ba8d207ed6bcbcc7e3126abdb2a6567ad05f38e40c7bf23310e9dbe.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [32],
+        "dlc": [80]
     },
     {
         "titleId": "000500001010af00",
@@ -936,12 +896,8 @@
         "productCode": "WUP-P-AMVE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e4f335ab8bf2bcd1137e08f85ccb4aaebb1479f2dff49f7e445ba49a9e56a87a.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "000500001010b000",
@@ -950,9 +906,7 @@
         "productCode": "WUP-P-ARBE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0ac6d037f2d551e2b0820e4381144194a3f47479482870ee17efc196cf505379.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -982,9 +936,7 @@
         "productCode": "WUP-P-AS2E",
         "companyCode": "008P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f6b3d414e437d723355b6db731664254729e21ef43ff2e6992cbec09230d5d7a.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -994,9 +946,7 @@
         "productCode": "WUP-P-ASPE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/458b37349e235155093723fc1395e65dd3963c47484540b0884119445a935e50.jpg",
-        "updates": [
-            33
-        ],
+        "updates": [33],
         "dlc": []
     },
     {
@@ -1016,9 +966,7 @@
         "productCode": "WUP-P-AYSE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/be1b60c3c46038509a5818d36ca414d25082456bad7d1721e5cd113c0f9792dd.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1028,9 +976,7 @@
         "productCode": "WUP-P-AURE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d02a4ae39ebcec2c468d6eb1232bd9c9688ad0c0c5fa0ec589b05f01afc44891.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1040,9 +986,7 @@
         "productCode": "WUP-P-AURP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4aee527097126ed4898a200f5cc1a18f4f6859afad57fc44fd3b7d3bfde9ed91.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1072,9 +1016,7 @@
         "productCode": "WUP-P-ANBE",
         "companyCode": "0054",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6134fea598971ff9d81a20f62a636eb9bf5d942aada0e55af53806475a8ee1e4.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1094,9 +1036,7 @@
         "productCode": "WUP-P-AZUE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/302222a093be91c75858b5eda48256be550e9dd7643248d12e2969e945658150.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1106,12 +1046,8 @@
         "productCode": "WUP-P-AS9E",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cf84a9d0d903d1faabeb9f3090eb45a2c7f2f17d69708715a6076bc314b5fbd8.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [48],
+        "dlc": [16]
     },
     {
         "titleId": "000500001010e400",
@@ -1140,12 +1076,8 @@
         "productCode": "WUP-P-AHBJ",
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/31e6232002b390a562fb1d9c7b4ca7bfa5b8dedd587f1e4ccfd0eb87c3e2e5d5.jpg",
-        "updates": [
-            64
-        ],
-        "dlc": [
-            96
-        ]
+        "updates": [64],
+        "dlc": [96]
     },
     {
         "titleId": "000500001010eb00",
@@ -1154,12 +1086,8 @@
         "productCode": "WUP-P-AMKJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0b30a9e493e0d5022c833aa950099ce89e64fe64db7a5e45e98e8a47558cc1df.jpg",
-        "updates": [
-            81
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [81],
+        "dlc": [80]
     },
     {
         "titleId": "000500001010ec00",
@@ -1168,12 +1096,8 @@
         "productCode": "WUP-P-AMKE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7c9d56833ae6f46c2ca420072fe0ec2490bda0842ca3f4415f90511e0572fdaa.jpg",
-        "updates": [
-            81
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [81],
+        "dlc": [80]
     },
     {
         "titleId": "000500001010ed00",
@@ -1182,12 +1106,8 @@
         "productCode": "WUP-P-AMKP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bd6a6c1c762406676e272e47fb23be5aef5f334a177aad2eccac6f67f2882d3a.jpg",
-        "updates": [
-            81
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [81],
+        "dlc": [80]
     },
     {
         "titleId": "000500001010ee00",
@@ -1196,9 +1116,7 @@
         "productCode": "WUP-P-AF3P",
         "companyCode": "0069",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/94600771391857aa9b9fa61ef42970639eb73de9dcc1af9bbbb9a5d04871b8fd.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -1208,9 +1126,7 @@
         "productCode": "WUP-P-AZUP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7e25a0a44bc771ac41e72b876de2c9cff15a703247768499dfc6ae4b5d0e3e15.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1220,12 +1136,8 @@
         "productCode": "WUP-P-AJDP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/61b1fb998398b94a91efe81f63c0f5efb4d7bb8e66ae29f326e83d5839b60738.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [32],
+        "dlc": [48]
     },
     {
         "titleId": "000500001010f100",
@@ -1274,12 +1186,8 @@
         "productCode": "WUP-P-ASSP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/43a40a9e0ce492c61753ae9909d561a4c5263b3758012a32f334007c4fcba0fd.jpg",
-        "updates": [
-            80
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [80],
+        "dlc": [48]
     },
     {
         "titleId": "000500001010f700",
@@ -1288,9 +1196,7 @@
         "productCode": "WUP-P-AYSP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/05d30c4979863876f5874bda0b3870c2d83cf4058e0710fc6fdb52241776f397.jpg",
-        "updates": [
-            33
-        ],
+        "updates": [33],
         "dlc": []
     },
     {
@@ -1300,9 +1206,7 @@
         "productCode": "WUP-P-AKNP",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6b111859cd964055b529bcc8cd3322a6790eea986b564ec05450450e4b407919.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1332,9 +1236,7 @@
         "productCode": "WUP-P-WDLP",
         "companyCode": "00NK",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/88407e49a7454a74966cbeb6d23213aaab200746ceae38c32785b7e597976a02.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -1344,9 +1246,7 @@
         "productCode": "WUP-P-ARBP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/13581840a2f5b402649ebd756683b3651e5b638fbd5509fdbdc43019797f7bb0.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -1356,9 +1256,7 @@
         "productCode": "WUP-P-AGPP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0378332168ca9117d97e2c9819b3e917faca9e41efa236c83b209567e0df347c.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -1368,9 +1266,7 @@
         "productCode": "WUP-P-AKNE",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9550ebba35a58ff9c1eba557af59100675b1c7ce743390f73e38b1fd1cd25702.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1380,9 +1276,7 @@
         "productCode": "WUP-P-WASE",
         "companyCode": "00JX",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0fb6437b8e9fdf9da7356776053b44304d04b068dbbca658a6ce8ecde50efafd.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -1392,12 +1286,8 @@
         "productCode": "WUP-P-AHBE",
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f574667b6b8740a11dc20fde8501ba5f7f33d869911813a13c8f01272fc947b1.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            96
-        ]
+        "updates": [32],
+        "dlc": [96]
     },
     {
         "titleId": "0005000010110500",
@@ -1416,9 +1306,7 @@
         "productCode": "WUP-P-WASP",
         "companyCode": "00JX",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ff6e75fd59ec61b33bd8b313dfa47347c32074d949ab4ac7b29ab5c809fc29f7.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -1428,12 +1316,8 @@
         "productCode": "WUP-P-AMVP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/58428b8affbe985958bade34c08020939a4a75615aa53fd7e7b99636afc9cb75.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010110900",
@@ -1442,9 +1326,7 @@
         "productCode": "WUP-P-ANGJ",
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/17b77a44f6cb01acaaedf91668b90336ac7ce8b4a61deec54daf495bfad48e3a.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -1454,9 +1336,7 @@
         "productCode": "WUP-P-ANGE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d102542f3eaf5c23f91cf0d0f0de6441cc3374902fb6222777046c84ff0c99cd.jpg",
-        "updates": [
-            80
-        ],
+        "updates": [80],
         "dlc": []
     },
     {
@@ -1466,9 +1346,7 @@
         "productCode": "WUP-P-ANGP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2c7958568837b225dfe85172675196129bfb786b0efcbf9383cfe17043883e10.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -1488,12 +1366,8 @@
         "productCode": "WUP-P-AXFJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9fe1acaeec3e4c62876dafc450d6a62dcc2010df05fab074e2a585acbd7b0225.jpg",
-        "updates": [
-            304
-        ],
-        "dlc": [
-            96
-        ]
+        "updates": [304],
+        "dlc": [96]
     },
     {
         "titleId": "0005000010110f00",
@@ -1562,12 +1436,8 @@
         "productCode": "WUP-P-AJSE",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7e182d46d78b5eb893533bb557cc5f8b9efe1c08ebd9c705d73f6517dbd38eca.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010111a00",
@@ -1576,12 +1446,8 @@
         "productCode": "WUP-P-AJSP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b2d05aed1752c5604cd679ebfa20bb5949d3abb4896f1f8707ddd94c5cfb9d68.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010111b00",
@@ -1600,9 +1466,7 @@
         "productCode": "WUP-P-AG9J",
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f213d8e34ab2f7a0ec1f97670fd9ff5d6418dfdc16db31fbc52f1fbbf68322d6.jpg",
-        "updates": [
-            33
-        ],
+        "updates": [33],
         "dlc": []
     },
     {
@@ -1612,9 +1476,7 @@
         "productCode": "WUP-P-ASPP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/98db8c177f393147a87683c499a7cc55a3d365ce480221e22907ae2149e4dce5.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -1624,9 +1486,7 @@
         "productCode": "WUP-P-AS2P",
         "companyCode": "008P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/514e7344162dc7eaf2baa42350b2a028a7c3a185524db78e5941a18bd0721bb7.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -1636,9 +1496,7 @@
         "productCode": "WUP-P-ACRE",
         "companyCode": "00G9",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c91e747ef4f1c65c6247283c48a395c8940f0ba4317ad4ec93e312a3c6939d1b.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -1648,9 +1506,7 @@
         "productCode": "WUP-P-WBDP",
         "companyCode": "00FZ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b01fb699729624e698fb308561bc9af2ca645987cadda5d536f3a648f5d85708.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -1660,9 +1516,7 @@
         "productCode": "WUP-P-AZUJ",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8a9c8878693068cf873fe7cc6fdab05387635961277678af59a39b55fe6e4b24.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1672,12 +1526,8 @@
         "productCode": "WUP-P-ASSJ",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/758be3238e62ace0c689a9da407999ac9b9782ffd3bd1f8180935aefaa97c3ea.jpg",
-        "updates": [
-            80
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [80],
+        "dlc": [48]
     },
     {
         "titleId": "0005000010112500",
@@ -1686,9 +1536,7 @@
         "productCode": "WUP-P-ASPJ",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a784bc2c884f9aeef3e2cdef392e785a8a61bebcd393ec3931647e9e0c030c28.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -1718,12 +1566,8 @@
         "productCode": "WUP-P-AS9J",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8440fe395eae9dddb8591977abf5f12e0db65243d38e121bc1afff4d38c0bd53.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [48],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010112900",
@@ -1742,12 +1586,8 @@
         "productCode": "WUP-P-AHBP",
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/def14583a7f571b060b6bccb016300a6ebccc8934c5f741401a636951490bc94.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            64
-        ]
+        "updates": [32],
+        "dlc": [64]
     },
     {
         "titleId": "0005000010112d00",
@@ -1776,9 +1616,7 @@
         "productCode": "WUP-P-ANBP",
         "companyCode": "0054",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/04fb158ebc2012091deab85abd8dce2633f93c5b223a4213c41e96dd65a20273.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -1788,12 +1626,8 @@
         "productCode": "WUP-P-ABHJ",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d356c4ee4494ac8611e64b4d4c43e1ef3d82a8ba52504b181392cdde1691b384.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010113200",
@@ -1822,12 +1656,8 @@
         "productCode": "WUP-P-WBAP",
         "companyCode": "00Y4",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/46bde706ae70efd5c6b1a1c55e53eb56672ff02e496fbd4765f7af53b41d9f4c.jpg",
-        "updates": [
-            96
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [96],
+        "dlc": [48]
     },
     {
         "titleId": "0005000010113a00",
@@ -1837,9 +1667,7 @@
         "companyCode": "00Y4",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b9655216d88b727ea31365aec5923de35a44bd2478ebaab26eda7345f73d0a44.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "0005000010113b00",
@@ -2118,12 +1946,8 @@
         "productCode": "WUP-P-ADQJ",
         "companyCode": "00GD",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e80b4ddf31549dd1365b873c4874eaa61e63371147bb740cd5b4692b480fa80c.jpg",
-        "updates": [
-            5904
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [5904],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010115f00",
@@ -2132,12 +1956,8 @@
         "productCode": "WUP-P-WBAE",
         "companyCode": "00Y4",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/939ea36cbb8a21191425a4b1cac3bfe2883a123c943aec4c2218cf6439679f4a.jpg",
-        "updates": [
-            96
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [96],
+        "dlc": [80]
     },
     {
         "titleId": "0005000010116100",
@@ -2146,12 +1966,8 @@
         "productCode": "WUP-P-AX5J",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/dc74395f17f7a32c545b431654e443a50b138bbd5af568f7e730fc16cc903626.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [48],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010116300",
@@ -2160,9 +1976,7 @@
         "productCode": "WUP-P-ACMJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/21fe3c8daff4c661d3f391ddb1a444b56168be8904b149685f97ff205714f03f.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -2182,9 +1996,7 @@
         "productCode": "WUP-P-WAAP",
         "companyCode": "00TW",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/deaff14f9837569c86480e41fe19f50c201d85d2a5a519c3cdb97048da35cc2a.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -2194,12 +2006,8 @@
         "productCode": "WUP-P-AH9J",
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d7afda41960ba4c20ad0f5287af3e0b90d078e22864453e9d55d94559b2839c4.jpg",
-        "updates": [
-            17
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [17],
+        "dlc": [32]
     },
     {
         "titleId": "0005000010116700",
@@ -2218,9 +2026,7 @@
         "productCode": "WUP-P-AHDP",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ab018f0d3ef6b866ba76dab74bbd9cfd60bf0a6d7e392b743e17d3224bc0fd3e.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -2230,9 +2036,7 @@
         "productCode": "WUP-P-WCAP",
         "companyCode": "00TJ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7cdeb3862d5d3dc1ff7d1ed33ef2cc24b3c4021d5f02b5c74024746aa622adac.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -2282,9 +2086,7 @@
         "productCode": "WUP-P-AHDE",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d8ed1a750c1c96e72353c5374fa71a17446982e48784e83b54f8131f7d41aa22.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -2494,9 +2296,7 @@
         "productCode": "WUP-P-AZUD",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7e25a0a44bc771ac41e72b876de2c9cff15a703247768499dfc6ae4b5d0e3e15.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -2576,12 +2376,8 @@
         "productCode": "WUP-P-WBTE",
         "companyCode": "00XY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1e7fc6c6aeb7f57efbc7f6f0fab378177ee61c01b703b5db69a59aaf5326961a.jpg",
-        "updates": [
-            33
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [33],
+        "dlc": [48]
     },
     {
         "titleId": "000500001011b000",
@@ -2620,9 +2416,7 @@
         "productCode": "WUP-P-AFBZ",
         "companyCode": "00TZ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3ae2381e18dc4f8a091cdd4217938b5c96a73d04f6b9949edccda6517fc8b173.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -2632,9 +2426,7 @@
         "productCode": "WUP-P-AQDJ",
         "companyCode": "00GD",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/612ea6a48ef01e5f3bc786b876613e24b41be5fd168a1c40b152b65e59905d5b.jpg",
-        "updates": [
-            96
-        ],
+        "updates": [96],
         "dlc": []
     },
     {
@@ -2644,9 +2436,7 @@
         "productCode": "WUP-P-WLAP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/765de03516431deaa0e9168d176afd490ecc17b4115e74e4cb29982b6f36e5f3.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -2666,9 +2456,7 @@
         "productCode": "WUP-P-WLAE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/04b075e76ef33494fa9589ec041cd4e8010518409c764d963518532ef24f9ec9.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -2678,9 +2466,7 @@
         "productCode": "WUP-P-WCAE",
         "companyCode": "00TJ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4621248cff7def7636809364a75b48fe07530dfbdaeaa9ae08b420916ab905f3.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -2760,9 +2546,7 @@
         "productCode": "WUP-P-ANSP",
         "companyCode": "0069",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5b8ab89a8eb032d7673589605d583f9b88ab994cbdcfd814c034082ef944a2ea.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -2782,9 +2566,7 @@
         "productCode": "WUP-P-WAAE",
         "companyCode": "00TW",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6562faa5dea33fb6cae03f38ebe502fc2edbdb30a995874453feed6f76cd48a0.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -2794,9 +2576,7 @@
         "productCode": "WUP-P-ANSE",
         "companyCode": "0069",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f23f2c3d294bc57d3ab5a1b712132bd9173165d004ba2d2ca31890935096e7c0.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -2816,9 +2596,7 @@
         "productCode": "WUP-P-WBDE",
         "companyCode": "00FZ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1a7e1420b0e1d96de8e8649ada83b5ba327fa1c3d89ad71b6be6f9ad67187ce4.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -2829,9 +2607,7 @@
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bdfb0a3157fa5ffc75d48abc2d6af5c7d8dc3162a07f9c068803fd831609cff2.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "0005000010128f00",
@@ -2840,12 +2616,8 @@
         "productCode": "WUP-P-ASNE",
         "companyCode": "008P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/31ded4d621464a58ac9dcc2e3e2c5d0daa60caa0653d35a48e64626a32731d02.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [48],
+        "dlc": [32]
     },
     {
         "titleId": "0005000010129000",
@@ -2854,9 +2626,7 @@
         "productCode": "WUP-P-WDKE",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/34c6e5d6a6b62a20887e86b0e59b6a98d811a171a9f0dc948aa6be0bea34f49b.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -2866,9 +2636,7 @@
         "productCode": "WUP-P-WDKP",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/941e1e7967b1a20f643fe48340e699d2e8126ce98eea4305dd1bd3059f85959d.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -3068,12 +2836,8 @@
         "productCode": "WUP-P-AS9P",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d4c20955cde6c3ac9c78a61294077c62a5f2ad605901bb2b62657de8ba1fc817.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [48],
+        "dlc": [16]
     },
     {
         "titleId": "000500001012ad00",
@@ -3092,12 +2856,8 @@
         "productCode": "WUP-P-ASNP",
         "companyCode": "008P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/885f4b88209a94a90ffb20cd8b2846707966d0e1e5ec34b55523a3f47a73b200.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [48],
+        "dlc": [32]
     },
     {
         "titleId": "000500001012b200",
@@ -3116,12 +2876,8 @@
         "productCode": "WUP-P-ABHP",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9a2bc66574611bd37b38beb0798d6632b7d467bdba12b834df0902cbfd977311.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "000500001012b500",
@@ -3140,9 +2896,7 @@
         "productCode": "WUP-P-ANSJ",
         "companyCode": "0013",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d7ed47dcdf3ef9d3781a23ed470dee295ca6b61e6c5b04ccfda5601e3a37e378.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -3153,9 +2907,7 @@
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/42882a8da6585136823160a43422e69a719eb7f8e0c039b7d9acb5b9c0bb2b88.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "000500001012b900",
@@ -3165,9 +2917,7 @@
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2cbb2d4be19515230077024736e3c66629db40f459df0a814a33f830b02b7492.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "000500001012ba00",
@@ -3186,12 +2936,8 @@
         "productCode": "WUP-P-AC3J",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a07fdcc37e806a2402760dbc7db48b32ab5a31949b7bf7f21210b1eee5607716.jpg",
-        "updates": [
-            96
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [96],
+        "dlc": [48]
     },
     {
         "titleId": "000500001012bd00",
@@ -3200,12 +2946,8 @@
         "productCode": "WUP-P-AC3E",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f7c70ad9f628b40a370a3efd66600d1096632f714577a3b3d51b2d8f70bae8e3.jpg",
-        "updates": [
-            96
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [96],
+        "dlc": [48]
     },
     {
         "titleId": "000500001012be00",
@@ -3214,12 +2956,8 @@
         "productCode": "WUP-P-AC3P",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1e69682faa879736b2cf17a62b45b19b11258e7d766b422d593de699113788ec.jpg",
-        "updates": [
-            96
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [96],
+        "dlc": [48]
     },
     {
         "titleId": "000500001012bf00",
@@ -3258,9 +2996,7 @@
         "productCode": "WUP-P-ACRP",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/58a13de25cbca6bf75f339b84227b944cc12b6f8c8a96f2c025e6833044e7565.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -3280,12 +3016,8 @@
         "productCode": "WUP-P-ABHE",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7d686ce54e5dab4703443f8ff970ac82fc6682573601ff836043ff961cb44999.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "000500001012d300",
@@ -3354,9 +3086,7 @@
         "productCode": "WUP-P-ACME",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/61926d8abaac4dd141b24d9ee201a881829a72e200930f544bb4d6c08e0a3bb2.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -3516,12 +3246,8 @@
         "productCode": "WUP-P-WFSE",
         "companyCode": "00JX",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9c9a223b44a14caed67450a1e966296e4f9178612ec9049081847cea44058cdd.jpg",
-        "updates": [
-            65
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [65],
+        "dlc": [0]
     },
     {
         "titleId": "000500001012f100",
@@ -3530,12 +3256,8 @@
         "productCode": "WUP-P-AWSJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/35b909c6bfe150b1284c7cb8e8214595448fb1ed9b999b540ddf3276d3f98d69.jpg",
-        "updates": [
-            112
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [112],
+        "dlc": [16]
     },
     {
         "titleId": "000500001012f200",
@@ -3545,9 +3267,7 @@
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9589e8576c1c49ddd0e4a7a1c5deff1cda13cb8bfe569f193b355ae586483e16.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "000500001012f300",
@@ -3956,12 +3676,8 @@
         "productCode": "WUP-P-ASEJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/597ffe0d2b8070ecfd469d3a1b15b1b361ff7bf933074e9ebf5fd43e733a5c8c.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [32],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010131e00",
@@ -3980,9 +3696,7 @@
         "productCode": "WUP-P-AYCJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b744ee19d346f25b979d0a3decf50f0b37964de59a1e55814271680e88990e3b.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -4013,9 +3727,7 @@
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/03d18c7d1ab8238bc97e9d5f5e450217ea1118503882d4d1b2ead08b04633432.jpg",
         "updates": [],
-        "dlc": [
-            112
-        ]
+        "dlc": [112]
     },
     {
         "titleId": "0005000010132400",
@@ -4024,9 +3736,7 @@
         "productCode": "WUP-P-ALMP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/46cdd51e01d0786773464441e176e4f0b8acfad70b7ae6e482cd90fa8ecba463.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -4036,9 +3746,7 @@
         "productCode": "WUP-P-WB9J",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/509aaf1a84d1df1f8533d9c02f44898d8d8ccbcd277c432b9f68fc567d96d3e2.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -4048,9 +3756,7 @@
         "productCode": "WUP-P-WB9E",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/11e70c6036475c7d25f1c7d3b379eeff51eb2401c974e2e471b0d93d02df7146.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -4060,9 +3766,7 @@
         "productCode": "WUP-P-WB9P",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f3a80c1d8a718e0b6841896e0ac11c7a8d5f56315ae5a597fe9c4be645fae614.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -4072,9 +3776,7 @@
         "productCode": "WUP-P-WEPE",
         "companyCode": "00UP",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8a9e0f9147cae6e508a6c24fb9a47d8347be88391fc550e70007dfa25b5bbe69.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -4084,9 +3786,7 @@
         "productCode": "WUP-P-ADSE",
         "companyCode": "004Q",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5dfc948edb452ffd08a23d16120f8f56f0c83cd74b8c4ff618ce0e387566b04d.jpg",
-        "updates": [
-            49
-        ],
+        "updates": [49],
         "dlc": []
     },
     {
@@ -4096,12 +3796,8 @@
         "productCode": "WUP-P-WA2P",
         "companyCode": "00Y4",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/36c8ab20b37c3c9cf59c5eb35df2ab625aeed9aa84d18b4d21fdf3e3e0c3a0ea.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [48],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010132b00",
@@ -4110,9 +3806,7 @@
         "productCode": "WUP-P-ALME",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9e3a230cf9829b8c3e66cd15e6f2498054899a066ff0c00e6f99414ec6f2125c.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -4223,9 +3917,7 @@
         "companyCode": "00Y4",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/668d27835e466a675d0ddc0adb67ccc56e1c9babda71c338f923603302f716e7.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "0005000010133800",
@@ -4235,9 +3927,7 @@
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/652828220516f6806eb57292f0fc01ab945ff68db6ced32c6139b995a8fa480c.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "0005000010133900",
@@ -4416,12 +4106,8 @@
         "productCode": "WUP-P-WA2E",
         "companyCode": "00Y4",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7acf2ebd9ca0b8e0cc26abb5ed581ecee00ce7164349c0b9f000b81817f190fd.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [48],
+        "dlc": [32]
     },
     {
         "titleId": "0005000010135300",
@@ -4430,9 +4116,7 @@
         "productCode": "WUP-P-ACMP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4f3315bd184ae5d452d0a49a7b641d4f900508fdd399641994c4cbfe85b098dc.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -4462,12 +4146,8 @@
         "productCode": "WUP-P-ASNJ",
         "companyCode": "008P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e1707b6586d0dada11e8d296089df8bd51c6c6481ceebacb97cedd404d2285c4.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [48],
+        "dlc": [32]
     },
     {
         "titleId": "0005000010135c00",
@@ -4516,12 +4196,8 @@
         "productCode": "WUP-P-WBTP",
         "companyCode": "00XY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/38255ac50513b0a203141e5c4c1548df2d348963a572b774b883bc46f0156ab3.jpg",
-        "updates": [
-            17
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [17],
+        "dlc": [32]
     },
     {
         "titleId": "0005000010136400",
@@ -4590,12 +4266,8 @@
         "productCode": "WUP-P-AZEP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8d3a01ec280f666601949f25b32e17b1e16ce2edcfe85755475566c46bd74977.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            64
-        ]
+        "updates": [16],
+        "dlc": [64]
     },
     {
         "titleId": "0005000010136d00",
@@ -4704,12 +4376,8 @@
         "productCode": "WUP-P-AZEE",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/88718e608ac8ac515756fb9d220a6b811184af4d899e7f233ba43c8cd445b221.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [16],
+        "dlc": [80]
     },
     {
         "titleId": "0005000010137d00",
@@ -4738,9 +4406,7 @@
         "productCode": "WUP-P-ARKE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1208e88e320fbbf732566f825fd2115aef3a1567e3cfa1f9c3d8fb6ae42e7180.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -4760,9 +4426,7 @@
         "productCode": "WUP-P-ARKP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/800d22dff689443b69da85d23752457eb8735c37c3c9f97e8fe8129f8487c5cc.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -4773,9 +4437,7 @@
         "companyCode": "00DV",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a1a5687a91699231cf6eba95dbbe1422d5a700535ec785e9831cc079d4d435c8.jpg",
         "updates": [],
-        "dlc": [
-            32
-        ]
+        "dlc": [32]
     },
     {
         "titleId": "0005000010138600",
@@ -4794,9 +4456,7 @@
         "productCode": "WUP-P-WB6P",
         "companyCode": "00YV",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/aae28715ca78b923ddf676dafeaf3a07b267c5c561c267b61f30e4932e40d322.jpg",
-        "updates": [
-            33
-        ],
+        "updates": [33],
         "dlc": []
     },
     {
@@ -4806,9 +4466,7 @@
         "productCode": "WUP-P-ASBP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d3a5a04afe54898ab9c0639b03ec36b3598a235e241c02a6f9c577df40385557.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -4819,9 +4477,7 @@
         "companyCode": "00GT",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/696cb7537397a4bf4fae40c7b17e0540e4d9d714606f3a5c6db9408e7c5f916f.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "0005000010138a00",
@@ -4840,9 +4496,7 @@
         "productCode": "WUP-P-ASBE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/31572c33c32a354904e420d9a595eca57ef0afc8dde8b544951afb5816e08f79.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -4862,9 +4516,7 @@
         "productCode": "WUP-P-WB7P",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7c8b2aeb8a05d1093217e0389db26ae840d04091da2135381977991a50140b09.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -4874,9 +4526,7 @@
         "productCode": "WUP-P-ADNJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1436f951e45952e928635fefec71f1803024b23b4c3d68826e74426a03137987.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -4886,9 +4536,7 @@
         "productCode": "WUP-P-ASFE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7b78a73cfe4ee2711642acc20fc90392ae268432c2bc05f46f141bebc79259f4.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -4908,9 +4556,7 @@
         "productCode": "WUP-P-WB7E",
         "companyCode": "0041",
         "iconUrl": null,
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -4930,12 +4576,8 @@
         "productCode": "WUP-P-AJ5E",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6fba651b9d72859413eb7a54e7214541e0286fd11e1eb96cfe17976830917f5c.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            144
-        ]
+        "updates": [16],
+        "dlc": [144]
     },
     {
         "titleId": "0005000010139a00",
@@ -4974,9 +4616,7 @@
         "productCode": "WUP-P-ASFP",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/152864ce87d573e7dcfc1289234ddd956e82ab9d89162ecff40ee81732fcc665.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -4987,9 +4627,7 @@
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/27b971bb2113a8576eba58a8d9613279d3862755b266a8c2216e7823c116d5ce.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "0005000010140600",
@@ -5008,12 +4646,8 @@
         "productCode": "WUP-P-AJSJ",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/822843d66087b85a496554ad7fe106ed4819d681510d7386724f8a05519b4c83.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010140800",
@@ -5233,9 +4867,7 @@
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a2136e7a586c1e97819fc22a289dbd7ae8101f7db384c5891b27c7c539e282d4.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "0005000010142700",
@@ -5244,9 +4876,7 @@
         "productCode": "WUP-P-AA9P",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5860753193d10d9d5fa0821412e93f910c24f5cfdac875a42e3edebf815238a3.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5266,9 +4896,7 @@
         "productCode": "WUP-P-AZBE",
         "companyCode": "005G",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/14dca1865c5e11877560e62be2fa8317635458a296ea5a42cfb41748d4aa3811.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5278,9 +4906,7 @@
         "productCode": "WUP-P-AA9J",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/df3516a9b93e21b1f79a897de73bd820eed7f413b58a2137dcd445fb7ac30833.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5290,9 +4916,7 @@
         "productCode": "WUP-P-AA9E",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a1e82fbfd0888596872d45b2f966ac5f0c867cb9dd01e7db6f70074d831ada59.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5372,12 +4996,8 @@
         "productCode": "WUP-P-AJ5P",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/162e3ba486ab776bb9bca3fe43d9fa81ac4dc99c2d2726f208c1e7bf2f7dd60f.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            128
-        ]
+        "updates": [16],
+        "dlc": [128]
     },
     {
         "titleId": "0005000010144000",
@@ -5386,12 +5006,8 @@
         "productCode": "WUP-P-ADVE",
         "companyCode": "00G9",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5f7fecb6c2c0fb650a8752c38fd225e22c1ff9e49edd0b90a488b9a3ee024217.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010144800",
@@ -5400,9 +5016,7 @@
         "productCode": "WUP-P-ARKJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6cd08b1c2f8e29c16afb796f76c0d21ac5b45098e8b44801f8bf4d1444cb97b4.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -5412,12 +5026,8 @@
         "productCode": "WUP-P-AWSE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8e084908f6dcca132217cf443677bf19555cce7f3506e66e2fb11ca807160756.jpg",
-        "updates": [
-            112
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [112],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010144e00",
@@ -5426,12 +5036,8 @@
         "productCode": "WUP-P-AWSP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/abb45e167dffb5397d42b5c01d5ff0767912cab95642218dc8da9f8bed16ad53.jpg",
-        "updates": [
-            112
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [112],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010144f00",
@@ -5440,12 +5046,8 @@
         "productCode": "WUP-P-AXFE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/db4f20e4024f7a0b3c3db01d4ef813d3530021cbc68b85ce3503483f9fa7dbb1.jpg",
-        "updates": [
-            304
-        ],
-        "dlc": [
-            96
-        ]
+        "updates": [304],
+        "dlc": [96]
     },
     {
         "titleId": "0005000010145000",
@@ -5454,12 +5056,8 @@
         "productCode": "WUP-P-AXFP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2dd6a1cb123c01dc5c106738db9f34f37d0688eac8eebfc1af99d28e5c65c102.jpg",
-        "updates": [
-            304
-        ],
-        "dlc": [
-            96
-        ]
+        "updates": [304],
+        "dlc": [96]
     },
     {
         "titleId": "0005000010145100",
@@ -5508,9 +5106,7 @@
         "productCode": "WUP-P-ADBA",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7243f892b09a7273c95658a22b175eafb2964e4bbff33af1217d16f26284a0a0.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5520,9 +5116,7 @@
         "productCode": "WUP-P-WEPP",
         "companyCode": "00UP",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5ab16d24f6627cc38a9146e650534c3b615b408ab9021ea2f643ee27f94143ed.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -5532,9 +5126,7 @@
         "productCode": "WUP-P-WCDP",
         "companyCode": "00HL",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/004a8ba0a653a48e8f8020e4c34827a6bb53d7cfc97eee9a78a2ff87900356eb.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5545,9 +5137,7 @@
         "companyCode": "00CY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/fae1a3a2f68e76470563f5c2883784575885cc9760a0a240845dc8973fea7e0d.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "0005000010145b00",
@@ -5596,9 +5186,7 @@
         "productCode": "WUP-P-WMGJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6594c7e488abcc4d1e00efa8e4ff13fd1a8b6b733d501306319f0bcdc605bccf.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5608,9 +5196,7 @@
         "productCode": "WUP-P-WMGE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8aa4d98938cafe3fbfaff229ca3b7f5045552639ae8c70bac4f61b8f719b2aa5.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5620,9 +5206,7 @@
         "productCode": "WUP-P-WMGP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/062d22d27c2f34cd28c5007bb6e7c6997a2d0f4f54cc810c223f7bef5eb3df33.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5683,9 +5267,7 @@
         "companyCode": "00CY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6b636a444fa39de94a9378ab1c25d43549c588745f82e7939dcd9c7332841282.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "0005000010147500",
@@ -5704,9 +5286,7 @@
         "productCode": "WUP-P-WEVP",
         "companyCode": "00DZ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6e06ad9bfabf3b843907818fcfde387c3c2189fd73243990a422d0f411e0cff2.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -5776,9 +5356,7 @@
         "productCode": "WUP-P-WB6E",
         "companyCode": "00YV",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0d7092179dfcea6c81a134af00f544240f8f48928e6a59d2b0c65d6057df4178.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -5788,12 +5366,8 @@
         "productCode": "WUP-P-AUNJ",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7e760bb1280b189a9b4da50e2dfea924536bb25fb72689deb5a256f6547eeb70.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [16],
+        "dlc": [32]
     },
     {
         "titleId": "0005000010148200",
@@ -5802,9 +5376,7 @@
         "productCode": "WUP-P-WAEE",
         "companyCode": "00UP",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4ee70aa2dbeb1b79d5da216be0df93c9f94d3b44aac89f6a33b4b1625be9515e.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5824,9 +5396,7 @@
         "productCode": "WUP-P-WLAJ",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5746fdab05fe38a734fae94fea8092a5f785fe63fc1e6e69451ce7c5bd876422.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -5856,9 +5426,7 @@
         "productCode": "WUP-P-WDFP",
         "companyCode": "00SS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/902083c1266fc5595d89b9a73d632d7e2556cfbf7ad89dc62a2041e378f54df3.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -5888,9 +5456,7 @@
         "productCode": "WUP-P-WKTE",
         "companyCode": "00CS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9f96000d11e82f22a3d5b01347fb194efa5eb166a86fe72c58ec4297d9925be5.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -5910,9 +5476,7 @@
         "productCode": "WUP-P-WAUJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2903c67303b7ef6b04188ee488832d68866a3cffc55b1bb3fda5daf7a7432dd3.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -6193,9 +5757,7 @@
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e28ac7477038d0c8944b7826a01d631e7bea0642f71442ed2ca0e9ba11a5f5b8.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "000500001014c100",
@@ -6224,9 +5786,7 @@
         "productCode": "WUP-P-WGSP",
         "companyCode": "00CX",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f6a6e7f1300e56e4e7264526cdb435fd293bf6d4703218e0428e775c36991335.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -6237,9 +5797,7 @@
         "companyCode": "00GT",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2dba032cd4b1c7234347b24e24c2f09f75e0f37a9e377096049b6c7c0ae342a0.jpg",
         "updates": [],
-        "dlc": [
-            32
-        ]
+        "dlc": [32]
     },
     {
         "titleId": "000500001014c800",
@@ -6248,9 +5806,7 @@
         "productCode": "WUP-P-ASBJ",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5d81fc0e396199ca05069f1dbadefef8cb663c2f1333c9e427e86491099aef87.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -6280,9 +5836,7 @@
         "productCode": "WUP-P-WGSE",
         "companyCode": "00CX",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e910aefbf0603be78a8c4c60f704853fbb256b05b65f34466a65181e58c73a13.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -6312,9 +5866,7 @@
         "productCode": "WUP-P-WCDE",
         "companyCode": "00HL",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/dc3ebd24fa0de4fe4248acf5b265a6aa1ab63df0b3a9acc6961717e3e2cecdec.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -6334,9 +5886,7 @@
         "productCode": "WUP-P-WKTP",
         "companyCode": "00CS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ea1a76f18402c418a555f4429dd3f99c8e1c556f706852c2f9ca65528fddad4a.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -6376,12 +5926,8 @@
         "productCode": "WUP-P-APTJ",
         "companyCode": "008P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/218f8ebc055438690359a129bd69610802bdef3838dd0b6989b7fc8cad9d61be.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [32],
+        "dlc": [16]
     },
     {
         "titleId": "000500001014da00",
@@ -6390,9 +5936,7 @@
         "productCode": "WUP-P-AMFJ",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0ff74207378247b108d94599afbabdd062da3a0002a938f9401aa3878bbd8b93.jpg",
-        "updates": [
-            2064
-        ],
+        "updates": [2064],
         "dlc": []
     },
     {
@@ -6422,9 +5966,7 @@
         "productCode": "WUP-P-ALAE",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/412cdb6645280362b5d99b71a0e84a3a4adb374372c9e81d074500f6789cebbd.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -6444,9 +5986,7 @@
         "productCode": "WUP-P-ALAP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/00a7ed8a84060f362e0dc105f7c6e475260cb880a7def7abacda739166108996.jpg",
-        "updates": [
-            18
-        ],
+        "updates": [18],
         "dlc": []
     },
     {
@@ -6456,12 +5996,8 @@
         "productCode": "WUP-P-ADVP",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3cd4eac3b7105076fb8c04bd095accb2fb9d318879d45d67573ae1f427229ab4.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "000500001014ef00",
@@ -7050,12 +6586,8 @@
         "productCode": "WUP-P-AZEJ",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5be36c5d9d75d4beb36605eb049179b319a721ef45ffad23cdf6b63bfa4c50bf.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [16],
+        "dlc": [80]
     },
     {
         "titleId": "0005000010154800",
@@ -7114,9 +6646,7 @@
         "productCode": "WUP-P-WC3P",
         "companyCode": "00BU",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a8398c8f397e116a7b87b851f9a56fcfa70f84452bc2812e29567eace14a7351.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -7166,9 +6696,7 @@
         "productCode": "WUP-P-WC3E",
         "companyCode": "00BU",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d6f630dd9cd4a97eae95b03c4402940eec31bfe6e1dc5a912747c9fbc2213e23.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -7598,9 +7126,7 @@
         "productCode": "WUP-P-AFCJ",
         "companyCode": "0001",
         "iconUrl": null,
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -7610,9 +7136,7 @@
         "productCode": "WUP-P-AFCE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b055bd5b5d8e4e55fa1e17187ef63a29124a683e47bef6c3751c3dabe4dbf5c7.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -7622,9 +7146,7 @@
         "productCode": "WUP-P-AFCP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ad266c660c1c3556ae0695c5cf1306bf3f357dead76dc1d74650fe76f6b5b27d.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -7644,9 +7166,7 @@
         "productCode": "WUP-P-ACLE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6854b0f19901c37cefb43a5b61aa61661c2b6f3af8785d9f1e601a39acbe89f9.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -7966,12 +7486,8 @@
         "productCode": "WUP-P-WLCE",
         "companyCode": "00AS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bd4b5e3584416b91070ee9cec92cf9d9da1e1381b1d4b89ba35db1eb1da74df9.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [32],
+        "dlc": [32]
     },
     {
         "titleId": "000500001015d700",
@@ -8140,9 +7656,7 @@
         "productCode": "WUP-P-WHYJ",
         "companyCode": "00R7",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/12220edd1774fa531a55285a52b9020c77a90895fcedc0f734931a2ca0fc7807.jpg",
-        "updates": [
-            18
-        ],
+        "updates": [18],
         "dlc": []
     },
     {
@@ -8592,9 +8106,7 @@
         "productCode": "WUP-P-ABAJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3a09ea1e03645b4ed1ef4a9423891076150eac39ca496bc0673aad5dc7b2d219.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -8614,9 +8126,7 @@
         "productCode": "WUP-P-WCZP",
         "companyCode": "00YR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/915ae81820645464a6db18cb5cc25eb754df977e3a36d1c8756679a359ef07bd.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -8666,9 +8176,7 @@
         "productCode": "WUP-P-AGMJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/48a8ac64ac0ca8e2843001c61e1f53f059eabaaab600b9d10535979d99315e9b.jpg",
-        "updates": [
-            288
-        ],
+        "updates": [288],
         "dlc": []
     },
     {
@@ -8678,9 +8186,7 @@
         "productCode": "WUP-P-ABAE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/60a2e4bf7bebce3e78a5575f973439bdec87c6344394935a565e24b5b713d7f9.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -9640,9 +9146,7 @@
         "productCode": "WUP-P-WEPS",
         "companyCode": "00UP",
         "iconUrl": null,
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -9762,9 +9266,7 @@
         "productCode": "WUP-P-WBXP",
         "companyCode": "00SS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/92dad40c8685931132230ad54151f4ab36597ac8b623e7f84bbc9a5637c8e232.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -9784,9 +9286,7 @@
         "productCode": "WUP-P-BTMP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/efdd0a31aee7bbb77af1ca4570b775c1617c58d94478f793673ec660d71aed39.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -9806,9 +9306,7 @@
         "productCode": "WUP-P-WB6J",
         "companyCode": "00TF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/00c52c2d1dd422df1a64d9c8ccc134dd14bacc6e9275de05cb5a2b9bbdf47390.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -9858,9 +9356,7 @@
         "productCode": "WUP-P-WBXE",
         "companyCode": "00SS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4467869802bb7ef36391838338c20a1bd4353885c8b365cdb3bbd9688dfba6b4.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -9870,9 +9366,7 @@
         "productCode": "WUP-P-WMLE",
         "companyCode": "009T",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/567cc005c83969c4cf548d9e38ebbaf519ef337e6fbbb7308eb9eac9df9f21a5.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -9882,9 +9376,7 @@
         "productCode": "WUP-P-BTME",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f551e2d38de9e88d9e801f4a5e85d56099920441b911a849826c02394a027374.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -9924,9 +9416,7 @@
         "productCode": "WUP-P-WMRE",
         "companyCode": "009V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/52e5cca663c2d9cc0089e1711e5ac9b3bf84c42bb36306814c2f308086bd38aa.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10136,9 +9626,7 @@
         "productCode": "WUP-P-WMLP",
         "companyCode": "009T",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f4d05d3a6cef884716b7ecfbef503692fbdd4317ff52dda3585c7bac07386e44.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10148,9 +9636,7 @@
         "productCode": "WUP-P-WCZE",
         "companyCode": "00YR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/de1c016b8c6342b9adcc555bc47f03464cd9bcc9a52e61bb96a55351b55a65ba.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10220,9 +9706,7 @@
         "productCode": "WUP-P-WCTP",
         "companyCode": "009Y",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/898d2197e6083babd69c0a22793f392b8707952a1e314e022be8558405176f87.jpg",
-        "updates": [
-            22
-        ],
+        "updates": [22],
         "dlc": []
     },
     {
@@ -10242,9 +9726,7 @@
         "productCode": "WUP-P-ACLJ",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a16ae89098e645e2a9638f076ff8885d0580062ff1035cc26f3ed9e4d28643b1.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10284,9 +9766,7 @@
         "productCode": "WUP-P-ADRE",
         "companyCode": "004Q",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/28f82c8a0f15cf9cc345232186ef84c5adbcd75a5ea30642e8e47f4bd1350d4a.jpg",
-        "updates": [
-            80
-        ],
+        "updates": [80],
         "dlc": []
     },
     {
@@ -10306,9 +9786,7 @@
         "productCode": "WUP-P-WCTE",
         "companyCode": "009Y",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9c4e33e013c77e4e1187fef6d9212e9d6a7a31bf48c283d8a8a3c186f646f06d.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10338,9 +9816,7 @@
         "productCode": "WUP-P-WKNE",
         "companyCode": "00AY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/03c34d53adef1c35274828fbbd49adeea9912fd8641fd026e5842af02ea15b99.jpg",
-        "updates": [
-            128
-        ],
+        "updates": [128],
         "dlc": []
     },
     {
@@ -10360,9 +9836,7 @@
         "productCode": "WUP-P-WGRE",
         "companyCode": "008S",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4c898aa075c11699d73f658a70bedfa66b5d9d1052caba4049a743f03660c14f.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10402,9 +9876,7 @@
         "productCode": "WUP-P-WMRP",
         "companyCode": "009V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/df56a932102bc94c5ff92187b539e0262945d6e9d8a16f4751772fe4990bced4.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10424,9 +9896,7 @@
         "productCode": "WUP-P-ACLP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b4dff82db0e1fa863883b6918214e130519ce35280bf14efd7552b8c219ba434.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10586,9 +10056,7 @@
         "productCode": "WUP-P-WFWE",
         "companyCode": "00NT",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b291ad8ce9ca9acbfcace4f897fd4f9ad4f19f343583d6ced003f3ba8cf7d71c.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -10608,9 +10076,7 @@
         "productCode": "WUP-P-WGAE",
         "companyCode": "007Z",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5c6df97f1c950e45d8693f68cb85deb3bb80a31471a1f7210b4d8031bf4b4697.jpg",
-        "updates": [
-            33
-        ],
+        "updates": [33],
         "dlc": []
     },
     {
@@ -10630,12 +10096,8 @@
         "productCode": "WUP-P-ABWJ",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/44aaa80173cd49da5fd35acc6bcc08f5bef2719481b313fd4911a6fe59f82808.jpg",
-        "updates": [
-            17
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [17],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010170800",
@@ -10924,9 +10386,7 @@
         "productCode": "WUP-N-HRLE",
         "companyCode": "009Z",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f08b2c70133a1d5f3acd5634caff9bc63b342c31a710f3dffe7e7acf9f562a78.jpg",
-        "updates": [
-            49
-        ],
+        "updates": [49],
         "dlc": []
     },
     {
@@ -10936,9 +10396,7 @@
         "productCode": "WUP-N-HRLP",
         "companyCode": "009Z",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/320c1ccf2505b4f3fa88ed3cefde207c5bd65dffec6c27276835bdf26358afb6.jpg",
-        "updates": [
-            49
-        ],
+        "updates": [49],
         "dlc": []
     },
     {
@@ -11018,9 +10476,7 @@
         "productCode": "WUP-P-WCGP",
         "companyCode": "00UB",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/36d50c47bed8ecb614aaa435b3cad1d695e3786d1c28acdd1ed31286eae58b05.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -11400,12 +10856,8 @@
         "productCode": "WUP-P-BSSE",
         "companyCode": "008P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a11772fea7d6f1e55dbb6411b1bbbb8ad8c4829b950df3ec70e44d12aa4353c5.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010175c00",
@@ -11415,9 +10867,7 @@
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9cfd7103e4a0636fdecc9617a42517d5e43b937d77f9fe73f86cc124c166e97f.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "0005000010175d00",
@@ -11426,12 +10876,8 @@
         "productCode": "WUP-P-AUNP",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9ac0037051bb8f4987a0818b2aba70c37901fb8d20795488fa0b0ed377387cef.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [16],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010175e00",
@@ -11510,9 +10956,7 @@
         "productCode": "WUP-P-WCGE",
         "companyCode": "00UB",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6c6ede811afc57061529bcf20ea07cd891d87e08a7b610f4c60fbf6f514d6799.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -11522,9 +10966,7 @@
         "productCode": "WUP-P-WG8J",
         "companyCode": "00R5",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/10c7f978bbf867a60c401245d7b6eb797f7d8e557fe0feaaeed3ffd5afe81abb.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -11554,9 +10996,7 @@
         "productCode": "WUP-P-AGME",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cbfd34ab4b780df95328c39b082d948832d2cdd2d9d06f5554b91425e0596458.jpg",
-        "updates": [
-            288
-        ],
+        "updates": [288],
         "dlc": []
     },
     {
@@ -11566,9 +11006,7 @@
         "productCode": "WUP-P-AGMP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f77607e7a1124325a99da699b31b5f2da77c6473aacb0ff3b99d68b8ba1668c9.jpg",
-        "updates": [
-            288
-        ],
+        "updates": [288],
         "dlc": []
     },
     {
@@ -11618,12 +11056,8 @@
         "productCode": "WUP-P-BJDP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1c1b3e413d5a4765d516cf528b8ac9389f90e7f3645671cac86c9c51789796f5.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [16],
+        "dlc": [32]
     },
     {
         "titleId": "0005000010177000",
@@ -11682,9 +11116,7 @@
         "productCode": "WUP-P-ADNE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e4078a15f1b5400a7ca686410f4de5d5f26f2e7432b07c4f76953b329e8530ca.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -11704,12 +11136,8 @@
         "productCode": "WUP-P-BSSP",
         "companyCode": "008P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c595c1d4a520669afd7542cb201d51c66e394795f98432ec37a1a3aa7117f536.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "0005000010177900",
@@ -11928,9 +11356,7 @@
         "productCode": "WUP-P-WKNP",
         "companyCode": "00AY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/03c34d53adef1c35274828fbbd49adeea9912fd8641fd026e5842af02ea15b99.jpg",
-        "updates": [
-            96
-        ],
+        "updates": [96],
         "dlc": []
     },
     {
@@ -11940,12 +11366,8 @@
         "productCode": "WUP-P-BJDE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/20de27639c9895c3edbcd059684c4a0c0ad6c491f897c202018f21f24b07001d.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [16],
+        "dlc": [32]
     },
     {
         "titleId": "0005000010179200",
@@ -12344,9 +11766,7 @@
         "productCode": "WUP-P-BXAJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/911511042714a62eb2b44b7d450978c87e29d9a22e176a19f610d2c9d4b0950e.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -12356,9 +11776,7 @@
         "productCode": "WUP-P-BXAE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/756d5867acb73ba7cda7d25008a3cbd84fc3308af3df052b0aec9fe79559b38c.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -12388,9 +11806,7 @@
         "productCode": "WUP-P-BK7E",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2cb3da7f48ca94691b3e89af7903a5ef65ec0472ecd493127017747afe9d50c7.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -12450,12 +11866,8 @@
         "productCode": "WUP-P-BWPJ",
         "companyCode": "00C8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/02097b6c92fa3dc862ecd5f0be2e1fa79e1dc2f9c242f0890a2c4c754c3f3d57.jpg",
-        "updates": [
-            272
-        ],
-        "dlc": [
-            192
-        ]
+        "updates": [272],
+        "dlc": [192]
     },
     {
         "titleId": "000500001017ce00",
@@ -12554,12 +11966,8 @@
         "productCode": "WUP-P-BWPE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d13de39c581beace3145a4ba657efdb48df896ab034ee30bc75cbc56ac81d4dc.jpg",
-        "updates": [
-            208
-        ],
-        "dlc": [
-            208
-        ]
+        "updates": [208],
+        "dlc": [208]
     },
     {
         "titleId": "000500001017d900",
@@ -12568,12 +11976,8 @@
         "productCode": "WUP-P-BWPP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2ae9034bf518771919d166c2cd311c317335038c432b70101e32c3407a0774c0.jpg",
-        "updates": [
-            208
-        ],
-        "dlc": [
-            208
-        ]
+        "updates": [208],
+        "dlc": [208]
     },
     {
         "titleId": "000500001017da00",
@@ -12582,9 +11986,7 @@
         "productCode": "WUP-P-ACQE",
         "companyCode": "011S",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/975ed548b80861d0b9578f1a61891ac5b8c4b612d0bda91152810322555c3946.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -12614,9 +12016,7 @@
         "productCode": "WUP-P-WK8P",
         "companyCode": "00XQ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/51533d8949c53881983925ff5e95f375074ca7db92f94b15201e7d19d2dad519.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -12636,9 +12036,7 @@
         "productCode": "WUP-P-WTSP",
         "companyCode": "0102",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/35f2c767484bbc816900dfbe8e063654f258eb8c59dfabe72fe4f65ddce21df5.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -12688,9 +12086,7 @@
         "productCode": "WUP-P-WTSE",
         "companyCode": "0102",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/35f2c767484bbc816900dfbe8e063654f258eb8c59dfabe72fe4f65ddce21df5.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -12701,9 +12097,7 @@
         "companyCode": "00W8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/17fcfd2a106f6ea83f7346e5fb5f5fa0e65cbbadf5362496931d4cab2f090a3d.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "000500001017ec00",
@@ -12962,9 +12356,7 @@
         "productCode": "WUP-P-AKBJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/df2789f59484f83b7e0985c8cf8c11fa9995bd2ac055e8d72c5586c8ae8333d8.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -12974,9 +12366,7 @@
         "productCode": "WUP-P-AKBE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5fe3042a84fe93c12ac114cfac819295df4cf2e2905b7d2dcdec30668ffc50d1.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -12986,9 +12376,7 @@
         "productCode": "WUP-P-AKBP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/22a8ca35b4fc9760e573f5ef6371fe5f5c4039af3dc440d04a55aa92823cef3f.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -13098,9 +12486,7 @@
         "productCode": "WUP-P-BK7P",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6ea8773f80c0ce81fef68d90c217d93a5c73d8c195b197c3806d9b164bb1702c.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -13190,9 +12576,7 @@
         "productCode": "WUP-P-AJTP",
         "companyCode": "00XT",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a83d2615c51b024cd7ba0b0a4254c7b190b529023b3384bb4ab7800a688ae903.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -13232,12 +12616,8 @@
         "productCode": "WUP-P-ARNE",
         "companyCode": "010P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/eb81a4d238c484448ad0b6d99566b06862e0361087e954f29438935811fb3bd5.jpg",
-        "updates": [
-            80
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [80],
+        "dlc": [16]
     },
     {
         "titleId": "0005000010183100",
@@ -13306,9 +12686,7 @@
         "productCode": "WUP-P-BMVE",
         "companyCode": "00UP",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8c19152d04247055480a5cb689d00dbf70e2b981e5e4150648797a63d1ea1ef1.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -13418,9 +12796,7 @@
         "productCode": "WUP-P-AYCE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4376b69d9db235d7f2c4659befb2278dbcf6a0a4dfc16ffc56c5e36bafe75e35.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -13430,9 +12806,7 @@
         "productCode": "WUP-P-AYCP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bc629014c9a414c7045f32ab4086fb95671d3a935aa45c1c3ba528a60829b2d1.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -13712,9 +13086,7 @@
         "productCode": "WUP-P-BUGP",
         "companyCode": "00LW",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/882ecb607f6bb083d288cf47725d70107d221ebe3aa151a8603ae99c533fa37c.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -13743,7 +13115,7 @@
         "region": "USA",
         "productCode": "WUP-P-BMNE",
         "companyCode": "0116",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8dcacabc0cb6683aa29a062795cb8fc129e30f98814a164e9af378b6b7296ba2.jpg",
         "updates": [],
         "dlc": []
     },
@@ -13874,9 +13246,7 @@
         "productCode": "WUP-P-AXYJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/dec315bfec55b6cab22cbdf7cb2ec60ea66c23fbaa188bad57dbe199e0495fe6.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -13886,9 +13256,7 @@
         "productCode": "WUP-P-ADRP",
         "companyCode": "004Q",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d2e95c5b89a777338686920d767fe501de932355e11fe24b91b5ce6231e05943.jpg",
-        "updates": [
-            80
-        ],
+        "updates": [80],
         "dlc": []
     },
     {
@@ -13898,9 +13266,7 @@
         "productCode": "WUP-P-ADRZ",
         "companyCode": "004Q",
         "iconUrl": null,
-        "updates": [
-            80
-        ],
+        "updates": [80],
         "dlc": []
     },
     {
@@ -13930,9 +13296,7 @@
         "productCode": "WUP-P-BSPE",
         "companyCode": "011C",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6f4eb5cea8adbbe84aad0e92a0b2ebaba292e2d027be0d08c6d231de842aeeab.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -14282,9 +13646,7 @@
         "productCode": "WUP-P-BSFJ",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/be448c70798c8eac00b23f0cec9cb1e7b1d9f642c13aee5e1cb1dc0c95b4bb51.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -14434,9 +13796,7 @@
         "productCode": "WUP-P-APHJ",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3a992dba4120f1d7370e33b0f0d3d544275a4f3bd92a375a6cbd1045c78a8769.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -14446,9 +13806,7 @@
         "productCode": "WUP-P-AMAJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8ec5f8b89ff5f1c67d5f2fe4496fbcdfef1e01edadedcfb378eafff8681eba36.jpg",
-        "updates": [
-            272
-        ],
+        "updates": [272],
         "dlc": []
     },
     {
@@ -14458,9 +13816,7 @@
         "productCode": "WUP-P-AMAE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/64ccd83ae41ffe815ef8c9cd7bc2c3cf8fbc6feed68f2f93f38b0bf9878b0d86.jpg",
-        "updates": [
-            272
-        ],
+        "updates": [272],
         "dlc": []
     },
     {
@@ -14470,9 +13826,7 @@
         "productCode": "WUP-P-AMAP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/afca513bfefadfbb732c2f47215bc0e600a338e549b43a9dceca345bf4fdf5be.jpg",
-        "updates": [
-            272
-        ],
+        "updates": [272],
         "dlc": []
     },
     {
@@ -14482,9 +13836,7 @@
         "productCode": "WUP-P-ATCP",
         "companyCode": "00NK",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/aae13d1453e8b34f731eb687433c40daec348e74f09357968c5052211592174b.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -14604,9 +13956,7 @@
         "productCode": "WUP-P-ATCE",
         "companyCode": "00NK",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a91d4a6c6f05f3841f5baa8291aa40c25ac13d033be9937f327c3a14b653ccbb.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -14746,9 +14096,7 @@
         "productCode": "WUP-P-ABJJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ec87c25ed84905d3d89293b73e400c81b997fe832d4f0801fcd791495dcf2530.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -14898,9 +14246,7 @@
         "productCode": "WUP-P-BMVP",
         "companyCode": "00UP",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/55ab2b86075515c7c09145f4b64317710477eaa517fde2214d1738ed8e7a1fb8.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -14910,9 +14256,7 @@
         "productCode": "WUP-P-WAEP",
         "companyCode": "00UP",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/781021d5b8573a26088fd61f3e083a8643cc8e2095c9be9fa21711f18dec1350.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -14933,9 +14277,7 @@
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e0c83a9afb8771f2ea22ec943278829ef41015ca4af8c79e752ddb17d12d80f9.jpg",
         "updates": [],
-        "dlc": [
-            96
-        ]
+        "dlc": [96]
     },
     {
         "titleId": "0005000010192100",
@@ -15094,9 +14436,7 @@
         "productCode": "WUP-P-BLKP",
         "companyCode": "006V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1bfbc4a59432f4118a42f267f811b319d59a848bac965fc84ce39f714d8aa82e.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -15106,9 +14446,7 @@
         "productCode": "WUP-P-BLKE",
         "companyCode": "006V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/010ad51d0e9bee332fff0da3dd750a5b4c07a0e10e2e8f7d9ba05c972aeb9dae.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -15138,9 +14476,7 @@
         "productCode": "WUP-P-ATFE",
         "companyCode": "012Q",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ca61f9ad6c5c1241f2b600f1645596388075132897f2078168ebe7d69c5efaf7.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -15540,9 +14876,7 @@
         "productCode": "WUP-P-ACQP",
         "companyCode": "011S",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9cd9cf28f433a1df696892162ab4dedc503a835f2e5ac50cfdc43f698d4989f0.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -15712,9 +15046,7 @@
         "productCode": "WUP-P-BTXP",
         "companyCode": "00GT",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/56de94efcbf16b7d4197742307bc445d59b65854bfecbd841841a042dd7e974e.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -15724,9 +15056,7 @@
         "productCode": "WUP-P-AVXJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c9b0b63465c4dd55dfdd27a144b90dc4adf5824f8ad896f7c12026d63108db90.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -15926,9 +15256,7 @@
         "productCode": "WUP-P-BEQE",
         "companyCode": "011A",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d74dfcf2a6ccebf45761a873b6c1260fad6ff6d397921d8504f1d6f533ab0b13.jpg",
-        "updates": [
-            114
-        ],
+        "updates": [114],
         "dlc": []
     },
     {
@@ -15958,9 +15286,7 @@
         "productCode": "WUP-P-BTCP",
         "companyCode": "009Y",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/41140a886c8c2032c9f1f5227e08f5f60745fd37df4b338bf78e4e24d4929adf.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -16030,9 +15356,7 @@
         "productCode": "WUP-P-BTXE",
         "companyCode": "00GT",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/21747d3f6c3490e4328da71e11d1677afdbb27ac2da4ecf36c9e621dd7c789ea.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -16042,9 +15366,7 @@
         "productCode": "WUP-P-AZAJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b05e60fb155d21726ab85e3317fd5e12954c575cd6bb427d82338543fe3d13b2.jpg",
-        "updates": [
-            82
-        ],
+        "updates": [82],
         "dlc": []
     },
     {
@@ -16324,9 +15646,7 @@
         "productCode": "WUP-P-AZAE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/075bf3f2522b9bb1f9bf41e4c6aa72d02adf4263b5acf002e53e8e043df7bb23.jpg",
-        "updates": [
-            81
-        ],
+        "updates": [81],
         "dlc": []
     },
     {
@@ -16696,9 +16016,7 @@
         "productCode": "WUP-P-BS2E",
         "companyCode": "00RG",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/396b8b549ab916fd2c7eaefe39b22e99b26ddc989c1113f4d75228b8ff419d25.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -16798,9 +16116,7 @@
         "productCode": "WUP-P-WKFJ",
         "companyCode": "00W4",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4c9d93bec41e48029a9075e8c3ef88e0c14b96febce9bc80520d2099a92565e6.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -16850,9 +16166,7 @@
         "productCode": "WUP-P-WEXJ",
         "companyCode": "00TF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2c6b7fd4059e917aba9291052bd5ec8380ecc2e6f33bbced1c3d000797dc00b4.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -16922,9 +16236,7 @@
         "productCode": "WUP-P-AVXE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8e2a49b43049218cfea3ce5a89642ff22368c7d64d688b4a294c3fd6ee253734.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -16934,9 +16246,7 @@
         "productCode": "WUP-P-AVXP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6dd7da7204311b9801bcd4b3301a0d2871338cba534f95ec10d90c43d22c41c4.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -16947,9 +16257,7 @@
         "companyCode": "00VW",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/43fcc2272fdf4a158fb8cba7b7d38a6b21ab9ca2c095eaa9ae1ca55e5530849a.jpg",
         "updates": [],
-        "dlc": [
-            32
-        ]
+        "dlc": [32]
     },
     {
         "titleId": "00050000101a3800",
@@ -16978,9 +16286,7 @@
         "productCode": "WUP-P-BLPE",
         "companyCode": "00LY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2626d83cdc202d12e08f6beba25649eed0ee83846561aa3bb7c0fbb07f5b86d0.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17021,9 +16327,7 @@
         "companyCode": "00VW",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b150f01b0e9c12d027a3053c5ed8b9b596b6efed2a0f780b8244653a4c17cb32.jpg",
         "updates": [],
-        "dlc": [
-            32
-        ]
+        "dlc": [32]
     },
     {
         "titleId": "00050000101a4300",
@@ -17031,7 +16335,7 @@
         "region": "USA",
         "productCode": "WUP-P-BTBE",
         "companyCode": "013S",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b8773554d96952b5c214a3faccf9105077707b66d96015e518497472fcb6bdb9.jpg",
         "updates": [],
         "dlc": []
     },
@@ -17062,9 +16366,7 @@
         "productCode": "WUP-P-APHE",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3c82107159c73a46b8f6f0ba4e88f7ab086388828480ff0adeb6b313c0b3be71.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17074,9 +16376,7 @@
         "productCode": "WUP-P-BLPP",
         "companyCode": "00LY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9265e4dd31c1b5f0c65605734154446f535f230e1d3c6b7eec978d2cd580cc4f.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17096,9 +16396,7 @@
         "productCode": "WUP-P-BSVE",
         "companyCode": "011F",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/374bddbf2318ed41097fada3ccc2b6445afa09a9b48e1e80073cc3a8abdd074a.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -17228,9 +16526,7 @@
         "productCode": "WUP-P-ALJP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f5bf5dbf5498ea50e6ea8150b17ceaf3c4bb9cd1edfa6c90950da20d22b3a28b.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17250,9 +16546,7 @@
         "productCode": "WUP-P-ALLP",
         "companyCode": "00UB",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6976157c3582cf5dd093f786a897176f15d1fe20026cd6776bf93d8a1676567a.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17262,9 +16556,7 @@
         "productCode": "WUP-P-BSXE",
         "companyCode": "00WY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/44ec26c2813af8abc97aebfffb66d923c58507099930c2c1517fb799771f3e2f.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17294,9 +16586,7 @@
         "productCode": "WUP-P-ALJE",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f091449dfa023d2ec019de2eafff4c046ee41af570330a75b3b2b9ebce8c9c59.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17306,9 +16596,7 @@
         "productCode": "WUP-P-ACUP",
         "companyCode": "00YR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2aa260d6e2b28e742def45eb0340246dce43817c751763331f58d71593975c58.jpg",
-        "updates": [
-            50
-        ],
+        "updates": [50],
         "dlc": []
     },
     {
@@ -17318,9 +16606,7 @@
         "productCode": "WUP-P-ACUE",
         "companyCode": "00YR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0076a5c2e5261895425d62a41f5f4ad8103653a7401cb7d50f9f8220a6bcf077.jpg",
-        "updates": [
-            49
-        ],
+        "updates": [49],
         "dlc": []
     },
     {
@@ -17330,12 +16616,8 @@
         "productCode": "WUP-P-BKFE",
         "companyCode": "00VZ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/dfda631eba168440629d21e94940bf30fb09c82da2249d22f3f5a7e788e7d64f.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101a6700",
@@ -17354,9 +16636,7 @@
         "productCode": "WUP-P-ALLE",
         "companyCode": "00UB",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1a3de043c27122ee23e3687bed724e5580a7eba136bea53ebe45bd2964b34fc0.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -17626,9 +16906,7 @@
         "productCode": "WUP-P-BSXP",
         "companyCode": "00WY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0bb2bce66aadb72bb29336cd689e48e2cdec6007775fec5df7d4e0df674d5747.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17708,9 +16986,7 @@
         "productCode": "WUP-P-BDAE",
         "companyCode": "0147",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c1c59fc6d841b62e5b37de0c71604c957536d11d7e2dc8b65667efe08370575b.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17730,9 +17006,7 @@
         "productCode": "WUP-P-APJE",
         "companyCode": "014K",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/be94a9cd82f25cc8886e1476ceeb8c32caa842b089887004afa8dbb43ebc4cbe.jpg",
-        "updates": [
-            18
-        ],
+        "updates": [18],
         "dlc": []
     },
     {
@@ -17752,12 +17026,8 @@
         "productCode": "WUP-P-BKFP",
         "companyCode": "00VZ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/26a7b923709c9d3bee20614ef251292d52faa3372a4d12b03e937702282a9c78.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [32],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101aac00",
@@ -17806,9 +17076,7 @@
         "productCode": "WUP-P-AXYE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6fa326936165a10c8144182e81edd17b15fdfcf9758a476389682f98c28f036c.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -17918,12 +17186,8 @@
         "productCode": "WUP-P-BFNE",
         "companyCode": "00VZ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/105ad195421f5ff49e4d4b472f19ee96f308863098f0d85f56e913626a6814de.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101ac900",
@@ -17932,9 +17196,7 @@
         "productCode": "WUP-P-BD3E",
         "companyCode": "004Q",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c4e89e5c3a6a3cbe4486de8a11960b2c3936f06d5fdfefa845bd57048aa59dfc.jpg",
-        "updates": [
-            80
-        ],
+        "updates": [80],
         "dlc": []
     },
     {
@@ -18185,9 +17447,7 @@
         "companyCode": "00W8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/17fcfd2a106f6ea83f7346e5fb5f5fa0e65cbbadf5362496931d4cab2f090a3d.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "00050000101aef00",
@@ -18246,12 +17506,8 @@
         "productCode": "WUP-P-BFNP",
         "companyCode": "00VZ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/952d5f61deb2bf2f5e2cc24c8a0924c9e9eb75960f6590565b261d9468ef019d.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101aff00",
@@ -18260,9 +17516,7 @@
         "productCode": "WUP-P-AFXJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8afd417a29ac4a688a60335e9890aa3be1219ffb85247d41ffaea0d1be213eed.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -18302,9 +17556,7 @@
         "productCode": "WUP-P-AFXE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/459646105548ace8f035a449ea8b618aebe341eda329ff59e8adab0f086cbeae.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -18724,9 +17976,7 @@
         "productCode": "WUP-P-BD3P",
         "companyCode": "004Q",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/dc58a9f29b1c57e400743338e494f02dcef565909378bfd547f0d7fb79cba5c4.jpg",
-        "updates": [
-            80
-        ],
+        "updates": [80],
         "dlc": []
     },
     {
@@ -18736,9 +17986,7 @@
         "productCode": "WUP-P-BD3Z",
         "companyCode": "004Q",
         "iconUrl": null,
-        "updates": [
-            80
-        ],
+        "updates": [80],
         "dlc": []
     },
     {
@@ -19088,9 +18336,7 @@
         "productCode": "WUP-P-BS5E",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/744781477e225ef49fc55a58cba362be89397b01ad2f7500920e73057d46a197.jpg",
-        "updates": [
-            96
-        ],
+        "updates": [96],
         "dlc": []
     },
     {
@@ -19160,12 +18406,8 @@
         "productCode": "WUP-P-AJ6E",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f622945def5ee5851d09bc9e0e65dd1235cc82b31d445a9add6676d022f5d68a.jpg",
-        "updates": [
-            32
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [32],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101b9100",
@@ -19214,9 +18456,7 @@
         "productCode": "WUP-P-AJ6P",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cbfde017144cbe6379b3942ee8b5abb3624592a5bcf948c2fddb0276278ccd27.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -19226,9 +18466,7 @@
         "productCode": "WUP-P-APHP",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/36665a44e929dfb4e883cb0b23677bae394f7e1299978aad55251b0b0078f9f7.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -19338,9 +18576,7 @@
         "productCode": "WUP-P-ATTE",
         "companyCode": "010C",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/85d6afe32b238e61210866fe4c5f79696babd91d924044b678c4ee32c527ef65.jpg",
-        "updates": [
-            33
-        ],
+        "updates": [33],
         "dlc": []
     },
     {
@@ -19400,9 +18636,7 @@
         "productCode": "WUP-P-WLSP",
         "companyCode": "008V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/735280aaa50f833d47a51ff2f0935b72aa5e4d3b617240751ffbc5c671d4a1c7.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -19432,9 +18666,7 @@
         "productCode": "WUP-P-BEQP",
         "companyCode": "011A",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bacd3b46e31cfab9ea54a4169237592ac13712fda03b34d8ae786fad25718441.jpg",
-        "updates": [
-            97
-        ],
+        "updates": [97],
         "dlc": []
     },
     {
@@ -19584,9 +18816,7 @@
         "productCode": "WUP-P-ACYE",
         "companyCode": "015W",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ca22dfd66a353758aad738071e6e1c39698ab1088c2ac576b603e83c785bcfc9.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -19615,7 +18845,7 @@
         "region": "USA",
         "productCode": "WUP-P-ADJE",
         "companyCode": "00W7",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/653d4ac2d65ecab004545da5d16c685f7ad73140b1daa57ba7c2f843ad035acc.jpg",
         "updates": [],
         "dlc": []
     },
@@ -19826,12 +19056,8 @@
         "productCode": "WUP-P-ALRP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0717783d0ae990d3f1edc1b5d55a9d8992b2fb04640f4b2b7780471b83759ff7.jpg",
-        "updates": [
-            64
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [64],
+        "dlc": [80]
     },
     {
         "titleId": "00050000101beb00",
@@ -19850,9 +19076,7 @@
         "productCode": "WUP-P-BWFE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8e156842224c251e28870f74eb66f1750f7974b3775ff0a1ec19fc8daeb52fab.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -19862,9 +19086,7 @@
         "productCode": "WUP-P-BWFP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3e62fd68f9976a5ea43801224bcd763dce7b2464adfb57bf7a55ae2c1adf6880.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -19874,12 +19096,8 @@
         "productCode": "WUP-P-ALRE",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1b67239b18cfabada37242d05c85f79dad5a135941dc7b7e54fe1d9ad4967a20.jpg",
-        "updates": [
-            64
-        ],
-        "dlc": [
-            96
-        ]
+        "updates": [64],
+        "dlc": [96]
     },
     {
         "titleId": "00050000101bf000",
@@ -19918,9 +19136,7 @@
         "productCode": "WUP-P-BS5P",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/94d8d5cc679d7a0e0574e8dc2b9bc27308526a0c6a1c52274bda42b61f5e9bf6.jpg",
-        "updates": [
-            97
-        ],
+        "updates": [97],
         "dlc": []
     },
     {
@@ -20030,9 +19246,7 @@
         "productCode": "WUP-P-AN3P",
         "companyCode": "00UB",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3fc47cd9ff4358c027789232e5d8b27476e915577278cf71dc379f8c3b3dbc6a.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20052,9 +19266,7 @@
         "productCode": "WUP-P-AN3E",
         "companyCode": "00UB",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/47f12e3360efd8c87f923884b7b767e7f03856c01dddfac1f811c170aedff794.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20064,9 +19276,7 @@
         "productCode": "WUP-P-BS7E",
         "companyCode": "00UB",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/dc69e057c541d646fe2836c56423bbc7a994f682a2c687fbb87c966443acec15.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20076,9 +19286,7 @@
         "productCode": "WUP-P-BS7P",
         "companyCode": "00UB",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/540a79a3d92d7d350e573410b7007917e1936f95729e7d81df92b5b8d4192631.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20238,9 +19446,7 @@
         "productCode": "WUP-P-AFEE",
         "companyCode": "0167",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3d37ec7b6b316a09f8fe9f00ed7ca4a85a42c727b6d67dbf70c9546024644455.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -20310,9 +19516,7 @@
         "productCode": "WUP-P-AWBP",
         "companyCode": "015G",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e5f466f7e48528146e0cd4efc279590e946763bcb15024963ea23daf339240db.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20472,12 +19676,8 @@
         "productCode": "WUP-P-AX5D",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f1629747cd48b95a6ede0c0beb4dd33d406a4a1c00be0e6acfacc9eb8c7d5dca.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101c4d00",
@@ -20486,12 +19686,8 @@
         "productCode": "WUP-P-AX5E",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2b136c92f807c33fcbf74a8f2d568ee01fb605d6384726bd6cf3b941000c8159.jpg",
-        "updates": [
-            48
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [48],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101c5400",
@@ -20540,9 +19736,7 @@
         "productCode": "WUP-P-APKJ",
         "companyCode": "002P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3ebf7f60fb73ec70f091d0e9137f3d3f7ccac56b776238fe8a6165f4319d3f23.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -20562,12 +19756,8 @@
         "productCode": "WUP-P-AMQP",
         "companyCode": "00KM",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c34da07e389405b14b77720280bec908f32144e16b31747136da6920aff9884f.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            32
-        ]
+        "updates": [16],
+        "dlc": [32]
     },
     {
         "titleId": "00050000101c5b00",
@@ -20646,9 +19836,7 @@
         "productCode": "WUP-P-AP5E",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/82c47627a7508e0bfbe71688ed2ae792eddd347d2d5941cd1b551d4aba20b279.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20658,9 +19846,7 @@
         "productCode": "WUP-P-AP5P",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/21261402c8d78a0f05570570bfbc798f7a2403eb09321d194561924b85812052.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20690,9 +19876,7 @@
         "productCode": "WUP-P-AD5E",
         "companyCode": "016E",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/25a8bfe5c070b0b5ee789bacf6ba490acbf8ceb435c7fab7ce1c00a2a0dca378.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20732,9 +19916,7 @@
         "productCode": "WUP-P-BS2P",
         "companyCode": "00RG",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cd3e6e931e1587a527582a4a7652dbe09bba6cda8224f5059ed121ba62d54b04.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20834,9 +20016,7 @@
         "productCode": "WUP-P-AMPE",
         "companyCode": "0164",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cc7473e3a43311d8202d69e3bde1f14cca9e627eb5538a9d53fff9bd1e15f003.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20906,9 +20086,7 @@
         "productCode": "WUP-P-ACYP",
         "companyCode": "015W",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/017a327571ca14fe89fda3dbc17764586e5dc6f18bec45fc8b2358f508403a19.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -20918,9 +20096,7 @@
         "productCode": "WUP-P-AWMP",
         "companyCode": "00YT",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ecca37cd5d5cdf14244ed16a2b4b795f4545260c9cb36d4b6e2468e0eab78e1c.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20940,9 +20116,7 @@
         "productCode": "WUP-P-ADTP",
         "companyCode": "008V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9b100c4e1982ca7bfd2698380bba1570bec08b981e1e6e2cd7f4838a3b340fc1.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -20952,12 +20126,8 @@
         "productCode": "WUP-P-ALZJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c21be56f71d29652b1af0c9dd0ce5dce2d65582a72836229dd845ca1b62ef6ec.jpg",
-        "updates": [
-            208
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [208],
+        "dlc": [80]
     },
     {
         "titleId": "00050000101c9400",
@@ -20966,12 +20136,8 @@
         "productCode": "WUP-P-ALZE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f29fc211b28a5d8e8d8a4a0cd30b14fcfc2aaa6158d48839e9b90d95ab142dc0.jpg",
-        "updates": [
-            208
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [208],
+        "dlc": [80]
     },
     {
         "titleId": "00050000101c9500",
@@ -20980,12 +20146,8 @@
         "productCode": "WUP-P-ALZP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c25ed5357bafad026c51bfeaa9807ede024879c4a66d1759f050cf0d8bde6588.jpg",
-        "updates": [
-            208
-        ],
-        "dlc": [
-            80
-        ]
+        "updates": [208],
+        "dlc": [80]
     },
     {
         "titleId": "00050000101c9600",
@@ -20994,12 +20156,8 @@
         "productCode": "WUP-P-AMQE",
         "companyCode": "00JJ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/fdde46ee217150109d4b13d6f2f06481d5d63888429ed6d99cfa4ffae593f192.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [16],
+        "dlc": [48]
     },
     {
         "titleId": "00050000101c9800",
@@ -21378,9 +20536,7 @@
         "productCode": "WUP-P-AFEP",
         "companyCode": "0167",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e42dd69a1eb5ea39d5c4ed108c21c211d83e7f2a7eaad2f9f0917161b3236fbf.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -21560,9 +20716,7 @@
         "productCode": "WUP-P-ACHE",
         "companyCode": "0175",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/466f6ecb42849f62f3c2b5d02fd69893f1b96d8d77a77fb7dfeea56202c31912.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -21712,9 +20866,7 @@
         "productCode": "WUP-P-AJLE",
         "companyCode": "017C",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c98591f1b7638167ebd09e0dde65d4f07f3809e8e71eeacec3cae5b8703828cf.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -21745,9 +20897,7 @@
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f20b2e119b0b36c33db10c66ce837096ddd259dc8d8943247b1453c916a4384d.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "00050000101d0700",
@@ -21756,9 +20906,7 @@
         "productCode": "WUP-P-ACHP",
         "companyCode": "0175",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9b26942d71ef8fa9818ff6ba50fd51e9db0beacf34f66548a981091e2325d589.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -21778,9 +20926,7 @@
         "productCode": "WUP-P-AGWE",
         "companyCode": "00FV",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4d0b9cd2f0b957f4fb7911e72edbbf9dac282b734dca769eb3eaa9099467facb.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -22060,9 +21206,7 @@
         "productCode": "WUP-P-ATXJ",
         "companyCode": "00SA",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e944365d026057af8f2e19a5cb49459d01221a8adea2711ddc79a7061f1219ca.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -22092,12 +21236,8 @@
         "productCode": "WUP-P-BT3J",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2373f5c8776f9559d81ff30b7e18ae13f3a0c8fdf2c1466c98b0db5210e7a62b.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            96
-        ]
+        "updates": [16],
+        "dlc": [96]
     },
     {
         "titleId": "00050000101d3100",
@@ -22146,9 +21286,7 @@
         "productCode": "WUP-P-AQCP",
         "companyCode": "017D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6c2778b7607fba89db4b2712a47c74b990bae3e38967bb6b6d0aba5c33714c67.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -22189,9 +21327,7 @@
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6b0ea04a06b933fca7edcd4a2a2c3fdd3eff2384a5fb8f382236ac3c959bd83b.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "00050000101d4200",
@@ -22200,9 +21336,7 @@
         "productCode": "WUP-P-ABPE",
         "companyCode": "00DV",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b3a647d20f674a2fabc2fc8bf7699f7ea2a616568145bd68801b5abe3744f4f4.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -22312,9 +21446,7 @@
         "productCode": "WUP-P-BSVP",
         "companyCode": "011F",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d8f36326cb9dd2ac84b7d06e39b0e4bf7b1f5473e52c6140ab97cbb8796a2eef.jpg",
-        "updates": [
-            96
-        ],
+        "updates": [96],
         "dlc": []
     },
     {
@@ -22434,12 +21566,8 @@
         "productCode": "WUP-P-WFSP",
         "companyCode": "00JX",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9beeb6c2efc96812dc35bac0fc14ed154d70f0754d9379c0ce4a955b68405b7c.jpg",
-        "updates": [
-            65
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [65],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101d6100",
@@ -22448,9 +21576,7 @@
         "productCode": "WUP-P-AGWP",
         "companyCode": "00FV",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f6e3057738ce0080473f46d914e56ddd7ca7fbeafca7d48cd3639ab314856c4e.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -22530,12 +21656,8 @@
         "productCode": "WUP-P-ARNP",
         "companyCode": "010P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0a6491f038d1619f3ae108b76236934837d1a2239e02a9e3c10bf4c2861d2112.jpg",
-        "updates": [
-            65
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [65],
+        "dlc": [16]
     },
     {
         "titleId": "00050000101d6e00",
@@ -22574,9 +21696,7 @@
         "productCode": "WUP-P-ATTP",
         "companyCode": "010C",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1d67b53402a89a2414b9261d0a42fcb9cc29f5e0a247a1c91f0454a5ae9b85bc.jpg",
-        "updates": [
-            33
-        ],
+        "updates": [33],
         "dlc": []
     },
     {
@@ -22586,12 +21706,8 @@
         "productCode": "WUP-P-AUMP",
         "companyCode": "00DU",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cca11d8221340d50100eb13bdf1436975993df1be45b973aac99811db0a74788.jpg",
-        "updates": [
-            688
-        ],
-        "dlc": [
-            496
-        ]
+        "updates": [688],
+        "dlc": [496]
     },
     {
         "titleId": "00050000101d7600",
@@ -22670,9 +21786,7 @@
         "productCode": "WUP-P-AEJP",
         "companyCode": "00TJ",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1478b4c765484afedd27979031b904a755759186f7b82fb0da0cd029bda3c873.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -22762,9 +21876,7 @@
         "productCode": "WUP-P-WKNJ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1149b9df7be5a1226faacf774a08d99483177a7f1c05a2d44649f4d0b2280f66.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -22784,9 +21896,7 @@
         "productCode": "WUP-P-ARXP",
         "companyCode": "00UP",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/66b468a239d144924d77beca3ffbcd4f4a3c5b2bbeec67ccd93cbd3ed2147e3e.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -22836,12 +21946,8 @@
         "productCode": "WUP-P-AUME",
         "companyCode": "00DU",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/78a5cdbff1edfe4697b5cbd2133981654fd1cee76c2367c8aa1eb4e534a85a67.jpg",
-        "updates": [
-            688
-        ],
-        "dlc": [
-            496
-        ]
+        "updates": [688],
+        "dlc": [496]
     },
     {
         "titleId": "00050000101d9e00",
@@ -22860,9 +21966,7 @@
         "productCode": "WUP-P-AJLP",
         "companyCode": "017C",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cb8cd158cbf49ae73246a6725dc5d26b0da6a910e1905608f676309ccc9fa862.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -22962,9 +22066,7 @@
         "productCode": "WUP-P-BLGP",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a3283022c4bdfb906116944b872fde17c87c7bdfac251e3e798354f1de7a6f25.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -22974,9 +22076,7 @@
         "productCode": "WUP-P-BLGE",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4625c69935d4e07bb0a8c92ad450ed5d7b557ca03eaddbd200a9631c6c0699bf.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -22996,9 +22096,7 @@
         "productCode": "WUP-P-AT7E",
         "companyCode": "016D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b7cdff226a299e700bd7afbbc72997223c8f9237fbd476e148b0c4af1b46e122.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23038,12 +22136,8 @@
         "productCode": "WUP-P-AHFE",
         "companyCode": "00WY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1ae0c9758de6902a73d2687821a3a3340a9dfe732e36a6a2f9ec43f5a676a03d.jpg",
-        "updates": [
-            80
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [80],
+        "dlc": [48]
     },
     {
         "titleId": "00050000101db600",
@@ -23062,9 +22156,7 @@
         "productCode": "WUP-P-AVME",
         "companyCode": "017D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ddfc66febe06dfc8312960893ea92e13fdaa9e31ea108fa9717b79b42a581e4a.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -23094,12 +22186,8 @@
         "productCode": "WUP-P-AUMJ",
         "companyCode": "0188",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b55e4428ed6ccc40c6c2f267b0166247f49dc2173927fc364af8c55330112db0.jpg",
-        "updates": [
-            688
-        ],
-        "dlc": [
-            496
-        ]
+        "updates": [688],
+        "dlc": [496]
     },
     {
         "titleId": "00050000101dbf00",
@@ -23128,9 +22216,7 @@
         "productCode": "WUP-P-AD5P",
         "companyCode": "016E",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7816d3a61a30b9d9b9294157aa0c35906b189af5a3fd31e4d1869959321e9513.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23160,9 +22246,7 @@
         "productCode": "WUP-P-AVMP",
         "companyCode": "017D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/280b1c9714a0eca6379d79bbcc24b1c0fd064d3fac87573f186a8d75e3066a6e.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23182,9 +22266,7 @@
         "productCode": "WUP-P-BWGE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8e156842224c251e28870f74eb66f1750f7974b3775ff0a1ec19fc8daeb52fab.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23194,9 +22276,7 @@
         "productCode": "WUP-P-BWGP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6a5bddd8067ad9fe624f6bf542966b61dccd593466052644ebe6136aef4ec394.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23266,12 +22346,8 @@
         "productCode": "WUP-P-ARNJ",
         "companyCode": "013P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7803d108e46314d9d8b2d562efc1f52ccaa5092921fad1021e8d3489ebf7c168.jpg",
-        "updates": [
-            49
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [49],
+        "dlc": [16]
     },
     {
         "titleId": "00050000101dd900",
@@ -23280,12 +22356,8 @@
         "productCode": "WUP-P-AMQJ",
         "companyCode": "0091",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4824cbade642a608fc15a7d8aed518e8bb669b75e58a1d4104ada6e0241c855b.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            16
-        ]
+        "updates": [16],
+        "dlc": [16]
     },
     {
         "titleId": "00050000101dda00",
@@ -23374,9 +22446,7 @@
         "productCode": "WUP-P-APKE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/758de3e0d15915853ef702249f8da375f8ec9b27b5080f8afafb402f40bdeffb.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -23386,9 +22456,7 @@
         "productCode": "WUP-P-APKP",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e72d6a7b251ed096701c10caa6ebb69fbd06d5e827bbf691e8a5a2238dac2986.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -23428,9 +22496,7 @@
         "productCode": "WUP-P-BP5J",
         "companyCode": "00R8",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/769d76dc00b0100f5bc30f74d5089eaf536d3991fd4225b12cb05a5fd06740ac.jpg",
-        "updates": [
-            48
-        ],
+        "updates": [48],
         "dlc": []
     },
     {
@@ -23450,12 +22516,8 @@
         "productCode": "WUP-P-BMTE",
         "companyCode": "00TL",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/029b811c552016fbdb0c6e0cde2d818e7c516499001ab836d099cc1151f6ad8d.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [16],
+        "dlc": [48]
     },
     {
         "titleId": "00050000101e0600",
@@ -23564,9 +22626,7 @@
         "productCode": "WUP-P-BPHP",
         "companyCode": "015D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/73140428546bb08ccddde96da0450a7e87c7c9739d9d842639efae0903b98a66.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23776,9 +22836,7 @@
         "productCode": "WUP-P-AJQE",
         "companyCode": "0190",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f795280506203701cd9cdd42509a5802c39f261ec3eb0b5155550470ff385f1b.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23788,9 +22846,7 @@
         "productCode": "WUP-P-AR7P",
         "companyCode": "011A",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/45bec542fc6f125239ec09be633931623890481419907dd6f8af4d96a0e1c028.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -23800,9 +22856,7 @@
         "productCode": "WUP-P-AR7E",
         "companyCode": "011A",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a6ec8ed53eb7d21dd41b313b22ee7b67dea0991e9797dbe5d5bb29cf36be1a71.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23862,12 +22916,8 @@
         "productCode": "WUP-P-WFSJ",
         "companyCode": "00JF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bf944adc72fdea29b033204ec43e9733c5ffd3f39b4fb9131b04b0418efd8195.jpg",
-        "updates": [
-            64
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [64],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101e4200",
@@ -23886,9 +22936,7 @@
         "productCode": "WUP-P-AMPJ",
         "companyCode": "00TF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/fbfd18a4eebbc48bb8579652fbcb116ab5ee62743a298b49cb33ce7b604b8e48.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -23938,9 +22986,7 @@
         "productCode": "WUP-P-ABJE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/13d601ac3ab5a9babe1bea512025a978e544210a1a079a43cb44d67d665468b3.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -24360,9 +23406,7 @@
         "productCode": "WUP-P-BGGE",
         "companyCode": "010C",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/71a7515052cb86de3d3ece70ffa7a2f3235339a8a2efbd3c19f01cea8f9c10ac.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -24372,9 +23416,7 @@
         "productCode": "WUP-P-BGGP",
         "companyCode": "010C",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5375b926c15bc192d47ec8d12e0608b86118f5c407be9be861a8446c1e7b34e0.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -24424,9 +23466,7 @@
         "productCode": "WUP-P-ACUJ",
         "companyCode": "00S6",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/273e1eebb8277377ebd1b721164a67d2fdad64ee2a59b7229fc95971d15e7656.jpg",
-        "updates": [
-            33
-        ],
+        "updates": [33],
         "dlc": []
     },
     {
@@ -24436,9 +23476,7 @@
         "productCode": "WUP-P-BUTP",
         "companyCode": "006V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/533df143261fb80fbf5b65351e95f137e04acf2838371e4f8bc20e9c5b2aa506.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -24448,9 +23486,7 @@
         "productCode": "WUP-P-BLGJ",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f06d50d5fcfd4744b2365bec745881a61e8d28dfbb37040cb4bf66617d7fd350.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -24460,12 +23496,8 @@
         "productCode": "WUP-P-ALRJ",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d818615eb2262df915c36e8172127c7240ef260b20193d8e141c5cadf9471c5b.jpg",
-        "updates": [
-            18
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [18],
+        "dlc": [48]
     },
     {
         "titleId": "00050000101ea200",
@@ -24504,9 +23536,7 @@
         "productCode": "WUP-P-BNBE",
         "companyCode": "019K",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c015ac6a2ba66d7de7e19d2de3ed74b1c6cdf634d74e99d160b9ad706655a5ea.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -24516,9 +23546,7 @@
         "productCode": "WUP-P-BJ7P",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f83f82437871277e0a198458741a9d48ad424fa1f19a8e366d8abad8bfa0bc4d.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -24558,9 +23586,7 @@
         "productCode": "WUP-P-BJ7E",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7a271c563c9807bde6d16f24e4f925e6aac896787344478eb0c7142685ca2b22.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -24841,9 +23867,7 @@
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/479fbe9ebdb037b8fd267e537b04191cbbf362667ae141b8d5099596a32f79d9.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "00050000101ed800",
@@ -24852,12 +23876,8 @@
         "productCode": "WUP-P-ASEE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4204a49c8b57125f7deda89e77afcc1711a8c50b048aca5fb38193dbda522da7.jpg",
-        "updates": [
-            16
-        ],
-        "dlc": [
-            0
-        ]
+        "updates": [16],
+        "dlc": [0]
     },
     {
         "titleId": "00050000101ef400",
@@ -25006,9 +24026,7 @@
         "productCode": "WUP-P-BY2P",
         "companyCode": "017P",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9e3e3b74611f2ffb415526e1a01bf41e256971184b1e207181964cc3d5cc7359.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -25248,9 +24266,7 @@
         "productCode": "WUP-P-AHYE",
         "companyCode": "017D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c64981d908c424c40482c968d9454c747ce9e6d8f4cdc9281a13dfbb38c2687a.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -25270,9 +24286,7 @@
         "productCode": "WUP-P-AHZE",
         "companyCode": "008V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9a03c265b321ad25c9f48f6c0d14b22e030bd86781aa41798438a4a2038ba6d7.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -25323,9 +24337,7 @@
         "companyCode": "00VA",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2f61eb4b872f006c82eb899fe57d070affca6dea9e3cc2aa8622f17162c15cda.jpg",
         "updates": [],
-        "dlc": [
-            16
-        ]
+        "dlc": [16]
     },
     {
         "titleId": "00050000101f6800",
@@ -25424,9 +24436,7 @@
         "productCode": "WUP-P-AHZP",
         "companyCode": "008V",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ded100a6097c37173e7651ca5545e878acf8b696b006800a7ed1662afe2f1414.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -25456,9 +24466,7 @@
         "productCode": "WUP-P-AHYP",
         "companyCode": "017D",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6bafabfaf5f4f0f1e166ff3a2ecc1c848787a3798893ac76fcf561ce6a3b8667.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -25478,9 +24486,7 @@
         "productCode": "WUP-P-AVEE",
         "companyCode": "020W",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6d033d2c5f002316d36743e3dd5ffc39562fae3a6587410df6f84233b2f7c1a0.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -25521,9 +24527,7 @@
         "companyCode": "00VA",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2f61eb4b872f006c82eb899fe57d070affca6dea9e3cc2aa8622f17162c15cda.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "00050000101f8400",
@@ -25622,9 +24626,7 @@
         "productCode": "WUP-P-BECE",
         "companyCode": "00VA",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8795ed1d8d80b85307d1c9705755eef35ddbd9e6c3769df38a850d6d956babea.jpg",
-        "updates": [
-            17
-        ],
+        "updates": [17],
         "dlc": []
     },
     {
@@ -25694,9 +24696,7 @@
         "productCode": "WUP-P-BECP",
         "companyCode": "00VA",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c0ba7884f554e4e5e94daa96b3ee6d3ca297a208fa2975c482d15f8a8b8749bf.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -25726,9 +24726,7 @@
         "productCode": "WUP-P-AJUE",
         "companyCode": "011F",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4d67c8c0fb9504819958f3b7a7780a23f3974707eac70ab23a257a7126f0e1e9.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26158,9 +25156,7 @@
         "productCode": "WUP-P-BB2E",
         "companyCode": "00SS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c3fbbddb737e5c587a8638c07c909c8478e1ec3e1cf8c99e2ff0bd4a8d00226c.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26260,9 +25256,7 @@
         "productCode": "WUP-P-ATFP",
         "companyCode": "012Q",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ca61f9ad6c5c1241f2b600f1645596388075132897f2078168ebe7d69c5efaf7.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26272,9 +25266,7 @@
         "productCode": "WUP-P-AVEP",
         "companyCode": "020W",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2c9649bcef7fc40361b47a156c716e8efa6011104754547cd3f21e5482c00437.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26284,9 +25276,7 @@
         "productCode": "WUP-P-BM7P",
         "companyCode": "00SS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/63b5dea787d2bd163cd4c98da7ca9750cefaf27db43aecc864d85c8d9fddfb74.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26296,9 +25286,7 @@
         "productCode": "WUP-P-BB2P",
         "companyCode": "00SS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4566000f9e493f2211f9ea6b9c23466327c12a7e3749b92b99f062d5408c0f73.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -26308,9 +25296,7 @@
         "productCode": "WUP-P-BT6P",
         "companyCode": "00SS",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bca8ece2a242c3473597cfa00614638b852753e37849744d3d2e0ca40af576a6.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26470,9 +25456,7 @@
         "productCode": "WUP-P-AWKE",
         "companyCode": "012F",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ba672636785c553f24edaa2f5c3c5e5b64f1b1ad10a97138980f96cc4276544a.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26572,12 +25556,8 @@
         "productCode": "WUP-P-AHFP",
         "companyCode": "00WY",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1ae0c9758de6902a73d2687821a3a3340a9dfe732e36a6a2f9ec43f5a676a03d.jpg",
-        "updates": [
-            80
-        ],
-        "dlc": [
-            48
-        ]
+        "updates": [80],
+        "dlc": [48]
     },
     {
         "titleId": "0005000010203300",
@@ -26636,9 +25616,7 @@
         "productCode": "WUP-P-AWKP",
         "companyCode": "012F",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3745644c9916289dae77cefd2df13cf1753aadbd08e08e2c8e7db1a96fb5154f.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26658,9 +25636,7 @@
         "productCode": "WUP-P-ANDE",
         "companyCode": "021F",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/dbbfebf5db72b979817338ca7985e937a8e421779fca55040319d7a193646d16.jpg",
-        "updates": [
-            19
-        ],
+        "updates": [19],
         "dlc": []
     },
     {
@@ -26821,9 +25797,7 @@
         "companyCode": "0231",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6a03ab03c8fc10e0dfda9ee94234700e8d6f0297eb82c825908466c8b29332c7.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "0005000010206600",
@@ -26842,9 +25816,7 @@
         "productCode": "WUP-P-AJUP",
         "companyCode": "011F",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/4d67c8c0fb9504819958f3b7a7780a23f3974707eac70ab23a257a7126f0e1e9.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -26914,9 +25886,7 @@
         "productCode": "WUP-P-BFYJ",
         "companyCode": "0237",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/352b085c3dcdd5d5803f729896144a3e9a1c164748722ca189a1677fdd873b5d.jpg",
-        "updates": [
-            32
-        ],
+        "updates": [32],
         "dlc": []
     },
     {
@@ -27026,9 +25996,7 @@
         "productCode": "WUP-P-BA4E",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/24bb2230c4e89336791c0cfffce1b331ba947ec8b343dc179992763a25dcdebe.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -27068,9 +26036,7 @@
         "productCode": "WUP-P-BAKP",
         "companyCode": "00TL",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f3b39acf350bd44b8afa5817613a6750c154b77f26ab83081307a948b157638a.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -27080,9 +26046,7 @@
         "productCode": "WUP-P-BA4P",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/05a64d3a9488c4d914055be43db5cae39fd5dbdc381f45afd10935069d106f4c.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -27351,7 +26315,7 @@
         "region": "USA",
         "productCode": "WUP-P-AW8E",
         "companyCode": "0212",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7c426a1c00c21214cfff855bc384ace7b5629f705222ead51fa275794e0c0a05.jpg",
         "updates": [],
         "dlc": []
     },
@@ -27393,9 +26357,7 @@
         "companyCode": "015G",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b06e5d033f2c4d9a4c24208b3daa29e3c2bf450fd8552884c01fc301d7c9491a.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "000500001020d200",
@@ -27445,9 +26407,7 @@
         "companyCode": "015G",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b06e5d033f2c4d9a4c24208b3daa29e3c2bf450fd8552884c01fc301d7c9491a.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "000500001020d800",
@@ -27457,9 +26417,7 @@
         "companyCode": "0231",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6a03ab03c8fc10e0dfda9ee94234700e8d6f0297eb82c825908466c8b29332c7.jpg",
         "updates": [],
-        "dlc": [
-            0
-        ]
+        "dlc": [0]
     },
     {
         "titleId": "000500001020d900",
@@ -27638,9 +26596,7 @@
         "productCode": "WUP-P-BL8E",
         "companyCode": "014K",
         "iconUrl": null,
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -28190,9 +27146,7 @@
         "productCode": "WUP-P-WRTP",
         "companyCode": "0182",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5ddb76db49d6d5b0156207b42a8e4ba09060be1d7b15c40f2bd38889157bc7a5.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -28262,9 +27216,7 @@
         "productCode": "WUP-P-WSAP",
         "companyCode": "021F",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cc6bad999998f1c5c68c12b3da9ef8df2c02459959769053a630b9960fd1b813.jpg",
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -28424,9 +27376,7 @@
         "productCode": "WUP-P-HJDP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9d284625a1a5090734f673e65ad5387c867f3b8f94fc3b6e4b6cbb500953927a.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -28456,9 +27406,7 @@
         "productCode": "WUP-P-HJDE",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2b8ed1b74826e52dcab4bd6a1650f34be273621a02072fa034ccd2abc0681d66.jpg",
-        "updates": [
-            64
-        ],
+        "updates": [64],
         "dlc": []
     },
     {
@@ -28477,7 +27425,7 @@
         "region": "USA",
         "productCode": "WUP-P-BBAE",
         "companyCode": "029S",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/722e9384d3bde5d4997f278a2f25e7cbba8ed37218c77c4e38aede597cb7898c.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28757,7 +27705,7 @@
         "region": "USA",
         "productCode": "WUP-P-WTBE",
         "companyCode": "00EY",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/5c54b03fadffcb7e062ffcd70130ef7a07528642787584c89f852c4b103a41a2.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28777,7 +27725,7 @@
         "region": "USA",
         "productCode": "WUP-P-BZ5E",
         "companyCode": "021F",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/bc996c57d9eb75a053861ee2da721c67381f18d850535c3dc92eb9a3f4ab9351.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28787,7 +27735,7 @@
         "region": "USA",
         "productCode": "WUP-P-AY1E",
         "companyCode": "021F",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2576ca0931fdaa1fde23542354df63255d8ccc359b2d26b0d360a595bdc45931.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28807,7 +27755,7 @@
         "region": "USA",
         "productCode": "WUP-P-AV5E",
         "companyCode": "021F",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9550438280159d430867d49d68d52025c9bc4fed8d4ce6fb18c76416cf9a4524.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28827,7 +27775,7 @@
         "region": "USA",
         "productCode": "WUP-P-AN5E",
         "companyCode": "0339",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/54b52e89cc68fe1df080bc7d2f3e36dcf0f40cf51ed8126f8a2bef13283e9021.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28867,7 +27815,7 @@
         "region": "USA",
         "productCode": "WUP-P-AX8E",
         "companyCode": "0182",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/38c92fd0df7b9d183ef6534070246f8c14b53ca32229d546ce00c47fe43ec20a.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28877,7 +27825,7 @@
         "region": "USA",
         "productCode": "WUP-P-AB1E",
         "companyCode": "030Q",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/2042bb242ccc26fd176e82387ac474cd304e2a289688a0197dd05b5947e74c5f.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28887,7 +27835,7 @@
         "region": "USA",
         "productCode": "WUP-P-AZ1E",
         "companyCode": "030Q",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/3debf13cbe3aba27f6ce27b0dc754a5905ae4c0d2ff730f841207271bf230ba8.jpg",
         "updates": [],
         "dlc": []
     },
@@ -28938,9 +27886,7 @@
         "productCode": "WUP-P-CNFJ",
         "companyCode": "0001",
         "iconUrl": null,
-        "updates": [
-            16
-        ],
+        "updates": [16],
         "dlc": []
     },
     {
@@ -28949,7 +27895,7 @@
         "region": "USA",
         "productCode": "WUP-P-CNFE",
         "companyCode": "0001",
-        "iconUrl": null,
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b6a75e0359c1d7fef6c364e87341006ac27ca0ddc8f10ec794cb2c998e9dd6c3.jpg",
         "updates": [],
         "dlc": []
     },

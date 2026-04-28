@@ -1,0 +1,186 @@
+[
+    {
+        "titleId": "0005000010013000",
+        "name": "Nintendo TVii",
+        "region": "JPN",
+        "productCode": "WUP-X-HBCJ",
+        "companyCode": "0001",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [16],
+        "availableOnCdn": "No"
+    },
+
+    {
+        "titleId": "0005000010104c00",
+        "name": "Hulu",
+        "region": "JPN",
+        "productCode": "WUP-N-HNPJ",
+        "companyCode": "00XB",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "0005000010105700",
+        "name": "YouTube",
+        "region": "ALL",
+        "productCode": "WUP-N-HNKA",
+        "companyCode": "00WB",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "0005000010105a00",
+        "name": "Netflix",
+        "region": "EUR/JAP/USA",
+        "productCode": "WUP-N-HNNA",
+        "companyCode": "00XN",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "00050000101fe600",
+        "name": "Amazonビデオ (Amazon Video)",
+        "region": "JPN",
+        "productCode": "WUP-N-AKUJ",
+        "companyCode": "00WD",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001f700700",
+        "name": "Account Manager Tool",
+        "region": "ALL",
+        "productCode": "WUP-P-ABCD",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001f700800",
+        "name": "Friend Manager Tool",
+        "region": "ALL",
+        "productCode": "WUP-P-ABCD",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001f700f00",
+        "name": "Friend Viewer",
+        "region": "ALL",
+        "productCode": "WUP-P-ABCD",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001f701600",
+        "name": "Delete Device Account Tool",
+        "region": "ALL",
+        "productCode": "WUP-P-ABCD",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001f940e00",
+        "name": "\"A\"",
+        "region": "FFFFFFFF",
+        "productCode": "WUP-P-2MAA",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": []
+    },
+    {
+        "titleId": "000500001f940f00",
+        "name": "B",
+        "region": "FFFFFFFF",
+        "productCode": "WUP-P-2BLA",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": []
+    },
+    {
+        "titleId": "000500001f943100",
+        "name": "Nintendo eShop",
+        "region": "JPN",
+        "productCode": "WUP-N-HAEJ",
+        "companyCode": "0001",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": []
+    },
+    {
+        "titleId": "000500001f947000",
+        "name": "ecTool",
+        "region": "ALL",
+        "productCode": "WUP-P-ABCD",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001fbf1000",
+        "name": "FBF10 [patched2]",
+        "region": "ALL",
+        "productCode": "WUP-P-ABCD",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [32],
+        "dlc": []
+    },
+    {
+        "titleId": "000500001fd00400",
+        "name": "FFLUtility",
+        "region": "JPN",
+        "productCode": "WUP-N-HAAJ",
+        "companyCode": "0001",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001fd00700",
+        "name": "NWF Samples",
+        "region": "ALL",
+        "productCode": "WUP-P-255A",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    },
+    {
+        "titleId": "000500001fd01100",
+        "name": "Boss LotCheck Tool",
+        "region": "ALL",
+        "productCode": "WUP-P-ABCD",
+        "companyCode": "ZZZZ",
+        "iconUrl": null,
+        "updates": [],
+        "dlc": [],
+        "availableOnCdn": "No"
+    }
+]
