@@ -170,7 +170,7 @@ if [[ -f "$titledb_file" ]]; then
     else
         mkdir -p "$tmp_dir/extra-updates" "$tmp_dir/extra-dlc"
 
-        mlr --icsv --ojson cat "$titledb_file" |
+        mlr --icsv --ojson --infer-none cat "$titledb_file" |
         jq --slurpfile titles "$titles_file" --slurpfile exclude "$exclude_title_ids_file" '
             ($titles[0]
                 | map(.titleId | tostring | ascii_downcase)

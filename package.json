@@ -22,7 +22,8 @@
         "start": "tsx scripts/start.ts",
         "test": "vitest run",
         "convert:wiiutdb": "tsx scripts/convert.ts",
-        "generate:titles": "bash scripts/generate-titles.sh"
+        "generate:titles": "bash scripts/generate-titles.sh",
+        "generate:titles:node": "tsx scripts/generate-titles.ts"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -47,6 +48,7 @@
         "vitest": "^4.1.4"
     },
     "dependencies": {
+        "csv-parse": "^6.2.1",
         "express": "^5.2.1",
         "fast-xml-parser": "^5.7.1"
     }
