@@ -1,5 +1,6 @@
-# I like nano.  Deal with it.
-**/*.swp
+/config.json
+/common.key
+/titles/wiiutdb.xml
 
 # Transient node files
 **/node_modules/
@@ -15,11 +16,11 @@ yarn.lock
 .pnp.cjs
 .pnp.loader.mjs
 
-config.json
-common.key
-
 # Build output
 **/dist/
 **/types/
 .cache/
 **/tsconfig.tsbuildinfo
+
+# I like nano.  Deal with it.
+**/*.swp

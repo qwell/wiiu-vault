@@ -20,8 +20,9 @@
         "clean": "rimraf dist/ .cache/",
         "build": "tsx scripts/build.ts",
         "start": "tsx scripts/start.ts",
-        "titles:generate": "bash scripts/update-titles.sh",
-        "test": "vitest run"
+        "test": "vitest run",
+        "convert:wiiutdb": "tsx scripts/convert.ts",
+        "generate:titles": "bash scripts/update-titles.sh"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
