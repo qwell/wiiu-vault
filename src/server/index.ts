@@ -92,6 +92,66 @@ app.get('/api/title-metadata', async (req, res) => {
     }
 });
 
+app.get('/api/title-all', async (req, res) => {
+    const titleId = req.query.titleId as string;
+
+    if (!titleId) {
+        res.status(400).json({
+            error: 'Missing titleId query parameter',
+        });
+        return;
+    }
+
+    try {
+        const [metadata, updateMetadata, dlcMetadata] = await Promise.all([
+            downloadNusTitleMetadata(titleId),
+            getUpdateMetadata(titleId),
+            getDlcMetadata(titleId),
+        ]);
+
+        if (!metadata) {
+            res.status(404).json({
+                error: 'Failed to parse title metadata',
+            });
+            return;
+        }
+
+        res.json({
+            titleId: metadata.titleId,
+            name: metadata.name,
+            region: metadata.region,
+            productCode: metadata.productCode,
+            companyCode: metadata.companyCode,
+            titleKey: metadata.titleKey
+                ? Buffer.from(metadata.titleKey).toString('hex')
+                : null,
+            titleKeyPassword: metadata.titleKeyPassword,
+            updates:
+                updateMetadata.exists && updateMetadata.titleVersion !== null
+                    ? [updateMetadata.titleVersion]
+                    : [],
+            dlc:
+                dlcMetadata.exists && dlcMetadata.titleVersion !== null
+                    ? [dlcMetadata.titleVersion]
+                    : [],
+        });
+    } catch (error) {
+        console.error('[server] Failed to load full title metadata:', error);
+
+        res.status(500).json({
+            error: 'Failed to load full title metadata',
+            message: error instanceof Error ? error.message : String(error),
+            stage:
+                typeof error === 'object' &&
+                error !== null &&
+                'stage' in error &&
+                typeof error.stage === 'string'
+                    ? error.stage
+                    : null,
+        });
+    }
+});
+
 app.get('/api/title-update', async (req, res) => {
     const titleId = req.query.titleId as string;
 

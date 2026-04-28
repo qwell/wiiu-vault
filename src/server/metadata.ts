@@ -203,6 +203,7 @@ export async function downloadNusTitleMetadata(
     titleId: string
 ): Promise<NusTitleMetadata | null> {
     const baseUrl = NUS_BASE_URL;
+    const normalizedTitleId = replaceTitlePrefix(titleId, 'base');
     const commonKey = await readCommonKey().catch((error: unknown) => {
         throw new TitleMetadataError(
             'read_common_key',
@@ -211,7 +212,7 @@ export async function downloadNusTitleMetadata(
     });
 
     const [tik, tmdBytes] = await Promise.all([
-        downloadTicket(baseUrl, titleId).catch((error: unknown) => {
+        downloadTicket(baseUrl, normalizedTitleId).catch((error: unknown) => {
             if (isHttpErrorStatus(error, 404)) {
                 return null;
             }
@@ -219,15 +220,15 @@ export async function downloadNusTitleMetadata(
                 'download_ticket',
                 error instanceof Error
                     ? error.message
-                    : `Failed to download ticket for ${titleId}`
+                    : `Failed to download ticket for ${normalizedTitleId}`
             );
         }),
-        downloadTmd(baseUrl, titleId).catch((error: unknown) => {
+        downloadTmd(baseUrl, normalizedTitleId).catch((error: unknown) => {
             throw new TitleMetadataError(
                 'download_tmd',
                 error instanceof Error
                     ? error.message
-                    : `Failed to download TMD for ${titleId}`
+                    : `Failed to download TMD for ${normalizedTitleId}`
             );
         }),
     ]);
@@ -236,7 +237,7 @@ export async function downloadNusTitleMetadata(
     if (!tmd) {
         throw new TitleMetadataError(
             'parse_tmd',
-            `Failed to parse TMD for ${titleId}`
+            `Failed to parse TMD for ${normalizedTitleId}`
         );
     }
 
@@ -245,20 +246,22 @@ export async function downloadNusTitleMetadata(
     if (!fstContent) {
         throw new TitleMetadataError(
             'missing_fst_content',
-            `TMD has no first content entry for ${titleId}`
+            `TMD has no first content entry for ${normalizedTitleId}`
         );
     }
     const encryptedFst = fstContent
-        ? await downloadContent(baseUrl, titleId, fstContent.id).catch(
-              (error: unknown) => {
-                  throw new TitleMetadataError(
-                      'download_fst_content',
-                      error instanceof Error
-                          ? error.message
-                          : `Failed to download FST content for ${titleId}`
-                  );
-              }
-          )
+        ? await downloadContent(
+              baseUrl,
+              normalizedTitleId,
+              fstContent.id
+          ).catch((error: unknown) => {
+              throw new TitleMetadataError(
+                  'download_fst_content',
+                  error instanceof Error
+                      ? error.message
+                      : `Failed to download FST content for ${normalizedTitleId}`
+              );
+          })
         : null;
 
     const ticketTitleKey =
@@ -304,12 +307,12 @@ export async function downloadNusTitleMetadata(
         tmd,
         titleKey,
         baseUrl,
-        titleId
+        normalizedTitleId
     );
     if (!metaXml) {
         throw new TitleMetadataError(
             'extract_meta_xml',
-            `Failed to extract meta.xml for ${titleId}`
+            `Failed to extract meta.xml for ${normalizedTitleId}`
         );
     }
     const metaJson = metaXml ? readMetaXmlJson(metaXml) : null;
@@ -317,12 +320,12 @@ export async function downloadNusTitleMetadata(
     if (!metaJson) {
         throw new TitleMetadataError(
             'parse_meta_xml',
-            `Failed to parse meta.xml for ${titleId}`
+            `Failed to parse meta.xml for ${normalizedTitleId}`
         );
     }
 
     return {
-        titleId,
+        titleId: normalizedTitleId,
         titleVersion: tmd.header.titleVersion,
         name: meta?.name ?? null,
         region: meta?.region ?? null,
@@ -334,24 +337,22 @@ export async function downloadNusTitleMetadata(
     };
 }
 
-export function getUpdateTitleId(baseTitleId: string): string {
-    return replaceTitlePrefix(baseTitleId, '0005000e');
-}
-
-export function getDlcTitleId(baseTitleId: string): string {
-    return replaceTitlePrefix(baseTitleId, '0005000c');
-}
-
 export async function getUpdateMetadata(
     baseTitleId: string
 ): Promise<ChildTitleMetadata> {
-    return getChildTitleMetadata(baseTitleId, getUpdateTitleId(baseTitleId));
+    return getChildTitleMetadata(
+        baseTitleId,
+        replaceTitlePrefix(baseTitleId, 'update')
+    );
 }
 
 export async function getDlcMetadata(
     baseTitleId: string
 ): Promise<ChildTitleMetadata> {
-    return getChildTitleMetadata(baseTitleId, getDlcTitleId(baseTitleId));
+    return getChildTitleMetadata(
+        baseTitleId,
+        replaceTitlePrefix(baseTitleId, 'dlc')
+    );
 }
 
 export function readMetaXml(buffer: Uint8Array): NUSTitleInformation | null {
@@ -1103,16 +1104,34 @@ async function getChildTitleMetadata(
     }
 }
 
-function replaceTitlePrefix(titleId: string, prefix: string): string {
+function replaceTitlePrefix(
+    titleId: string,
+    nextKind: 'base' | 'update' | 'dlc' | 'demo'
+): string {
     const normalizedTitleId = titleId.toLowerCase();
-    const normalizedPrefix = prefix.toLowerCase();
 
     if (!/^[0-9a-f]{16}$/.test(normalizedTitleId)) {
         throw new Error(`Invalid titleId: ${titleId}`);
     }
 
+    let normalizedPrefix: string;
+    switch (nextKind) {
+        case 'base':
+            normalizedPrefix = '00050000';
+            break;
+        case 'update':
+            normalizedPrefix = '0005000e';
+            break;
+        case 'dlc':
+            normalizedPrefix = '0005000c';
+            break;
+        case 'demo':
+            normalizedPrefix = '00050002';
+            break;
+    }
+
     if (!/^[0-9a-f]{8}$/.test(normalizedPrefix)) {
-        throw new Error(`Invalid title prefix: ${prefix}`);
+        throw new Error(`Invalid title kind: ${nextKind}`);
     }
 
     return `${normalizedPrefix}${normalizedTitleId.slice(8)}`;
