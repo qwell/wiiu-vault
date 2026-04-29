@@ -5820,16 +5820,6 @@
         "dlc": []
     },
     {
-        "titleId": "000500001014ce00",
-        "name": "YouTube",
-        "region": "USA",
-        "productCode": "WUP-N-HNCE",
-        "companyCode": "00WB",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a5bea79de0dac4c476f67339b901ea48f2578e9b2f68fc379c46adb0d4f3fcad.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
         "titleId": "000500001014cf00",
         "name": "Coaster Crazy Deluxe",
         "region": "USA",
@@ -25136,26 +25126,6 @@
         "productCode": "WUP-P-ANVE",
         "companyCode": "00YD",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a9b02ffd4b77754044178f75f94cd54547b91882b65d06fa886dc6109ae1993d.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "0005000010202900",
-        "name": "Amazon Video BETA",
-        "region": "JPN",
-        "productCode": "WUP-N-HAPJ",
-        "companyCode": "00WD",
-        "iconUrl": null,
-        "updates": [],
-        "dlc": []
-    },
-    {
-        "titleId": "0005000010202a00",
-        "name": "Amazon Video",
-        "region": "USA",
-        "productCode": "WUP-N-HAPE",
-        "companyCode": "00WD",
-        "iconUrl": null,
         "updates": [],
         "dlc": []
     },
