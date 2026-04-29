@@ -3,6 +3,7 @@ import type { Dirent } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { getAppRoot } from './paths.js';
+import { normalizeRegion } from '../shared/regions.js';
 import { TITLE_TMD } from './metadata.js';
 
 import {
@@ -144,7 +145,7 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
         return {
             titleId: entry.titleId.toLowerCase(),
             name: normalizeTitleName(entry.name),
-            region: entry.region?.length > 0 ? entry.region : null,
+            region: normalizeRegion(entry.region, entry.productCode),
             companyCode: entry.companyCode?.length ? entry.companyCode : null,
             productCode: entry.productCode?.length ? entry.productCode : null,
             iconUrl: entry.iconUrl,
@@ -156,19 +157,37 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
     });
 }
 
-async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
-    const titlesJsonPath = path.join(getAppRoot(), 'titles', 'titles.json');
+async function readTitleDatabaseFile(
+    filePath: string,
+    required = false
+): Promise<TitleDatabaseEntry[]> {
     try {
-        const jsonText = await readFile(titlesJsonPath, 'utf8');
-        const entries = parseTitleDatabaseEntries(jsonText);
-        return new Map(entries.map((entry) => [entry.family, entry]));
+        const jsonText = await readFile(filePath, 'utf8');
+        return parseTitleDatabaseEntries(jsonText);
     } catch (error) {
-        console.error(
-            `[wiiu] failed to read titles DB at ${titlesJsonPath}:`,
-            error
-        );
-        return new Map();
+        const message = `[wiiu] failed to read titles DB at ${filePath}:`;
+
+        if (required) {
+            console.error(message, error);
+        } else {
+            console.warn(message, error);
+        }
+
+        return [];
     }
+}
+
+async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
+    const titlesDir = path.join(getAppRoot(), 'titles');
+    const titlesJsonPath = path.join(titlesDir, 'titles.json');
+    const extraJsonPath = path.join(titlesDir, 'extra.json');
+
+    const titleEntries = await readTitleDatabaseFile(titlesJsonPath, true);
+    const extraEntries = await readTitleDatabaseFile(extraJsonPath);
+
+    return new Map(
+        [...titleEntries, ...extraEntries].map((entry) => [entry.family, entry])
+    );
 }
 
 async function getDirectorySizeBytes(targetPath: string): Promise<number> {
@@ -237,7 +256,10 @@ async function readTitleEntry(
         titleId,
         version: tmd.header.titleVersion,
         titleName: getTitleName(dirname, databaseEntry?.name ?? null),
-        region: databaseEntry?.region ?? tmd.header.region,
+        region: normalizeRegion(
+            databaseEntry?.region ?? tmd.header.region,
+            databaseEntry?.productCode
+        ),
         iconUrl: databaseEntry?.iconUrl ?? null,
 
         kind,
@@ -269,7 +291,10 @@ function getParentByKind<T extends { kind: TitleKinds }>(
     );
 }
 
-export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
+export async function scanWiiUTitles(
+    root: string,
+    options: { includeAll?: boolean } = {}
+): Promise<TitleGroup[]> {
     const titleDatabase = await readTitleDatabase();
 
     // Recursively find directories that contain a title.tmd file.
@@ -381,6 +406,6 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
     }
 
     return [...groups.values()]
-        .filter((group) => group.entries.length > 0)
+        .filter((group) => options.includeAll || group.entries.length > 0)
         .sort((a, b) => a.name.localeCompare(b.name));
 }

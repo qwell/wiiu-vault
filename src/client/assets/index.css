@@ -70,7 +70,7 @@ select {
     display: grid;
     grid-template-columns:
         max-content max-content minmax(220px, 420px)
-        max-content 22px;
+        max-content max-content 22px;
     grid-template-rows: auto auto;
     column-gap: 8px;
     row-gap: 2px;
@@ -97,6 +97,11 @@ select {
     grid-row: 1;
 }
 
+.library-label-scope {
+    grid-column: 4;
+    grid-row: 1;
+}
+
 .library-field-region {
     grid-column: 1;
     grid-row: 2;
@@ -112,13 +117,18 @@ select {
     grid-row: 2;
 }
 
-.library-field-view {
+.library-field-scope {
     grid-column: 4;
     grid-row: 2;
 }
 
-.library-field-refresh {
+.library-field-view {
     grid-column: 5;
+    grid-row: 2;
+}
+
+.library-field-refresh {
+    grid-column: 6;
     grid-row: 2;
 
     width: 22px;
@@ -130,6 +140,15 @@ select {
     border-radius: 100%;
     background: transparent;
     cursor: pointer;
+    font-size: 12px;
+}
+
+.library-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 22px;
+    white-space: nowrap;
     font-size: 12px;
 }
 

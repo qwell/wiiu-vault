@@ -11,6 +11,7 @@ import {
     findGeneratedTitleKey,
 } from './decryption.js';
 import { getAppRoot } from './paths.js';
+import { normalizeRegion } from '../shared/regions.js';
 
 export type Tmd = {
     header: TmdHeader;
@@ -359,7 +360,7 @@ export function readMetaXml(buffer: Uint8Array): NUSTitleInformation | null {
     const productCode = getMenuString(menu, 'product_code');
     const companyCode = getMenuString(menu, 'company_code');
     const name = getMenuString(menu, 'longname_en');
-    const region = parseMetaRegion(getMenuString(menu, 'region'));
+    const region = normalizeRegion(getMenuString(menu, 'region'), productCode);
     const version = parseMetaUnsignedInt(getMenuString(menu, 'version'));
     const titleVersion = parseMetaUnsignedInt(
         getMenuString(menu, 'title_version')
@@ -1060,17 +1061,6 @@ function parseMetaUnsignedInt(value: string | null): number | null {
     if (!value) return null;
     const parsed = Number.parseInt(value, 10);
     return Number.isFinite(parsed) ? parsed : null;
-}
-
-function parseMetaRegion(value: string | null): string | null {
-    if (!value) return null;
-    const regionMask = Number.parseInt(value, 16);
-    if (!Number.isFinite(regionMask)) return null;
-    if (regionMask === 0x1) return 'JPN';
-    if (regionMask === 0x2) return 'USA';
-    if (regionMask === 0x4) return 'EUR';
-    if (regionMask === 0x7) return 'ALL';
-    return value;
 }
 
 async function getChildTitleMetadata(

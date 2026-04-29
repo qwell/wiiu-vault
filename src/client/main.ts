@@ -12,6 +12,7 @@ type SlotBadgeState = 'complete' | 'incomplete' | 'na' | 'unknown';
 type LibraryViewMode = 'table' | 'list';
 
 let refreshLibrary: (() => Promise<void>) | null = null;
+let showAllTitles = false;
 
 function getViewMode(): LibraryViewMode {
     return localStorage.getItem('libraryViewMode') === 'list'
@@ -35,8 +36,18 @@ function formatRegion(region: string | null): {
             return { text: 'EUR', flag: '🇪🇺' };
         case 'JPN':
             return { text: 'JPN', flag: '🇯🇵' };
+        case 'FRA':
+            return { text: 'FRA', flag: '🇫🇷' };
+        case 'GER':
+            return { text: 'GER', flag: '🇩🇪' };
+        case 'ITA':
+            return { text: 'ITA', flag: '🇮🇹' };
+        case 'SPA':
+            return { text: 'SPA', flag: '🇪🇸' };
         case 'UNK':
             return { text: 'UNK', flag: '🏴‍☠️', class: 'arrr' };
+        case 'ALL':
+            return { text: 'ALL', flag: '🌐' };
         default:
             return { text: region ?? '', flag: '' };
     }
@@ -306,6 +317,10 @@ function buildControls(
     searchText.className = 'library-label library-label-search';
     searchText.textContent = 'Search';
 
+    const scopeText = document.createElement('div');
+    scopeText.className = 'library-label library-label-scope';
+    scopeText.textContent = 'Scope';
+
     const regionSelect = document.createElement('select');
     regionSelect.className = 'library-select library-field-region';
     regionSelect.disabled = loading || groups.length === 0;
@@ -346,6 +361,19 @@ function buildControls(
     searchInput.className = 'library-search library-field-search';
     searchInput.disabled = loading || groups.length === 0;
 
+    const scopeLabel = document.createElement('label');
+    scopeLabel.className = 'library-checkbox library-field-scope';
+
+    const scopeCheckbox = document.createElement('input');
+    scopeCheckbox.type = 'checkbox';
+    scopeCheckbox.checked = showAllTitles;
+    scopeCheckbox.disabled = loading;
+
+    const scopeLabelText = document.createElement('span');
+    scopeLabelText.textContent = 'Show all titles';
+
+    scopeLabel.append(scopeCheckbox, scopeLabelText);
+
     const viewToggle = buildViewControl(grid);
 
     const refreshButton = document.createElement('button');
@@ -363,9 +391,11 @@ function buildControls(
         regionText,
         statusText,
         searchText,
+        scopeText,
         regionSelect,
         statusSelect,
         searchInput,
+        scopeLabel,
         viewToggle,
         refreshButton
     );
@@ -383,6 +413,13 @@ function buildControls(
     searchInput.addEventListener('input', update);
     regionSelect.addEventListener('change', update);
     statusSelect.addEventListener('change', update);
+
+    scopeCheckbox.addEventListener('change', () => {
+        showAllTitles = scopeCheckbox.checked;
+        if (refreshLibrary) {
+            void refreshLibrary();
+        }
+    });
 
     refreshButton.addEventListener('click', () => {
         if (!refreshButton.disabled && refreshLibrary) {
@@ -482,7 +519,9 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
     output.replaceChildren(buildLibraryContent([], true));
 
     try {
-        const response = await fetch('/api/library');
+        const response = await fetch(
+            showAllTitles ? '/api/library?includeAll=true' : '/api/library'
+        );
 
         if (!response.ok) {
             throw new Error(`Request failed with status ${response.status}`);

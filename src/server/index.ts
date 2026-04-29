@@ -27,9 +27,10 @@ app.use((req, _res, next) => {
 app.use(express.json());
 app.use(express.static(clientDir));
 
-app.get('/api/library', async (_req, res) => {
+app.get('/api/library', async (req, res) => {
     try {
-        const groups = await scanWiiUTitles(romRoot);
+        const includeAll = req.query.includeAll === 'true';
+        const groups = await scanWiiUTitles(romRoot, { includeAll });
 
         res.json({
             groups,

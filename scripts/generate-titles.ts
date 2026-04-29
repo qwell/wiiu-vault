@@ -5,6 +5,8 @@ import path from 'node:path';
 import { parse as CsvParse } from 'csv-parse/sync';
 import { XMLParser } from 'fast-xml-parser';
 
+import { normalizeRegion } from '../src/shared/regions.js';
+
 type Title = {
     titleId: string;
     name: string | null;
@@ -276,7 +278,7 @@ async function processTitle(
     const title: Title = {
         titleId,
         name: metadata.name ?? null,
-        region: metadata.region ?? null,
+        region: normalizeRegion(metadata.region, metadata.productCode),
         productCode: metadata.productCode ?? null,
         companyCode: metadata.companyCode ?? null,
         iconUrl: null,
@@ -359,7 +361,7 @@ async function loadExtraTitles(
             return {
                 titleId: titleId,
                 name: row.Description ?? 'Unknown',
-                region: row.Region === '' ? null : (row.Region ?? null),
+                region: normalizeRegion(row.Region, row['Product Code']),
                 productCode:
                     row['Product Code'] === ''
                         ? null
