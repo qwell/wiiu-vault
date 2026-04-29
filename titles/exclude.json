@@ -104,6 +104,16 @@
         "dlc": []
     },
     {
+        "titleId": "000500001017e300",
+        "name": "Splatoon\nGlobal Testfire",
+        "region": "ALL",
+        "productCode": "WUP-P-AGEA",
+        "companyCode": "0001",
+        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/098c13348f95e38554bc08922026ffbf590232a942e7b1e21b3f0929179dc9af.jpg",
+        "updates": [],
+        "dlc": []
+    },
+    {
         "titleId": "00050000101bca00",
         "name": "Napster",
         "region": "EUR",

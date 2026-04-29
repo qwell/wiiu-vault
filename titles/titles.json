@@ -342,7 +342,7 @@
     {
         "titleId": "0005000010107a00",
         "name": "Kirby's Adventure",
-        "region": "EUR",
+        "region": "FRA",
         "productCode": "WUP-N-FADF",
         "companyCode": "0001",
         "iconUrl": null,
@@ -652,7 +652,7 @@
     {
         "titleId": "0005000010109a00",
         "name": "The Legend of Zelda:\nA Link to the Past",
-        "region": "EUR",
+        "region": "FRA",
         "productCode": "WUP-N-JADF",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/877f0d2b5963c3a02d7ab7525561232e3303edacc6a4d1803a8f5c0914a85d1c.jpg",
@@ -662,7 +662,7 @@
     {
         "titleId": "0005000010109b00",
         "name": "The Legend of Zelda:\nA Link to the Past",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-N-JADD",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/71a10b591301d3bbdd52a5b298addbc44899635bf3519c59b39aadf6e22fb2c4.jpg",
@@ -742,7 +742,7 @@
     {
         "titleId": "000500001010a300",
         "name": "Donkey Kong Country 2:\nDiddy's Kong Quest",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-N-JAGD",
         "companyCode": "0001",
         "iconUrl": null,
@@ -1162,7 +1162,7 @@
     {
         "titleId": "000500001010f700",
         "name": "Your Shape®\nFitness Evolved 2013",
-        "region": "0000000C",
+        "region": "EUR",
         "productCode": "WUP-P-AYSP",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/05d30c4979863876f5874bda0b3870c2d83cf4058e0710fc6fdb52241776f397.jpg",
@@ -1812,7 +1812,7 @@
     {
         "titleId": "0005000010114e00",
         "name": "The Legend of\nThe Mystical Ninja",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-N-JALD",
         "companyCode": "0001",
         "iconUrl": null,
@@ -1992,7 +1992,7 @@
     {
         "titleId": "0005000010117200",
         "name": "MONSTER HUNTER 3 ULTIMATE",
-        "region": "0000000C",
+        "region": "EUR",
         "productCode": "WUP-P-AHDP",
         "companyCode": "0008",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ab018f0d3ef6b866ba76dab74bbd9cfd60bf0a6d7e392b743e17d3224bc0fd3e.jpg",
@@ -2262,7 +2262,7 @@
     {
         "titleId": "000500001011a700",
         "name": "ZombiU",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-P-AZUD",
         "companyCode": "0041",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7e25a0a44bc771ac41e72b876de2c9cff15a703247768499dfc6ae4b5d0e3e15.jpg",
@@ -2352,7 +2352,7 @@
     {
         "titleId": "000500001011b000",
         "name": "Disney Epic Mickey 2",
-        "region": "EUR",
+        "region": "SPA",
         "productCode": "WUP-P-AEMS",
         "companyCode": "004Q",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9b497439d630cf1d3569c8017ff193f15352791dba5d552663b613755a7e953f.jpg",
@@ -4212,7 +4212,7 @@
     {
         "titleId": "0005000010136a00",
         "name": "Disney Planes",
-        "region": "EUR",
+        "region": "RUS",
         "productCode": "WUP-P-APAR",
         "companyCode": "004Q",
         "iconUrl": null,
@@ -4312,7 +4312,7 @@
     {
         "titleId": "0005000010137800",
         "name": "Harvest Moon",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-N-JBKD",
         "companyCode": "0001",
         "iconUrl": null,
@@ -5262,7 +5262,7 @@
     {
         "titleId": "0005000010147700",
         "name": "Pokémon Rumble U",
-        "region": "00000006",
+        "region": "UNK",
         "productCode": "WUP-P-WCNZ",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6932ecfc90263295ff6924477f0bbc630a4dfd98479db43cad4592345683d0b0.jpg",
@@ -6862,7 +6862,7 @@
     {
         "titleId": "0005000010157f00",
         "name": "BAYONETTA",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-P-AAFD",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6637c53a6ed0a7301df7abe51f8722ea281b559cf4eccc337a7b44a38fc8a0ce.jpg",
@@ -9102,7 +9102,7 @@
     {
         "titleId": "0005000010169600",
         "name": "Unepic\nEnjoyUp Games",
-        "region": "EUR",
+        "region": "SPA",
         "productCode": "WUP-P-WEPS",
         "companyCode": "00UP",
         "iconUrl": null,
@@ -11980,16 +11980,6 @@
         "dlc": []
     },
     {
-        "titleId": "000500001017e300",
-        "name": "Splatoon\nGlobal Testfire",
-        "region": "ALL",
-        "productCode": "WUP-P-AGEA",
-        "companyCode": "0001",
-        "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/098c13348f95e38554bc08922026ffbf590232a942e7b1e21b3f0929179dc9af.jpg",
-        "updates": [],
-        "dlc": []
-    },
-    {
         "titleId": "000500001017e400",
         "name": "Chasing Dead",
         "region": "USA",
@@ -12822,7 +12812,7 @@
     {
         "titleId": "0005000010185900",
         "name": "GolT Stadium",
-        "region": "EUR",
+        "region": "SPA",
         "productCode": "WUP-N-BGSS",
         "companyCode": "010V",
         "iconUrl": null,
@@ -15042,7 +15032,7 @@
     {
         "titleId": "0005000010199500",
         "name": "Super Mario 64",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NABE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e21ab27ac81fdfc041232b7a175d2625c4ba049fc821feb63c323c42101f75bc.jpg",
@@ -15882,7 +15872,7 @@
     {
         "titleId": "00050000101a0e00",
         "name": "Kirby 64: The Crystal Shards",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAEE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/27356713b6553a6fe32f81e4eabfef9a9a126b4dead0a0769a10427093f571d7.jpg",
@@ -15902,7 +15892,7 @@
     {
         "titleId": "00050000101a1000",
         "name": "Mario Tennis",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAFE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/037a383fc9db4c920d3c1879f7bc7ed53a189a0dd13616e70977afb23c0ff741.jpg",
@@ -16432,7 +16422,7 @@
     {
         "titleId": "00050000101a5900",
         "name": "Mario Golf",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAGE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/7a151ef123c31bec8b398582316419e69bf5d9101e55ac6906286a1d915423c9.jpg",
@@ -16452,7 +16442,7 @@
     {
         "titleId": "00050000101a5b00",
         "name": "1080° Snowboarding",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAHE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/8e2ca692c9e154a9e2c5245e309ae1577b83977dbc2ec156383866d5ccce1a47.jpg",
@@ -16862,7 +16852,7 @@
     {
         "titleId": "00050000101a9800",
         "name": "Pocky & Rocky with Becky",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-PCJE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/d8759c23af9d8636119be7f7573cd73316aa4e52af997ab2e5f20bc2fa4cef77.jpg",
@@ -17092,7 +17082,7 @@
     {
         "titleId": "00050000101ac400",
         "name": "Star Fox 64",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAJE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/29322f589caf42602bf3115284ecbfa60f9cad41c020544dda3fd8aff8c6ef2a.jpg",
@@ -17112,7 +17102,7 @@
     {
         "titleId": "00050000101ac600",
         "name": "Wave Race 64",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAKE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/31fb10087729512d9731cc1b66890b361ac3e3d2888bda2ab2af62487d03305a.jpg",
@@ -17982,7 +17972,7 @@
     {
         "titleId": "00050000101b4600",
         "name": "Mario Kart 64",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NALE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/23abebcfeb96bc95425236f734571c4dd85b0c56ed4d6b029cb20e2f37dd10ef.jpg",
@@ -18002,7 +17992,7 @@
     {
         "titleId": "00050000101b4800",
         "name": "Sin & Punishment",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAME",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/6250e311c216fce942a4166a9e7099341fabedb305ce6b7ef18762fa81068d1a.jpg",
@@ -18562,7 +18552,7 @@
     {
         "titleId": "00050000101bb200",
         "name": "Yoshi's Story",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAPE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ab26f10305bb280f0964e47d2efeab2bbfb4ee7b0712dd6abe4aa6582afab073.jpg",
@@ -19602,7 +19592,7 @@
     {
         "titleId": "00050000101c4c00",
         "name": "Xenoblade Chronicles X",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-P-AX5D",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f1629747cd48b95a6ede0c0beb4dd33d406a4a1c00be0e6acfacc9eb8c7d5dca.jpg",
@@ -19712,7 +19702,7 @@
     {
         "titleId": "00050000101c5d00",
         "name": "Mario Party 2",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAQE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/c6cfc22405c9a9faeea826fcbcda851ac6f1c9f3c2a8ff48e87734f573d791e0.jpg",
@@ -22292,7 +22282,7 @@
     {
         "titleId": "00050000101e1300",
         "name": "Frag doch mal...die Maus!",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-P-BFDD",
         "companyCode": "018P",
         "iconUrl": null,
@@ -22742,7 +22732,7 @@
     {
         "titleId": "00050000101e6500",
         "name": "Excitebike 64",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NATE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/f2b5e287b8cbf93b996d91ec0af5c2eb6d38ee9edf8af1da3239e63d663c043b.jpg",
@@ -22762,7 +22752,7 @@
     {
         "titleId": "00050000101e6700",
         "name": "Ogre Battle 64: \nPerson of Lordly Caliber",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAUE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/0717e0906eb82f3ad787d4eed7f0f8ccef21b983d0d4ee0e2a18ae0d8bb4b595.jpg",
@@ -23312,7 +23302,7 @@
     {
         "titleId": "00050000101ebc00",
         "name": "F-Zero X",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAWE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a15435d9fac677d6ed539fb09de55b97b70d2473883b22cf0595d86791a2caef.jpg",
@@ -24732,7 +24722,7 @@
     {
         "titleId": "00050000101fe800",
         "name": "BOMBERMAN 64",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NAZE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a5409ea649c13bca69bb29cd57a3057aa61ad8db22ee823ff69a54847d03f0c1.jpg",
@@ -24752,7 +24742,7 @@
     {
         "titleId": "00050000101fea00",
         "name": "Harvest Moon 64",
-        "region": "00000006",
+        "region": "USA",
         "productCode": "WUP-N-NA2E",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a7b45c5384de7a41444efb7c745d274f084abd7591ceca199b45ed6b314c3a44.jpg",
@@ -26722,7 +26712,7 @@
     {
         "titleId": "0005000010213700",
         "name": "Schlag den Star - Das Spiel",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-P-WSDD",
         "companyCode": "00RV",
         "iconUrl": null,

@@ -167,7 +167,7 @@
     {
         "titleId": "0005000010113500",
         "name": "Call of Duty: Black Ops II",
-        "region": "EUR",
+        "region": "ITA",
         "productCode": "WUP-P-AECI",
         "companyCode": "0052",
         "iconUrl": null,
@@ -189,7 +189,7 @@
     {
         "titleId": "0005000010113700",
         "name": "Call of Duty: Black Ops II",
-        "region": "EUR",
+        "region": "GER",
         "productCode": "WUP-P-AECD",
         "companyCode": "0052",
         "iconUrl": null,
@@ -332,7 +332,7 @@
     {
         "titleId": "0005000010136f00",
         "name": "Disney Infinity",
-        "region": "USA",
+        "region": "EUR",
         "productCode": "WUP-P-ADSP",
         "companyCode": "004Q",
         "iconUrl": null,
@@ -486,7 +486,7 @@
     {
         "titleId": "0005000010157600",
         "name": "Call of Duty: Ghosts",
-        "region": "EUR",
+        "region": "ITA",
         "productCode": "WUP-P-ACPI",
         "companyCode": "0052",
         "iconUrl": null,
@@ -508,7 +508,7 @@
     {
         "titleId": "000500001015a300",
         "name": "Disney INFINITY",
-        "region": "USA",
+        "region": "JPN",
         "productCode": "WUP-P-ADSJ",
         "companyCode": "00AF",
         "iconUrl": null,
