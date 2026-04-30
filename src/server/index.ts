@@ -8,7 +8,8 @@ import {
     getDlcMetadata,
     getUpdateMetadata,
 } from './metadata.js';
-import { scanWiiUTitles } from './wiiu.js';
+import { getCachedImage } from './image-cache.js';
+import { getTitleIconUrl, scanWiiUTitles } from './wiiu.js';
 
 const config = loadConfig();
 
@@ -40,6 +41,29 @@ app.get('/api/library', async (req, res) => {
 
         res.status(500).json({
             error: 'Failed to scan library',
+        });
+    }
+});
+
+app.get('/api/title-icon/:family', async (req, res) => {
+    try {
+        const iconUrl = await getTitleIconUrl(req.params.family);
+
+        if (!iconUrl) {
+            res.status(404).json({
+                error: 'Missing title icon',
+            });
+            return;
+        }
+
+        const image = await getCachedImage(iconUrl);
+        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+        res.send(image.body);
+    } catch (error) {
+        console.error('[server] Failed to load title icon:', error);
+
+        res.status(500).json({
+            error: 'Failed to load title icon',
         });
     }
 });

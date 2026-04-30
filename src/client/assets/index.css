@@ -248,6 +248,14 @@ select {
     color: var(--complete);
 }
 
+.title-group-missing {
+    border-color: var(--fg);
+}
+
+.title-group-missing .title-group-header {
+    color: var(--fg);
+}
+
 .title-group-unknown {
     border-color: var(--unknown);
 }
@@ -281,6 +289,7 @@ select {
     overflow-wrap: anywhere;
     word-break: break-word;
     white-space: normal;
+    font-size: 14px;
 }
 
 .title-slot-badges {

@@ -36,26 +36,27 @@
         <header>
             <img src="/assets/logo-64x64.png" height="32" width="32" />
             <h1>Wii U Vault</h1>
+
+            <button id="theme-toggle" type="button" aria-label="Toggle theme">
+                <img
+                    id="theme-icon-light"
+                    src="/assets/light-mode-64x64.png"
+                    alt=""
+                    width="24"
+                    height="24"
+                />
+                <img
+                    id="theme-icon-dark"
+                    src="/assets/dark-mode-64x64.png"
+                    alt=""
+                    width="24"
+                    height="24"
+                />
+            </button>
         </header>
 
-        <button id="theme-toggle" type="button" aria-label="Toggle theme">
-            <img
-                id="theme-icon-light"
-                src="/assets/light-mode-64x64.png"
-                alt=""
-                width="24"
-                height="24"
-            />
-            <img
-                id="theme-icon-dark"
-                src="/assets/dark-mode-64x64.png"
-                alt=""
-                width="24"
-                height="24"
-            />
-        </button>
-
         <div id="output">Waiting...</div>
+
         <script type="module" src="./main.ts"></script>
     </body>
     <footer>

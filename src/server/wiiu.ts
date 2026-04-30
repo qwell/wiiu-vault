@@ -9,6 +9,7 @@ import { TITLE_TMD } from './metadata.js';
 import {
     type TitleEntry,
     type TitleGroup,
+    type TitleGroupStatus,
     TitleKinds,
     type ChildKind,
     type ParentKind,
@@ -190,6 +191,11 @@ async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
     );
 }
 
+export async function getTitleIconUrl(family: string): Promise<string | null> {
+    const titleDatabase = await readTitleDatabase();
+    return titleDatabase.get(family)?.iconUrl ?? null;
+}
+
 async function getDirectorySizeBytes(targetPath: string): Promise<number> {
     const info = await stat(targetPath);
 
@@ -276,6 +282,7 @@ function createEmptyGroup(family: string): TitleGroup {
         iconUrl: null,
         titleInDatabase: false,
         expectedChildren: [],
+        status: 'unknown',
 
         entries: [],
     };
@@ -289,6 +296,27 @@ function getParentByKind<T extends { kind: TitleKinds }>(
             PARENT_KINDS.includes(candidate.kind as ParentKind)
         ) ?? null
     );
+}
+
+function getGroupStatus(group: TitleGroup): TitleGroupStatus {
+    if (!group.titleInDatabase) {
+        return 'unknown';
+    }
+
+    if (group.entries.length === 0) {
+        return 'missing';
+    }
+
+    if (
+        !getParentByKind(group.entries) ||
+        group.expectedChildren.some(
+            (kind) => !group.entries.some((entry) => entry.kind === kind)
+        )
+    ) {
+        return 'incomplete';
+    }
+
+    return 'complete';
 }
 
 export async function scanWiiUTitles(
@@ -383,15 +411,20 @@ export async function scanWiiUTitles(
                 ? databaseEntry.updates.length > 0
                 : databaseEntry.dlc.length > 0;
         });
+        group.status = getGroupStatus(group);
 
         if (parentEntry) {
             group.name = parentEntry.titleName;
             group.region = parentEntry.region;
-            group.iconUrl = parentEntry.iconUrl;
+            group.iconUrl = databaseEntry?.iconUrl
+                ? `/api/title-icon/${encodeURIComponent(group.family)}`
+                : parentEntry.iconUrl;
         } else if (databaseEntry) {
             group.name = databaseEntry.name;
             group.region = databaseEntry.region;
-            group.iconUrl = databaseEntry.iconUrl;
+            group.iconUrl = databaseEntry.iconUrl
+                ? `/api/title-icon/${encodeURIComponent(group.family)}`
+                : null;
         } else {
             const firstLocalChild = group.entries.find((entry) =>
                 CHILD_KINDS.includes(entry.kind as ChildKind)

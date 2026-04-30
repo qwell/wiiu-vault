@@ -25,6 +25,11 @@ export const CHILD_KINDS = [TitleKinds.DLC, TitleKinds.Update] as const;
 
 export type ParentKind = (typeof PARENT_KINDS)[number];
 export type ChildKind = (typeof CHILD_KINDS)[number];
+export type TitleGroupStatus =
+    | 'complete'
+    | 'incomplete'
+    | 'missing'
+    | 'unknown';
 
 export type TitleEntry = {
     titleId: string;
@@ -47,6 +52,7 @@ export type TitleGroup = {
     family: string;
     titleInDatabase: boolean;
     expectedChildren: ChildKind[];
+    status: TitleGroupStatus;
 };
 
 export type LibraryResponse = {

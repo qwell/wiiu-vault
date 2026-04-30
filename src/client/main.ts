@@ -2,17 +2,45 @@ import {
     type LibraryResponse,
     type TitleGroup,
     type TitleEntry,
+    type TitleGroupStatus,
     TitleKinds,
     type ChildKind,
     PARENT_KINDS,
 } from '../shared/shared.js';
 
-type GroupStatus = 'complete' | 'incomplete' | 'unknown';
 type SlotBadgeState = 'complete' | 'incomplete' | 'na' | 'unknown';
 type LibraryViewMode = 'table' | 'list';
 
 let refreshLibrary: (() => Promise<void>) | null = null;
 let showAllTitles = false;
+let iconObserver: IntersectionObserver | null = null;
+
+iconObserver = new IntersectionObserver(
+    (entries) => {
+        for (const entry of entries) {
+            if (!entry.isIntersecting) {
+                continue;
+            }
+
+            const image = entry.target;
+            if (!(image instanceof HTMLImageElement)) {
+                continue;
+            }
+
+            const iconUrl = image.dataset.src;
+            if (iconUrl) {
+                image.src = iconUrl;
+                delete image.dataset.src;
+            }
+
+            iconObserver?.unobserve(image);
+        }
+    },
+    {
+        root: document.querySelector('library-grid'),
+        rootMargin: '256px',
+    }
+);
 
 function getViewMode(): LibraryViewMode {
     return localStorage.getItem('libraryViewMode') === 'list'
@@ -95,24 +123,6 @@ function formatTooltip(group: TitleGroup): string {
     ].join('\n');
 }
 
-function getGroupStatus(group: TitleGroup): GroupStatus {
-    if (!group.titleInDatabase) {
-        return 'unknown';
-    }
-
-    if (
-        !getEntry(group, PARENT_KINDS) ||
-        (isChildExpected(group, TitleKinds.Update) &&
-            !getEntry(group, TitleKinds.Update)) ||
-        (isChildExpected(group, TitleKinds.DLC) &&
-            !getEntry(group, TitleKinds.DLC))
-    ) {
-        return 'incomplete';
-    }
-
-    return 'complete';
-}
-
 function getGameBadgeState(group: TitleGroup): SlotBadgeState {
     if (!group.titleInDatabase) {
         return 'unknown';
@@ -150,7 +160,7 @@ function renderGroup(group: TitleGroup): HTMLElement | null {
         return null;
     }
 
-    const status = getGroupStatus(group);
+    const status = group.status;
 
     const root = document.createElement('div');
     root.className = `title-group title-group-${status}`;
@@ -159,9 +169,16 @@ function renderGroup(group: TitleGroup): HTMLElement | null {
     if (group.iconUrl) {
         const image = document.createElement('img');
         image.className = 'title-icon';
-        image.src = group.iconUrl;
+        image.dataset.src = group.iconUrl;
         image.alt = group.name;
+        image.loading = 'lazy';
+        image.decoding = 'async';
         root.append(image);
+        if (iconObserver) {
+            iconObserver.observe(image);
+        } else {
+            image.src = group.iconUrl;
+        }
     } else {
         const placeholder = document.createElement('div');
         placeholder.className = 'title-icon-placeholder';
@@ -272,9 +289,7 @@ function renderGroups(
     const normalizedSearch = normalizeSearchText(searchValue.trim());
 
     const filteredGroups = [...allGroups].filter((group) => {
-        const groupStatus = getGroupStatus(group);
-
-        if (statusValue !== 'all' && groupStatus !== statusValue) {
+        if (statusValue !== 'all' && group.status !== statusValue) {
             return false;
         }
 
@@ -341,10 +356,14 @@ function buildControls(
     statusSelect.className = 'library-select library-field-status';
     statusSelect.disabled = loading || groups.length === 0;
 
-    const statusOptions: Array<{ value: string; label: string }> = [
+    const statusOptions: Array<{
+        value: TitleGroupStatus | 'all';
+        label: string;
+    }> = [
         { value: 'all', label: 'All' },
         { value: 'complete', label: 'Complete' },
         { value: 'incomplete', label: 'Incomplete' },
+        { value: 'missing', label: 'Missing' },
         { value: 'unknown', label: 'Unknown' },
     ];
 
