@@ -25,6 +25,32 @@ export function normalizeTitleName(name: string): string {
     return name.replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim() || 'Unknown';
 }
 
+export async function mapConcurrent<T, U>(
+    items: T[],
+    concurrency: number,
+    mapper: (item: T, index: number) => Promise<U>
+): Promise<U[]> {
+    if (items.length === 0) {
+        return [];
+    }
+
+    const results = new Array<U>(items.length);
+    const workers = new Array(Math.min(concurrency, items.length))
+        .fill(null)
+        .map(async (_, workerIndex) => {
+            for (
+                let index = workerIndex;
+                index < items.length;
+                index += concurrency
+            ) {
+                results[index] = await mapper(items[index], index);
+            }
+        });
+
+    await Promise.all(workers);
+    return results;
+}
+
 export const PARENT_KINDS = [
     TitleKinds.vWii,
     TitleKinds.Base,

@@ -59,42 +59,49 @@ async function copyTitlesFileIntoDist(name: string) {
     );
 }
 
-async function main() {
-    await fs.mkdir(path.join(root, 'dist'), { recursive: true });
-    const version = await readAppVersion();
-
-    // Server build
-    await build({
-        configFile: false,
-        mode: 'production',
-        build: {
-            ssr: path.join(root, 'src/server/index.ts'),
-            outDir: path.join(root, 'dist/server'),
-            emptyOutDir: true,
-            sourcemap: true,
-        },
-    });
-
-    // Client build
-    await build({
-        configFile: false,
-        mode: 'production',
-        root: path.join(root, 'src/client'),
-        publicDir: false,
-        define: {
-            __APP_VERSION__: JSON.stringify(version),
-        },
-        build: {
-            outDir: path.join(root, 'dist/client'),
-            emptyOutDir: false,
-            sourcemap: true,
-        },
-    });
-
+async function copyFilesIntoDist() {
     await copyFileIntoDist('config.json');
     await copyTitlesFileIntoDist('titles.json');
     await copyTitlesFileIntoDist('extra.json');
     await copyTitlesFileIntoDist('wiiutdb.json');
+}
+
+async function main() {
+    await fs.mkdir(path.join(root, 'dist'), { recursive: true });
+    const version = await readAppVersion();
+
+    await Promise.all([
+        // server
+        build({
+            configFile: false,
+            mode: 'production',
+            build: {
+                ssr: path.join(root, 'src/server/index.ts'),
+                outDir: path.join(root, 'dist/server'),
+                emptyOutDir: true,
+                sourcemap: true,
+            },
+        }),
+
+        // client
+        build({
+            configFile: false,
+            mode: 'production',
+            root: path.join(root, 'src/client'),
+            publicDir: false,
+            define: {
+                __APP_VERSION__: JSON.stringify(version),
+            },
+            build: {
+                outDir: path.join(root, 'dist/client'),
+                emptyOutDir: false,
+                sourcemap: true,
+            },
+        }),
+
+        // other
+        copyFilesIntoDist(),
+    ]);
 }
 
 main().catch((error) => {

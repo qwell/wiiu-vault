@@ -14,7 +14,7 @@ import {
 } from './decryption.js';
 import { getAppRoot } from './paths.js';
 import { normalizeRegion } from '../shared/regions.js';
-import { normalizeTitleName } from '../shared/shared.js';
+import { mapConcurrent, normalizeTitleName } from '../shared/shared.js';
 
 export type Tmd = {
     header: TmdHeader;
@@ -1205,32 +1205,6 @@ function logExistingContentSkipped(contentId: string, size: bigint): void {
     console.log(
         `[metadata] existing content hash matches, skipping download: ${contentId} (${size.toString()} bytes)`
     );
-}
-
-async function mapConcurrent<T, U>(
-    items: T[],
-    concurrency: number,
-    mapper: (item: T, index: number) => Promise<U>
-): Promise<U[]> {
-    if (items.length === 0) {
-        return [];
-    }
-
-    const results = new Array<U>(items.length);
-    const workers = new Array(Math.min(concurrency, items.length))
-        .fill(null)
-        .map(async (_, workerIndex) => {
-            for (
-                let index = workerIndex;
-                index < items.length;
-                index += concurrency
-            ) {
-                results[index] = await mapper(items[index], index);
-            }
-        });
-
-    await Promise.all(workers);
-    return results;
 }
 
 function verifyEncryptedContentTree(

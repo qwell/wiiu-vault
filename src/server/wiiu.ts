@@ -19,6 +19,7 @@ import {
     CHILD_KINDS,
     toArray,
     normalizeTitleName,
+    mapConcurrent,
     TitleKinds,
 } from '../shared/shared.js';
 import { readTmd } from './metadata.js';
@@ -84,6 +85,8 @@ type GameTdbFile = {
 type LocalTitleEntry = TitleEntry & {
     family: string;
 };
+
+const LIBRARY_SCAN_CONCURRENCY = 8;
 
 function cleanDirectoryName(dirname: string): string {
     // Clear [ and anything after it.
@@ -348,8 +351,10 @@ async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
     const titlesJsonPath = path.join(titlesDir, 'titles.json');
     const extraJsonPath = path.join(titlesDir, 'extra.json');
 
-    const titleEntries = await readTitleDatabaseFile(titlesJsonPath, true);
-    const extraEntries = await readTitleDatabaseFile(extraJsonPath);
+    const [titleEntries, extraEntries] = await Promise.all([
+        readTitleDatabaseFile(titlesJsonPath, true),
+        readTitleDatabaseFile(extraJsonPath),
+    ]);
 
     return new Map(
         [...titleEntries, ...extraEntries].map((entry) => [entry.family, entry])
@@ -490,8 +495,10 @@ export async function scanWiiUTitles(
     root: string,
     options: { includeAll?: boolean } = {}
 ): Promise<TitleGroup[]> {
-    const titleDatabase = await readTitleDatabase();
-    const gameTdb = await readGameTdb();
+    const [titleDatabase, gameTdb] = await Promise.all([
+        readTitleDatabase(),
+        readGameTdb(),
+    ]);
 
     // Recursively find directories that contain a title.tmd file.
     async function findTitleDirs(
@@ -513,16 +520,19 @@ export async function scanWiiUTitles(
             found.push(relative || '.');
         }
 
-        for (const entry of entries) {
-            if (entry.isDirectory()) {
+        const childDirectories = entries.filter((entry) => entry.isDirectory());
+        const childResults = await mapConcurrent(
+            childDirectories,
+            LIBRARY_SCAN_CONCURRENCY,
+            async (entry) => {
                 const subRel = relative
                     ? `${relative}/${entry.name}`
                     : entry.name;
                 const childPath = path.join(currentPath, entry.name);
-                const childFound = await findTitleDirs(childPath, subRel);
-                found.push(...childFound);
+                return findTitleDirs(childPath, subRel);
             }
-        }
+        );
+        found.push(...childResults.flat());
 
         return found;
     }
@@ -532,10 +542,10 @@ export async function scanWiiUTitles(
     );
 
     const scanned = (
-        await Promise.all(
-            directories.map(async (dirname) =>
-                readTitleEntry(root, dirname, titleDatabase)
-            )
+        await mapConcurrent(
+            directories,
+            LIBRARY_SCAN_CONCURRENCY,
+            async (dirname) => readTitleEntry(root, dirname, titleDatabase)
         )
     ).filter((entry): entry is LocalTitleEntry => entry !== null);
 
