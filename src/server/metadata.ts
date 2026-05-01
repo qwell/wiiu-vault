@@ -198,6 +198,8 @@ const META_XML_PARSER = new XMLParser({
     trimValues: false,
 });
 
+let commonKeyPromise: Promise<Uint8Array> | null = null;
+
 // -- Public API --
 
 export async function downloadNusTitleMetadata(
@@ -552,9 +554,14 @@ export function getTitleIdNumber(value: Uint8Array): bigint {
     return Buffer.from(value).readBigUInt64BE(0);
 }
 
-export async function readCommonKey(
-    filePath = path.join(getAppRoot(), 'common.key')
-): Promise<Uint8Array> {
+export async function readCommonKey(): Promise<Uint8Array> {
+    const commonKeyPath = path.join(getAppRoot(), 'common.key');
+
+    commonKeyPromise ??= readCommonKeyFile(commonKeyPath);
+    return commonKeyPromise;
+}
+
+async function readCommonKeyFile(filePath: string): Promise<Uint8Array> {
     const raw = await readFile(filePath, 'utf8');
     const normalized = raw.replace(/\s+/g, '');
     if (!/^[\da-fA-F]+$/.test(normalized)) {
