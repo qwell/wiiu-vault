@@ -11,14 +11,19 @@ import {
     getUpdateMetadata,
 } from './metadata.js';
 import { getCachedImage } from './image-cache.js';
-import { getTitleIconUrl, scanWiiUTitles, validateWiiUTitles } from './wiiu.js';
+import {
+    findFirstReadableWiiURoot,
+    getTitleIconUrl,
+    scanWiiUTitleRoots,
+    validateWiiUTitleRoots,
+} from './wiiu.js';
 
 const config = loadConfig();
 
 const app = express();
 const host = config.server.host;
 const port = config.server.port;
-const romRoot = config.roms.wiiuRoot;
+const romRoots = config.roms.wiiuRoots;
 
 const clientDir = path.join(getAppRoot(), 'client');
 
@@ -98,6 +103,14 @@ function sendServerError(
     res.status(500).json(body);
 }
 
+function formatLogError(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
+}
+
+function logServerError(message: string, error: unknown): void {
+    console.error(`${message} ${formatLogError(error)}`);
+}
+
 function formatUrlHost(host: string): string {
     return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
 }
@@ -123,20 +136,20 @@ app.use(express.static(clientDir));
 app.get('/api/library', async (req, res) => {
     try {
         const includeAll = req.query.includeAll === 'true';
-        const groups = await scanWiiUTitles(romRoot, { includeAll });
+        const groups = await scanWiiUTitleRoots(romRoots, { includeAll });
 
         res.json({
             groups,
         });
     } catch (error) {
-        console.error('[server] Failed to scan library:', error);
+        logServerError('[server] Failed to scan library:', error);
         sendServerError(res, 'Failed to scan library', error);
     }
 });
 
 app.get('/api/library/validate', async (_req, res) => {
     try {
-        const titles = await validateWiiUTitles(romRoot);
+        const titles = await validateWiiUTitleRoots(romRoots);
         const failed = titles.filter((title) => title.status !== 'ok').length;
 
         res.json({
@@ -146,7 +159,7 @@ app.get('/api/library/validate', async (_req, res) => {
             titles,
         });
     } catch (error) {
-        console.error('[server] Failed to validate library:', error);
+        logServerError('[server] Failed to validate library:', error);
         sendServerError(res, 'Failed to validate library', error, {
             includeDetails: true,
         });
@@ -168,7 +181,7 @@ app.get('/api/title-icon/:family', async (req, res) => {
         res.set('Cache-Control', 'public, max-age=31536000, immutable');
         res.send(image.body);
     } catch (error) {
-        console.error('[server] Failed to load title icon:', error);
+        logServerError('[server] Failed to load title icon:', error);
         sendServerError(res, 'Failed to load title icon', error);
     }
 });
@@ -204,7 +217,7 @@ app.get('/api/title-metadata', async (req, res) => {
             titleKeyPassword: metadata.titleKeyPassword,
         });
     } catch (error) {
-        console.error('[server] Failed to download title metadata:', error);
+        logServerError('[server] Failed to download title metadata:', error);
         sendServerError(res, 'Failed to download title metadata', error, {
             includeDetails: true,
         });
@@ -253,7 +266,7 @@ app.get('/api/title-all', async (req, res) => {
                     : [],
         });
     } catch (error) {
-        console.error('[server] Failed to load full title metadata:', error);
+        logServerError('[server] Failed to load full title metadata:', error);
         sendServerError(res, 'Failed to load full title metadata', error, {
             includeDetails: true,
         });
@@ -267,9 +280,10 @@ app.get('/api/title-download', async (req, res) => {
     }
 
     try {
+        const romRoot = await findFirstReadableWiiURoot(romRoots);
         res.json(await generateTitleInstallFiles(titleId, romRoot));
     } catch (error) {
-        console.error('[server] Failed to download title:', error);
+        logServerError('[server] Failed to download title:', error);
         sendServerError(res, 'Failed to download title', error, {
             includeDetails: true,
         });
@@ -291,7 +305,7 @@ app.get('/api/title-update', async (req, res) => {
             titleVersion: metadata.titleVersion,
         });
     } catch (error) {
-        console.error('[server] Failed to load title update metadata:', error);
+        logServerError('[server] Failed to load title update metadata:', error);
         sendServerError(res, 'Failed to load title update metadata', error, {
             includeDetails: true,
         });
@@ -313,7 +327,7 @@ app.get('/api/title-dlc', async (req, res) => {
             titleVersion: metadata.titleVersion,
         });
     } catch (error) {
-        console.error('[server] Failed to load title DLC metadata:', error);
+        logServerError('[server] Failed to load title DLC metadata:', error);
         sendServerError(res, 'Failed to load title DLC metadata', error, {
             includeDetails: true,
         });

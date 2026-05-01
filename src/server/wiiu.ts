@@ -29,6 +29,7 @@ import {
 import { readTmd } from './metadata.js';
 
 export type LibraryTitleValidation = {
+    root: string;
     directory: string;
     titleId: string | null;
     titleVersion: number | null;
@@ -102,6 +103,13 @@ type LocalTitleEntry = TitleEntry & {
 const LIBRARY_SCAN_CONCURRENCY = 8;
 const ANSI_RED = '\u001b[31m';
 const ANSI_RESET = '\u001b[0m';
+
+async function assertReadableDirectory(root: string): Promise<void> {
+    const info = await stat(root);
+    if (!info.isDirectory()) {
+        throw new Error(`not a directory: ${root}`);
+    }
+}
 
 function cleanDirectoryName(dirname: string): string {
     // Clear [ and anything after it.
@@ -624,6 +632,86 @@ export async function scanWiiUTitles(
         .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function mergeTitleGroups(groups: TitleGroup[]): TitleGroup[] {
+    const merged = new Map<string, TitleGroup>();
+
+    for (const group of groups) {
+        const existing = merged.get(group.family);
+        if (!existing) {
+            merged.set(group.family, {
+                ...group,
+                availableEntries: [...group.availableEntries],
+                expectedChildren: [...group.expectedChildren],
+                entries: [...group.entries],
+            });
+            continue;
+        }
+
+        existing.entries.push(...group.entries);
+
+        if (existing.status === 'missing' && group.status !== 'missing') {
+            existing.name = group.name;
+            existing.region = group.region;
+            existing.iconUrl = group.iconUrl;
+            existing.details = group.details;
+            existing.titleInDatabase = group.titleInDatabase;
+            existing.status = group.status;
+        }
+    }
+
+    for (const group of merged.values()) {
+        group.entries.sort((a, b) => b.version - a.version);
+        group.status = getGroupStatus(group);
+    }
+
+    return [...merged.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function scanWiiUTitleRoots(
+    roots: string[],
+    options: { includeAll?: boolean } = {}
+): Promise<TitleGroup[]> {
+    const scannedGroups: TitleGroup[] = [];
+    let scannedRootCount = 0;
+
+    for (const root of roots) {
+        try {
+            await assertReadableDirectory(root);
+            scannedGroups.push(
+                ...(await scanWiiUTitles(root, {
+                    includeAll: options.includeAll && scannedRootCount === 0,
+                }))
+            );
+            scannedRootCount += 1;
+        } catch {
+            console.warn(`[wiiu] skipping Wii U root ${root}`);
+        }
+    }
+
+    return mergeTitleGroups(scannedGroups).filter(
+        (group) => options.includeAll || group.entries.length > 0
+    );
+}
+
+export async function findFirstReadableWiiURoot(
+    roots: string[]
+): Promise<string> {
+    const errors: string[] = [];
+
+    for (const root of roots) {
+        try {
+            await assertReadableDirectory(root);
+            return root;
+        } catch (error) {
+            errors.push(
+                `${root}: ${error instanceof Error ? error.message : String(error)}`
+            );
+        }
+    }
+
+    throw new Error(`No readable Wii U roots found. ${errors.join('; ')}`);
+}
+
 export async function validateWiiUTitles(
     root: string
 ): Promise<LibraryTitleValidation[]> {
@@ -641,9 +729,12 @@ export async function validateWiiUTitles(
             validation.status === 'failed'
                 ? `${ANSI_RED}failed${ANSI_RESET}`
                 : validation.status;
+
+        // Keep the extra space, for alignment purposes
         console.log(`[wiiu] validated title:  ${directory} (${status})`);
 
         validations.push({
+            root,
             directory,
             titleId: validation.titleId,
             titleVersion: validation.titleVersion,
@@ -651,6 +742,23 @@ export async function validateWiiUTitles(
             error: validation.error,
             verification: validation.verification,
         });
+    }
+
+    return validations;
+}
+
+export async function validateWiiUTitleRoots(
+    roots: string[]
+): Promise<LibraryTitleValidation[]> {
+    const validations: LibraryTitleValidation[] = [];
+
+    for (const root of roots) {
+        try {
+            await assertReadableDirectory(root);
+            validations.push(...(await validateWiiUTitles(root)));
+        } catch {
+            console.warn(`[wiiu] skipping Wii U root ${root}`);
+        }
     }
 
     return validations;

@@ -13,7 +13,7 @@ type ServerConfig = {
         openBrowser: boolean;
     };
     roms: {
-        wiiuRoot: string;
+        wiiuRoots: string[];
     };
 };
 
@@ -55,9 +55,46 @@ function assertConfig(value: unknown): asserts value is ServerConfig {
         throw new Error('Config.server.openBrowser must be a boolean.');
     }
 
-    if (typeof roms.wiiuRoot !== 'string' || roms.wiiuRoot.length === 0) {
+    if (
+        'wiiuRoot' in roms &&
+        (typeof roms.wiiuRoot !== 'string' || roms.wiiuRoot.length === 0)
+    ) {
         throw new Error('Config.roms.wiiuRoot must be a non-empty string.');
     }
+
+    if (
+        'wiiuRoots' in roms &&
+        (!Array.isArray(roms.wiiuRoots) ||
+            !roms.wiiuRoots.every(
+                (root) => typeof root === 'string' && root.length > 0
+            ))
+    ) {
+        throw new Error(
+            'Config.roms.wiiuRoots must be an array of non-empty strings.'
+        );
+    }
+
+    if (!('wiiuRoot' in roms) && !('wiiuRoots' in roms)) {
+        throw new Error('Config.roms.wiiuRoot or wiiuRoots must be set.');
+    }
+}
+
+function readWiiURoots(roms: Record<string, unknown>): string[] {
+    const roots: string[] = [];
+
+    if (typeof roms.wiiuRoot === 'string') {
+        roots.push(roms.wiiuRoot);
+    }
+
+    if (Array.isArray(roms.wiiuRoots)) {
+        roots.push(
+            ...roms.wiiuRoots.filter(
+                (root): root is string => typeof root === 'string'
+            )
+        );
+    }
+
+    return [...new Set(roots)];
 }
 
 export function loadConfig(): ServerConfig {
@@ -74,6 +111,10 @@ export function loadConfig(): ServerConfig {
             host: parsed.server.host ?? DEFAULT_SERVER_HOST,
             port: parsed.server.port ?? DEFAULT_SERVER_PORT,
             openBrowser: parsed.server.openBrowser ?? true,
+        },
+        roms: {
+            ...parsed.roms,
+            wiiuRoots: readWiiURoots(parsed.roms),
         },
     };
 }

@@ -5,6 +5,6 @@
         "openBrowser": true
     },
     "roms": {
-        "wiiuRoot": "/ROMs/wiiu/"
+        "wiiuRoots": ["G:/ROMs/wiiu/", "/mnt/g/ROMs/wiiu/"]
     }
 }
