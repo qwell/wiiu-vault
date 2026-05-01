@@ -1,6 +1,7 @@
 import path from 'path';
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import { XMLParser } from 'fast-xml-parser';
 import {
     createContentIv,
@@ -952,9 +953,12 @@ export function getTitleIdNumber(value: Uint8Array): bigint {
 }
 
 export async function readCommonKey(): Promise<Uint8Array> {
-    const commonKeyPath = path.join(getAppRoot(), 'common.key');
+    const commonKeyPaths = [
+        path.join(os.homedir(), '.wiiu', 'common.key'),
+        path.join(getAppRoot(), 'common.key'),
+    ];
 
-    commonKeyPromise ??= readCommonKeyFile(commonKeyPath);
+    commonKeyPromise ??= readCommonKeyFromPaths(commonKeyPaths);
     return commonKeyPromise;
 }
 
@@ -1007,18 +1011,85 @@ async function readDefaultCert(): Promise<Uint8Array> {
     return defaultCertPromise;
 }
 
-async function readCommonKeyFile(filePath: string): Promise<Uint8Array> {
-    const raw = await readFile(filePath, 'utf8');
-    const normalized = raw.replace(/\s+/g, '');
-    if (!/^[\da-fA-F]+$/.test(normalized)) {
-        throw new Error(`common key at ${filePath} is not valid hex`);
+async function readCommonKeyFromPaths(
+    filePaths: string[]
+): Promise<Uint8Array> {
+    const errors: string[] = [];
+
+    for (const filePath of filePaths) {
+        try {
+            return parseCommonKey(await readFile(filePath), filePath);
+        } catch (error) {
+            if (isNodeError(error) && error.code === 'ENOENT') {
+                continue;
+            }
+
+            errors.push(error instanceof Error ? error.message : String(error));
+        }
     }
-    if (normalized.length !== COMMON_KEY_SIZE * 2) {
-        throw new Error(
-            `common key at ${filePath} must be ${COMMON_KEY_SIZE * 2} hex chars`
+
+    throw new Error(
+        `common key not found or invalid. Checked: ${filePaths.join(', ')}${errors.length > 0 ? `. ${errors.join('; ')}` : ''}`
+    );
+}
+
+function parseCommonKey(raw: Uint8Array, filePath: string): Uint8Array {
+    if (raw.length === COMMON_KEY_SIZE) {
+        return new Uint8Array(raw);
+    }
+
+    const text = Buffer.from(raw).toString('utf8').trim();
+    const normalizedText = text.replace(/\s+/g, '');
+
+    const byteLiteralKey = parseCommonKeyByteLiterals(text);
+    if (byteLiteralKey) {
+        return assertCommonKeyLength(byteLiteralKey, filePath, 'byte literals');
+    }
+
+    if (/^[\da-fA-F]+$/.test(normalizedText)) {
+        return assertCommonKeyLength(
+            new Uint8Array(Buffer.from(normalizedText, 'hex')),
+            filePath,
+            'hex'
         );
     }
-    return new Uint8Array(Buffer.from(normalized, 'hex'));
+
+    throw new Error(
+        `common key at ${filePath} must be raw binary, hex, or comma-separated byte literals`
+    );
+}
+
+function parseCommonKeyByteLiterals(text: string): Uint8Array | null {
+    const tokens = text
+        .split(',')
+        .map((token) => token.trim())
+        .filter((token) => token.length > 0);
+
+    if (tokens.length === 0 || !tokens.every((token) => /^0x[\da-fA-F]{1,2}$/.test(token))) {
+        return null;
+    }
+
+    return new Uint8Array(
+        tokens.map((token) => Number.parseInt(token.slice(2), 16))
+    );
+}
+
+function assertCommonKeyLength(
+    commonKey: Uint8Array,
+    filePath: string,
+    format: string
+): Uint8Array {
+    if (commonKey.length !== COMMON_KEY_SIZE) {
+        throw new Error(
+            `common key at ${filePath} decoded from ${format} must be ${COMMON_KEY_SIZE} bytes, got ${commonKey.length}`
+        );
+    }
+
+    return commonKey;
+}
+
+function isNodeError(error: unknown): error is NodeJS.ErrnoException {
+    return error instanceof Error && 'code' in error;
 }
 
 async function ensureContentTree({
