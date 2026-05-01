@@ -17,10 +17,11 @@
     "scripts": {
         "lint": "eslint --cache --cache-strategy metadata --cache-location ./.cache/eslint src/ tests/",
         "format": "prettier --write --cache --cache-strategy metadata --cache-location ./.cache/prettier .",
-        "clean": "rimraf dist/ .cache/",
+        "clean": "rimraf dist/ release/ .cache/",
         "build": "tsx scripts/build.ts",
         "start": "tsx scripts/start.ts",
         "test": "vitest run",
+        "release": "yarn clean && yarn build && tsx scripts/release.ts",
         "generate:titles": "tsx scripts/generate-titles.ts"
     },
     "devDependencies": {

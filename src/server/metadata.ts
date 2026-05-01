@@ -1,7 +1,10 @@
 import path from 'path';
-import { createHash } from 'node:crypto';
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { createDecipheriv, createHash } from 'node:crypto';
+import { createReadStream, createWriteStream } from 'node:fs';
+import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import { XMLParser } from 'fast-xml-parser';
 import {
     createContentIv,
@@ -127,6 +130,7 @@ type DownloadableTitle = {
 export type ContentTreeVerification = {
     contentId: string;
     status: 'ok' | 'missing-h3' | 'failed';
+    cached?: boolean;
     error?: string;
 };
 
@@ -143,6 +147,8 @@ type ContentInstallFiles = {
     h3Name: string | null;
     h3File: string | null;
 };
+
+type ContentFileDownload = (targetFile: string) => Promise<void>;
 
 export type InstalledTitleValidation = {
     titleId: string | null;
@@ -317,6 +323,11 @@ const META_XML_PARSER = new XMLParser({
     parseAttributeValue: false,
     trimValues: false,
 });
+
+const COMMON_KEY_DOWNLOAD_URLS_BASE64 = [
+    'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS9FbXJhbkFobTNkL2JkN2E3OTFkMDI5NzVkNzE4NmQwYzA1NTRmM2NmNmVhL3Jhdy8xYzM4MzM1ZjJhNzFhYjQyNDVkMjM3NjE4YzRmYWZlNjcwZWUzZTgyL3dpaXVjb21tb25rZXkudHh0',
+    'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS9xd2VsbC80NWJhN2QyZjMwNWRlNzJhODFkYjlkNzUxOTA4MTE3YS9yYXcvMWMzODMzNWYyYTcxYWI0MjQ1ZDIzNzYxOGM0ZmFmZTY3MGVlM2U4Mi93aWl1Y29tbW9ua2V5LnR4dA==',
+] as const;
 
 let commonKeyPromise: Promise<Uint8Array> | null = null;
 let defaultCertPromise: Promise<Uint8Array> | null = null;
@@ -643,7 +654,7 @@ export async function generateTitleInstallFiles(
     }
 
     console.log(
-        `[metadata] finished downloading: [${normalizedTitleId}] ${meta?.name ?? normalizedTitleId}`
+        `[metadata] finished downloading: [${normalizedTitleId}] ${normalizeTitleName(meta?.name ?? normalizedTitleId)}`
     );
 
     return {
@@ -768,7 +779,8 @@ async function downloadTitleContentFile({
             files,
             content,
             titleKey,
-            download: () => downloadContent(baseUrl, titleId, content.id),
+            download: (targetFile) =>
+                downloadContentToFile(baseUrl, titleId, content.id, targetFile),
         });
 
         return {
@@ -782,8 +794,10 @@ async function downloadTitleContentFile({
         files,
         content,
         titleKey,
-        downloadApp: () => downloadContent(baseUrl, titleId, content.id),
-        downloadH3: () => downloadContentH3(baseUrl, titleId, content.id),
+        downloadApp: (targetFile) =>
+            downloadContentToFile(baseUrl, titleId, content.id, targetFile),
+        downloadH3: (targetFile) =>
+            downloadContentH3ToFile(baseUrl, titleId, content.id, targetFile),
     });
 
     return {
@@ -1131,8 +1145,57 @@ async function readCommonKeyFromPaths(
         }
     }
 
+    if (errors.length === 0 && filePaths.length > 0) {
+        return downloadCommonKey(filePaths[0]);
+    }
+
     throw new Error(
         `common key not found or invalid. Checked: ${filePaths.join(', ')}${errors.length > 0 ? `. ${errors.join('; ')}` : ''}`
+    );
+}
+
+async function downloadCommonKey(filePath: string): Promise<Uint8Array> {
+    console.warn(
+        [
+            'Wii U common key was not found in any configured location.',
+            `Downloading a copy now and saving it to: ${filePath}`,
+            'This is a one-time setup step. Future runs will use the saved file instead of downloading it again.',
+        ].join('\n')
+    );
+
+    const errors: string[] = [];
+
+    for (const [
+        index,
+        encodedUrl,
+    ] of COMMON_KEY_DOWNLOAD_URLS_BASE64.entries()) {
+        const url = Buffer.from(encodedUrl, 'base64').toString('utf8');
+
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const body = new Uint8Array(await response.arrayBuffer());
+            const commonKey = parseCommonKey(body, url);
+
+            await mkdir(path.dirname(filePath), { recursive: true });
+            await writeFile(filePath, body);
+
+            return commonKey;
+        } catch (error) {
+            errors.push(
+                `source ${index + 1}: ${error instanceof Error ? error.message : String(error)}`
+            );
+        }
+    }
+
+    throw new Error(
+        `common key not found. Failed to download common key. ${errors.join(
+            '; '
+        )}`
     );
 }
 
@@ -1261,9 +1324,9 @@ async function ensureContentInstallFiles({
     files: ContentInstallFiles;
     content: TmdContent;
     titleKey: Uint8Array;
-    download?: () => Promise<Uint8Array>;
-    downloadApp?: () => Promise<Uint8Array>;
-    downloadH3?: () => Promise<Uint8Array>;
+    download?: ContentFileDownload;
+    downloadApp?: ContentFileDownload;
+    downloadH3?: ContentFileDownload;
 }): Promise<ContentTreeVerification> {
     if (isHashedContent(content)) {
         if (!files.h3File || !downloadApp || !downloadH3) {
@@ -1316,8 +1379,8 @@ async function ensureContentTree({
     content: TmdContent;
     titleKey: Uint8Array;
     contentId: string;
-    downloadApp: () => Promise<Uint8Array>;
-    downloadH3: () => Promise<Uint8Array>;
+    downloadApp: ContentFileDownload;
+    downloadH3: ContentFileDownload;
 }): Promise<ContentTreeVerification> {
     const existing = await verifyContentTree({
         appFile,
@@ -1329,36 +1392,47 @@ async function ensureContentTree({
 
     if (existing.status === 'ok') {
         logExistingContentSkipped(contentId, content.size);
-        return existing;
+        return {
+            ...existing,
+            cached: true,
+        };
     }
 
-    const h3 = await downloadH3().catch((error: unknown) => {
-        if (isHttpErrorStatus(error, 404)) {
-            return null;
-        }
+    logExistingContentInvalid(contentId, existing.error);
 
-        throw error;
-    });
+    const h3Downloaded = await downloadH3(h3File)
+        .then(() => true)
+        .catch((error: unknown) => {
+            if (isHttpErrorStatus(error, 404)) {
+                return false;
+            }
 
-    if (h3 === null) {
+            throw error;
+        });
+
+    if (!h3Downloaded) {
         return {
             contentId,
             status: 'missing-h3',
         };
     }
 
-    await Promise.all([
-        writeFile(appFile, await downloadApp()),
-        writeFile(h3File, h3),
-    ]);
+    await downloadApp(appFile);
 
-    return verifyContentTree({
+    const verification = await verifyContentTree({
         appFile,
         h3File,
         content,
         titleKey,
         contentId,
     });
+
+    return verification.status === 'ok'
+        ? {
+              ...verification,
+              cached: false,
+          }
+        : verification;
 }
 
 async function verifyContentTree({
@@ -1376,11 +1450,12 @@ async function verifyContentTree({
 }): Promise<ContentTreeVerification> {
     try {
         await assertExistingContentFileSize(appFile, content.size, contentId);
-        const [encryptedContent, h3] = await Promise.all([
-            readFile(appFile),
-            readFile(h3File),
-        ]);
-        verifyEncryptedContentTree(encryptedContent, h3, content, titleKey);
+        await verifyEncryptedContentTreeFile({
+            appFile,
+            h3File,
+            content,
+            titleKey,
+        });
 
         return {
             contentId,
@@ -1406,7 +1481,7 @@ async function ensureContentHash({
     content: TmdContent;
     titleKey: Uint8Array;
     contentId: string;
-    download: () => Promise<Uint8Array>;
+    download: ContentFileDownload;
 }): Promise<ContentTreeVerification> {
     const existing = await verifyContentHash({
         appFile,
@@ -1417,17 +1492,29 @@ async function ensureContentHash({
 
     if (existing.status === 'ok') {
         logExistingContentSkipped(contentId, content.size);
-        return existing;
+        return {
+            ...existing,
+            cached: true,
+        };
     }
 
-    await writeFile(appFile, await download());
+    logExistingContentInvalid(contentId, existing.error);
 
-    return verifyContentHash({
+    await download(appFile);
+
+    const verification = await verifyContentHash({
         appFile,
         content,
         titleKey,
         contentId,
     });
+
+    return verification.status === 'ok'
+        ? {
+              ...verification,
+              cached: false,
+          }
+        : verification;
 }
 
 async function verifyContentHash({
@@ -1443,15 +1530,14 @@ async function verifyContentHash({
 }): Promise<ContentTreeVerification> {
     try {
         await assertExistingContentFileSize(appFile, content.size, contentId);
-        const encryptedContent = await readFile(appFile);
-        const decryptedContent = decryptContentWithIndex(
-            encryptedContent,
+        const actualHash = await hashDecryptedContentFile(
+            appFile,
             titleKey,
             content.index
-        ).slice(0, Number(content.size));
+        );
 
         assertHashEquals(
-            sha1(decryptedContent),
+            actualHash,
             content.hash.slice(0, HASH_ENTRY_SIZE),
             `Content hash mismatch for ${contentId}`
         );
@@ -1484,54 +1570,125 @@ async function assertExistingContentFileSize(
 
 function logExistingContentSkipped(contentId: string, size: bigint): void {
     console.log(
-        `[metadata] existing content hash matches, skipping download: ${contentId} (${size.toString()} bytes)`
+        `[metadata] content ${contentId} (${size.toString()} bytes, cached)`
     );
 }
 
-function verifyEncryptedContentTree(
-    encryptedContent: Uint8Array,
-    h3: Uint8Array,
-    content: TmdContent,
-    titleKey: Uint8Array
+function logExistingContentInvalid(
+    contentId: string,
+    error: string | undefined
 ): void {
+    console.log(
+        `[metadata] cached content invalid, redownloading: ${contentId}${error ? ` (${error})` : ''}`
+    );
+}
+
+async function hashDecryptedContentFile(
+    appFile: string,
+    titleKey: Uint8Array,
+    contentIndex: number
+): Promise<Uint8Array> {
+    const decipher = createDecipheriv(
+        'aes-128-cbc',
+        Buffer.from(titleKey),
+        Buffer.from(createContentIv(contentIndex))
+    );
+    decipher.setAutoPadding(false);
+
+    const hash = createHash('sha1');
+    for await (const chunk of readFileChunks(appFile)) {
+        hash.update(decipher.update(chunk));
+    }
+    hash.update(decipher.final());
+
+    return new Uint8Array(hash.digest());
+}
+
+async function hashFile(filePath: string): Promise<Uint8Array> {
+    const hash = createHash('sha1');
+    for await (const chunk of readFileChunks(filePath)) {
+        hash.update(chunk);
+    }
+
+    return new Uint8Array(hash.digest());
+}
+
+async function* readFileChunks(filePath: string): AsyncGenerator<Buffer> {
+    for await (const chunk of createReadStream(filePath)) {
+        yield Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    }
+}
+
+async function verifyEncryptedContentTreeFile({
+    appFile,
+    h3File,
+    content,
+    titleKey,
+}: {
+    appFile: string;
+    h3File: string;
+    content: TmdContent;
+    titleKey: Uint8Array;
+}): Promise<void> {
+    const [h3, h3Hash] = await Promise.all([
+        readFile(h3File),
+        hashFile(h3File),
+    ]);
+
     assertHashEquals(
-        sha1(h3),
+        h3Hash,
         content.hash.slice(0, HASH_ENTRY_SIZE),
         'TMD H3 hash mismatch'
     );
 
-    for (
-        let blockOffset = 0, blockIndex = 0;
-        blockOffset < encryptedContent.length;
-        blockOffset += HASHED_BLOCK_SIZE, blockIndex += 1
-    ) {
-        const encryptedBlock = encryptedContent.slice(
-            blockOffset,
-            Math.min(blockOffset + HASHED_BLOCK_SIZE, encryptedContent.length)
-        );
+    let pending = Buffer.alloc(0);
+    let blockIndex = 0;
 
-        if (encryptedBlock.length === 0) {
-            continue;
+    for await (const chunk of createReadStream(appFile, {
+        highWaterMark: HASHED_BLOCK_SIZE,
+    })) {
+        pending = Buffer.concat([pending, chunk]);
+
+        while (pending.length >= HASHED_BLOCK_SIZE) {
+            verifyEncryptedContentTreeBlock(
+                pending.subarray(0, HASHED_BLOCK_SIZE),
+                h3,
+                titleKey,
+                blockIndex
+            );
+            pending = pending.subarray(HASHED_BLOCK_SIZE);
+            blockIndex += 1;
         }
-
-        const hashArea = decryptContentWithIv(
-            encryptedBlock.slice(0, HASHED_BLOCK_DATA_OFFSET),
-            titleKey,
-            new Uint8Array(16)
-        );
-        const h0Index = blockIndex % HASH_ENTRIES_PER_LEVEL;
-        const dataIv = hashArea.slice(
-            HASH_H0_START + h0Index * HASH_ENTRY_SIZE,
-            HASH_H0_START + h0Index * HASH_ENTRY_SIZE + 0x10
-        );
-        const dataArea = decryptContentWithIv(
-            encryptedBlock.slice(HASHED_BLOCK_DATA_OFFSET),
-            titleKey,
-            dataIv
-        );
-
-        verifyHashArea(hashArea, dataArea, h3, blockIndex);
     }
+
+    if (pending.length > 0) {
+        verifyEncryptedContentTreeBlock(pending, h3, titleKey, blockIndex);
+    }
+}
+
+function verifyEncryptedContentTreeBlock(
+    encryptedBlock: Uint8Array,
+    h3: Uint8Array,
+    titleKey: Uint8Array,
+    blockIndex: number
+): void {
+    const hashArea = decryptContentWithIv(
+        encryptedBlock.slice(0, HASHED_BLOCK_DATA_OFFSET),
+        titleKey,
+        new Uint8Array(16)
+    );
+    const h0Index = blockIndex % HASH_ENTRIES_PER_LEVEL;
+    const dataIv = hashArea.slice(
+        HASH_H0_START + h0Index * HASH_ENTRY_SIZE,
+        HASH_H0_START + h0Index * HASH_ENTRY_SIZE + 0x10
+    );
+    const dataArea = decryptContentWithIv(
+        encryptedBlock.slice(HASHED_BLOCK_DATA_OFFSET),
+        titleKey,
+        dataIv
+    );
+
+    verifyHashArea(hashArea, dataArea, h3, blockIndex);
 }
 
 function verifyHashArea(
@@ -1633,6 +1790,32 @@ export async function downloadContentH3(
 ): Promise<Uint8Array> {
     return downloadBinary(
         getContentH3Url(baseUrl, titleId, contentId),
+        `content ${formatContentId(contentId)}.h3`
+    );
+}
+
+async function downloadContentToFile(
+    baseUrl: string,
+    titleId: string,
+    contentId: number,
+    targetFile: string
+): Promise<void> {
+    return downloadBinaryToFile(
+        getContentUrl(baseUrl, titleId, contentId),
+        targetFile,
+        `content ${formatContentId(contentId)}`
+    );
+}
+
+async function downloadContentH3ToFile(
+    baseUrl: string,
+    titleId: string,
+    contentId: number,
+    targetFile: string
+): Promise<void> {
+    return downloadBinaryToFile(
+        getContentH3Url(baseUrl, titleId, contentId),
+        targetFile,
         `content ${formatContentId(contentId)}.h3`
     );
 }
@@ -2256,6 +2439,39 @@ async function downloadBinary(
         `[metadata] downloaded ${label}: ${url} (${bytes.length} bytes)`
     );
     return bytes;
+}
+
+async function downloadBinaryToFile(
+    url: string,
+    targetFile: string,
+    label = 'file'
+): Promise<void> {
+    console.log(`[metadata] downloading ${label}: ${url}`);
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`download failed for ${url}: ${response.status}`);
+    }
+    if (!response.body) {
+        throw new Error(`download failed for ${url}: empty response body`);
+    }
+
+    const tempFile = `${targetFile}.download`;
+
+    try {
+        await pipeline(
+            Readable.fromWeb(response.body),
+            createWriteStream(tempFile)
+        );
+        await rename(tempFile, targetFile);
+    } catch (error) {
+        await rm(tempFile, { force: true });
+        throw error;
+    }
+
+    const { size } = await stat(targetFile);
+    console.log(
+        `[metadata] downloaded ${label}: ${url} (${size.toString()} bytes)`
+    );
 }
 
 function ensureTrailingSlash(value: string): string {

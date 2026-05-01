@@ -31,6 +31,7 @@ import { readTmd } from './metadata.js';
 export type LibraryTitleValidation = {
     root: string | null;
     directory: string | null;
+    titleName: string;
     titleId: string | null;
     titleVersion: number | null;
     status: 'ok' | 'failed';
@@ -749,6 +750,7 @@ export async function validateWiiUTitles(
         validations.push({
             root,
             directory,
+            titleName,
             titleId: validation.titleId,
             titleVersion: validation.titleVersion,
             status: validation.status,
@@ -781,7 +783,22 @@ export async function validateWiiUTitleRoots(
         )
     );
 
-    return validations;
+    return sortLibraryTitleValidations(validations);
+}
+
+function sortLibraryTitleValidations(
+    validations: LibraryTitleValidation[]
+): LibraryTitleValidation[] {
+    return validations.sort((a, b) => {
+        const nameComparison = a.titleName.localeCompare(b.titleName);
+        if (nameComparison !== 0) {
+            return nameComparison;
+        }
+
+        return (a.directory ?? a.titleId ?? '').localeCompare(
+            b.directory ?? b.titleId ?? ''
+        );
+    });
 }
 
 function createMissingExpectedChildValidations(
@@ -815,6 +832,7 @@ function createMissingExpectedChildValidations(
             missing.push({
                 root: null,
                 directory: null,
+                titleName: group.name,
                 titleId: expectedEntry.titleId,
                 titleVersion: expectedEntry.versions[0] ?? null,
                 status: 'failed',

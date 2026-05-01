@@ -1,55 +1,9 @@
 import { build } from 'vite';
-import { execFile } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { promisify } from 'node:util';
+import { readAppVersion } from '../src/shared/scripts.js';
 
 const root = process.cwd();
-const execFileAsync = promisify(execFile);
-
-type PackageJson = {
-    version?: string;
-};
-
-async function readPackageVersion(): Promise<string> {
-    const text = await fs.readFile(path.join(root, 'package.json'), 'utf8');
-    const packageJson = JSON.parse(text) as PackageJson;
-
-    return packageJson.version ?? '0.0.0';
-}
-
-async function readGitVersionSuffix(): Promise<string> {
-    try {
-        const { stdout } = await execFileAsync(
-            'git',
-            ['rev-parse', '--short', 'HEAD'],
-            { cwd: root }
-        );
-        const hash = stdout.trim();
-        if (!hash) {
-            return '';
-        }
-
-        let dirty = false;
-        try {
-            await execFileAsync('git', ['diff', '--quiet'], { cwd: root });
-        } catch {
-            dirty = true;
-        }
-
-        return `+${hash}${dirty ? '.dirty' : ''}`;
-    } catch {
-        return '';
-    }
-}
-
-async function readAppVersion(): Promise<string> {
-    return `${await readPackageVersion()}${await readGitVersionSuffix()}`;
-}
-
-async function copyFileIntoDist(name: string) {
-    await fs.copyFile(path.join(root, name), path.join(root, 'dist', name));
-}
 
 async function copyTitlesFileIntoDist(name: string) {
     await fs.mkdir(path.join(root, 'dist', 'titles'), { recursive: true });
@@ -60,7 +14,10 @@ async function copyTitlesFileIntoDist(name: string) {
 }
 
 async function copyFilesIntoDist() {
-    await copyFileIntoDist('config.json');
+    await fs.copyFile(
+        path.join(root, 'config.sample.json'),
+        path.join(root, 'dist', 'config.json')
+    );
     await copyTitlesFileIntoDist('titles.json');
     await copyTitlesFileIntoDist('extra.json');
     await copyTitlesFileIntoDist('wiiutdb.json');
@@ -68,13 +25,16 @@ async function copyFilesIntoDist() {
 
 async function main() {
     await fs.mkdir(path.join(root, 'dist'), { recursive: true });
-    const version = await readAppVersion();
+    const version = await readAppVersion(root);
 
     await Promise.all([
         // server
         build({
             configFile: false,
             mode: 'production',
+            ssr: {
+                noExternal: true,
+            },
             build: {
                 ssr: path.join(root, 'src/server/index.ts'),
                 outDir: path.join(root, 'dist/server'),
