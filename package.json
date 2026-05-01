@@ -1,7 +1,7 @@
 {
-    "name": "happy-ts",
+    "name": "wiiu-vault",
     "version": "0.1.0",
-    "repository": "https://github.com/qwell/happy-ts",
+    "repository": "https://github.com/qwell/wiiu-vault",
     "author": "Jason Parker",
     "license": "GPLv3",
     "main": "dist/index.js",
