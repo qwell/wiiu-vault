@@ -4,7 +4,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { getAppRoot } from './paths.js';
 import { normalizeRegion } from '../shared/regions.js';
-import { TITLE_TMD } from './metadata.js';
+import { TMD_TITLE_FILE } from './metadata.js';
 
 import {
     type AvailableTitleEntry,
@@ -515,7 +515,9 @@ export async function scanWiiUTitles(
             return found;
         }
 
-        const hasTmd = entries.some((e) => e.isFile() && e.name === TITLE_TMD);
+        const hasTmd = entries.some(
+            (e) => e.isFile() && e.name === TMD_TITLE_FILE
+        );
         if (hasTmd) {
             found.push(relative || '.');
         }

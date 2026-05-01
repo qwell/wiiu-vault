@@ -5,6 +5,7 @@ import { getAppRoot } from './paths.js';
 import { loadConfig } from './config.js';
 import {
     downloadNusTitleMetadata,
+    generateTitleInstallFiles,
     getDlcMetadata,
     getUpdateMetadata,
 } from './metadata.js';
@@ -169,6 +170,35 @@ app.get('/api/title-all', async (req, res) => {
 
         res.status(500).json({
             error: 'Failed to load full title metadata',
+            message: error instanceof Error ? error.message : String(error),
+            stage:
+                typeof error === 'object' &&
+                error !== null &&
+                'stage' in error &&
+                typeof error.stage === 'string'
+                    ? error.stage
+                    : null,
+        });
+    }
+});
+
+app.get('/api/title-download', async (req, res) => {
+    const titleId = req.query.titleId as string;
+
+    if (!titleId) {
+        res.status(400).json({
+            error: 'Missing titleId query parameter',
+        });
+        return;
+    }
+
+    try {
+        res.json(await generateTitleInstallFiles(titleId, romRoot));
+    } catch (error) {
+        console.error('[server] Failed to download title:', error);
+
+        res.status(500).json({
+            error: 'Failed to download title',
             message: error instanceof Error ? error.message : String(error),
             stage:
                 typeof error === 'object' &&

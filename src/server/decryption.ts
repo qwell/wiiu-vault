@@ -10,7 +10,7 @@ export type TitleKey = Uint8Array;
 export type TitleKeyCandidate = {
     password: string;
     titleKey: TitleKey;
-    encryptedKey: Uint8Array;
+    encryptedTitleKey: Uint8Array;
 };
 
 export type GeneratedTitleKey = {
@@ -82,6 +82,14 @@ export function decryptTitleKey(
     return aes128CbcDecrypt(encryptedKey, commonKey, createTitleKeyIv(titleId));
 }
 
+export function encryptTitleKey(
+    titleKey: Uint8Array,
+    commonKey: Uint8Array,
+    titleId: Uint8Array
+): Uint8Array {
+    return aes128CbcEncrypt(titleKey, commonKey, createTitleKeyIv(titleId));
+}
+
 export function decryptContentWithBigIntIv(
     encryptedContent: Uint8Array,
     titleKey: Uint8Array,
@@ -111,20 +119,6 @@ export function decryptContentWithIv(
 }
 
 // -- Title key generation --
-
-export function generateTitleKeyCandidate(
-    titleId: Uint8Array,
-    commonKey: Uint8Array,
-    password: string
-): TitleKeyCandidate {
-    const titleKey = deriveTitleKey(titleId, password);
-    const encryptedKey = aes128CbcEncrypt(
-        titleKey,
-        commonKey,
-        createTitleKeyIv(titleId)
-    );
-    return { password, titleKey, encryptedKey };
-}
 
 export function generateTitleKey(
     titleId: Uint8Array,

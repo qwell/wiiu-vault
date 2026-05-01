@@ -16,7 +16,9 @@ export function toArray<T>(value: T | readonly T[] | null | undefined): T[] {
         return [];
     }
 
-    return Array.isArray(value) ? Array.from(value as readonly T[]) : [value];
+    return Array.isArray(value)
+        ? Array.from(value as readonly T[])
+        : [value as T];
 }
 
 export const PARENT_KINDS = [

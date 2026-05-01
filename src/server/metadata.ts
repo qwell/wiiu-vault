@@ -1,5 +1,6 @@
 import path from 'path';
-import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { XMLParser } from 'fast-xml-parser';
 import {
     createContentIv,
@@ -8,6 +9,7 @@ import {
     decryptContentWithIv,
     decryptContentWithBigIntIv,
     decryptTitleKey,
+    encryptTitleKey,
     findGeneratedTitleKey,
 } from './decryption.js';
 import { getAppRoot } from './paths.js';
@@ -73,6 +75,12 @@ export type Tik = {
     cert1: Uint8Array | null;
 };
 
+export type GeneratedTikInput = {
+    titleId: Uint8Array;
+    encryptedTitleKey: Uint8Array;
+    titleVersion: number;
+};
+
 export type NusTitleMetadata = {
     titleId: string;
     titleVersion: number;
@@ -90,6 +98,34 @@ export type ChildTitleMetadata = {
     childTitleId: string;
     exists: boolean;
     titleVersion: number | null;
+};
+
+export type GeneratedTitleInstallFiles = {
+    titleId: string;
+    kind: 'Game' | 'Update' | 'DLC';
+    titleVersion: number;
+    titleKey: string;
+    titleKeyPassword: string | null;
+    outputDir: string;
+    files: {
+        tmd: string;
+        tik: string;
+        cert: string;
+        app: string[];
+        h3: string[];
+    };
+    verification: ContentTreeVerification[];
+};
+
+type DownloadableTitle = {
+    titleId: string;
+    kind: 'Game' | 'Update' | 'DLC';
+};
+
+type ContentTreeVerification = {
+    contentId: string;
+    status: 'ok' | 'missing-h3' | 'failed';
+    error?: string;
 };
 
 class TitleMetadataError extends Error {
@@ -145,10 +181,16 @@ const SYSTEM_TYPE_WIIU = 'wiiu';
 const SYSTEM_TYPE_WII = 'wii';
 const SYSTEM_TYPE_UNKNOWN = 'unknown';
 
-export const TITLE_TIK = 'title.tik';
-export const TITLE_TMD = 'title.tmd';
-export const TITLE_CERT = 'title.cert';
-const CDN_TICKET_NAME = 'cetk';
+const TIK_TITLE_FILE = 'title.tik';
+const TIK_TITLE_FILE_CDN = 'cetk';
+export const TMD_TITLE_FILE = 'title.tmd';
+const CERT_TITLE_FILE = 'title.cert';
+
+const NUS_BASE_URL = 'http://ccs.cdn.wup.shop.nintendo.net/ccs/download';
+// const NUS_BASE_URL = 'http://ccs.cdn.c.shop.nintendowifi.net/ccs/download/';
+const DEFAULT_CERT_TITLE_ID = '000500101000400a'; // OSv10
+
+const COMMON_KEY_SIZE = 16;
 
 const TIK_TITLE_ID_OFFSET = 0x1dc;
 const TIK_TITLE_ID_SIZE = 8;
@@ -160,6 +202,54 @@ const TIK_CERT_1_OFFSET = 0x350;
 const TIK_CERT_1_SIZE = 0x300;
 const TIK_CERT_0_OFFSET = 0x650;
 const TIK_CERT_0_SIZE = 0x400;
+
+const GENERATED_TIK_TEMPLATE_SIZE = TIK_VERSION_OFFSET + TIK_VERSION_SIZE;
+const GENERATED_TIK_TEMPLATE = new Uint8Array([
+    0x00, 0x01, 0x00, 0x04, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed,
+    0x15, 0xab, 0xe1, 0x1a, 0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a,
+    0xd1, 0x5e, 0xa5, 0xed, 0x15, 0xab, 0xe1, 0x1a, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x52, 0x6f, 0x6f, 0x74,
+    0x2d, 0x43, 0x41, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x33, 0x2d,
+    0x58, 0x53, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x63, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce,
+    0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce,
+    0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce,
+    0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce,
+    0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce, 0xfe, 0xed, 0xfa, 0xce,
+    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+]);
+
+const TITLE_CERT_AUTHORITY_OFFSET = 0x350;
+const TITLE_CERT_AUTHORITY_SIZE = 0x300;
 
 const CERT_SIGNATURE_RSA_4096 = 0x00010000;
 const CERT_SIGNATURE_RSA_2048 = 0x00010001;
@@ -182,14 +272,19 @@ const TMD_CONTENT_SIZE = 0x30;
 const TMD_CERTIFICATE_1_SIZE = 0x400;
 const TMD_CERTIFICATE_2_SIZE = 0x300;
 
-const COMMON_KEY_SIZE = 16;
 const FST_MAGIC = 'FST';
 const FST_ENTRY_SIZE = 0x10;
 const FST_CHANGE_OFFSET_FLAG = 0x0004;
+
 const HASHED_BLOCK_SIZE = 0x10000;
 const HASHED_BLOCK_DATA_OFFSET = 0x400;
 const HASHED_BLOCK_DATA_SIZE = 0xfc00;
-const NUS_BASE_URL = 'http://ccs.cdn.wup.shop.nintendo.net/ccs/download';
+const HASH_ENTRY_SIZE = 0x14;
+const HASH_ENTRIES_PER_LEVEL = 0x10;
+const HASH_H0_START = 0x000;
+const HASH_H1_START = 0x140;
+const HASH_H2_START = 0x280;
+const HASH_H2_END = 0x3c0;
 
 const META_XML_PARSER = new XMLParser({
     ignoreAttributes: true,
@@ -199,6 +294,7 @@ const META_XML_PARSER = new XMLParser({
 });
 
 let commonKeyPromise: Promise<Uint8Array> | null = null;
+let defaultCertPromise: Promise<Uint8Array> | null = null;
 
 // -- Public API --
 
@@ -357,6 +453,204 @@ export async function getDlcMetadata(
     );
 }
 
+export async function generateTitleInstallFiles(
+    titleId: string,
+    outputRoot: string
+): Promise<GeneratedTitleInstallFiles> {
+    const baseUrl = NUS_BASE_URL;
+    const { titleId: normalizedTitleId, kind } =
+        normalizeDownloadableTitleId(titleId);
+    const commonKey = await readCommonKey();
+    const tmdBytes = await downloadTmd(baseUrl, normalizedTitleId);
+    const tmd = readTmdFromBuffer(Buffer.from(tmdBytes));
+
+    if (!tmd) {
+        throw new TitleMetadataError(
+            'parse_tmd',
+            `Failed to parse TMD for ${normalizedTitleId}`
+        );
+    }
+
+    const fstContent = tmd.contents[0];
+    if (!fstContent) {
+        throw new TitleMetadataError(
+            'missing_fst_content',
+            `TMD has no first content entry for ${normalizedTitleId}`
+        );
+    }
+
+    const encryptedFst = await downloadContent(
+        baseUrl,
+        normalizedTitleId,
+        fstContent.id
+    );
+    const ticketBytes = await downloadTicket(baseUrl, normalizedTitleId).catch(
+        (error: unknown) => {
+            if (isHttpErrorStatus(error, 404)) {
+                return null;
+            }
+
+            throw error;
+        }
+    );
+    const ticket = ticketBytes
+        ? readTikFromBuffer(Buffer.from(ticketBytes))
+        : null;
+    const ticketTitleKey =
+        ticket !== null
+            ? decryptTitleKey(ticket.encryptedKey, commonKey, ticket.titleId)
+            : null;
+    const ticketDecryptedFst =
+        ticketTitleKey !== null
+            ? decryptContentWithBigIntIv(encryptedFst, ticketTitleKey, 0)
+            : null;
+
+    let encryptedTitleKey = ticket?.encryptedKey ?? null;
+    let titleKey = ticketTitleKey;
+    let decryptedFst = ticketDecryptedFst;
+    let titleKeyPassword: string | null = null;
+
+    if (!looksLikeFst(ticketDecryptedFst)) {
+        const generatedMatch = findGeneratedTitleKey(
+            tmd.header.titleId,
+            (candidate) =>
+                looksLikeFst(
+                    decryptContentWithBigIntIv(
+                        encryptedFst,
+                        candidate.titleKey,
+                        0
+                    )
+                )
+        );
+
+        if (!generatedMatch) {
+            throw new TitleMetadataError(
+                'resolve_title_key',
+                `No usable title key produced an FST for ${normalizedTitleId}`
+            );
+        }
+
+        encryptedTitleKey = encryptTitleKey(
+            generatedMatch.titleKey,
+            commonKey,
+            tmd.header.titleId
+        );
+        titleKey = generatedMatch.titleKey;
+        decryptedFst = decryptContentWithBigIntIv(
+            encryptedFst,
+            generatedMatch.titleKey,
+            0
+        );
+        titleKeyPassword = generatedMatch.password;
+    }
+
+    if (
+        encryptedTitleKey === null ||
+        titleKey === null ||
+        decryptedFst === null
+    ) {
+        throw new TitleMetadataError(
+            'resolve_title_key',
+            `Failed to produce an encrypted title key for ${normalizedTitleId}`
+        );
+    }
+
+    const metaXml = await extractMetaXmlFromTitle(
+        decryptedFst,
+        tmd,
+        titleKey,
+        baseUrl,
+        normalizedTitleId
+    );
+    const meta = metaXml ? readMetaXml(metaXml) : null;
+    const outputDir = path.join(
+        outputRoot,
+        `${safeDirectoryName(meta?.name ?? normalizedTitleId)} [${kind}] [${normalizedTitleId}]`
+    );
+    const tmdFile = path.join(outputDir, TMD_TITLE_FILE);
+    const certFile = path.join(outputDir, CERT_TITLE_FILE);
+    const files = {
+        tmd: TMD_TITLE_FILE,
+        tik: TIK_TITLE_FILE,
+        cert: CERT_TITLE_FILE,
+        app: [] as string[],
+        h3: [] as string[],
+    };
+    const verification: ContentTreeVerification[] = [];
+    await mkdir(outputDir, { recursive: true });
+
+    await Promise.all([
+        writeFile(tmdFile, tmdBytes),
+        writeGeneratedTik(outputDir, {
+            titleId: tmd.header.titleId,
+            encryptedTitleKey,
+            titleVersion: tmd.header.titleVersion,
+        }),
+        writeFile(
+            certFile,
+            await createGeneratedCert(tmd, {
+                ticketBytes: ticketBytes ?? undefined,
+            })
+        ),
+    ]);
+
+    for (const content of tmd.contents) {
+        const contentId = formatContentId(content.id);
+        const appName = `${contentId}.app`;
+        const appFile = path.join(outputDir, appName);
+
+        if (!isHashedContent(content)) {
+            const result = await ensureContentHash({
+                appFile,
+                content,
+                titleKey,
+                contentId,
+                download: () =>
+                    downloadContent(baseUrl, normalizedTitleId, content.id),
+            });
+
+            if (result.status === 'ok') {
+                files.app.push(appName);
+            }
+
+            verification.push(result);
+            continue;
+        }
+
+        const h3Name = `${contentId}.h3`;
+        const h3File = path.join(outputDir, h3Name);
+        const result = await ensureContentTree({
+            appFile,
+            h3File,
+            content,
+            titleKey,
+            contentId,
+            downloadApp: () =>
+                downloadContent(baseUrl, normalizedTitleId, content.id),
+            downloadH3: () =>
+                downloadContentH3(baseUrl, normalizedTitleId, content.id),
+        });
+
+        if (result.status === 'ok') {
+            files.app.push(appName);
+            files.h3.push(h3Name);
+        }
+
+        verification.push(result);
+    }
+
+    return {
+        titleId: normalizedTitleId,
+        kind,
+        titleVersion: tmd.header.titleVersion,
+        titleKey: Buffer.from(titleKey).toString('hex'),
+        titleKeyPassword,
+        outputDir,
+        files,
+        verification,
+    };
+}
+
 export function readMetaXml(buffer: Uint8Array): NUSTitleInformation | null {
     const menu = readMetaXmlJson(buffer);
     const productCode = getMenuString(menu, 'product_code');
@@ -439,11 +733,76 @@ export function readTikFromBuffer(buffer: Buffer): Tik | null {
 
 export async function readTikHeader(dirPath: string): Promise<Tik | null> {
     try {
-        const buffer = await readFile(path.join(dirPath, TITLE_TIK));
+        const buffer = await readFile(path.join(dirPath, TIK_TITLE_FILE));
         return readTikFromBuffer(buffer);
     } catch {
         return null;
     }
+}
+
+export function createGeneratedTik({
+    titleId,
+    encryptedTitleKey,
+    titleVersion,
+}: GeneratedTikInput): Uint8Array {
+    assertByteLength(titleId, TIK_TITLE_ID_SIZE, 'titleId');
+    assertByteLength(
+        encryptedTitleKey,
+        TIK_ENCRYPTED_KEY_SIZE,
+        'encryptedTitleKey'
+    );
+    assertUint16(titleVersion, 'titleVersion');
+
+    if (GENERATED_TIK_TEMPLATE.length < GENERATED_TIK_TEMPLATE_SIZE) {
+        throw new Error(
+            `Generated ticket template too small: got ${GENERATED_TIK_TEMPLATE.length}, need ${GENERATED_TIK_TEMPLATE_SIZE}`
+        );
+    }
+
+    const ticket = Buffer.from(GENERATED_TIK_TEMPLATE);
+    Buffer.from(encryptedTitleKey).copy(ticket, TIK_ENCRYPTED_KEY_OFFSET);
+    Buffer.from(titleId).copy(ticket, TIK_TITLE_ID_OFFSET);
+    ticket.writeUInt16BE(titleVersion, TIK_VERSION_OFFSET);
+
+    return new Uint8Array(ticket);
+}
+
+export async function writeGeneratedTik(
+    dirPath: string,
+    input: GeneratedTikInput
+): Promise<void> {
+    await writeFile(
+        path.join(dirPath, TIK_TITLE_FILE),
+        createGeneratedTik(input)
+    );
+}
+
+export type GeneratedCertOptions = {
+    ticketBytes?: Uint8Array | null;
+};
+
+export async function createGeneratedCert(
+    tmd: Tmd,
+    options: GeneratedCertOptions = {}
+): Promise<Uint8Array> {
+    const { certificate1, certificate2 } = tmd.certificates;
+
+    if (!certificate1 || !certificate2) {
+        throw new TitleMetadataError(
+            'generate_cert',
+            'TMD is missing certificate data'
+        );
+    }
+
+    const authorityCert = await resolveTitleCertAuthority(options);
+
+    return new Uint8Array(
+        Buffer.concat([
+            Buffer.from(certificate1.raw),
+            Buffer.from(certificate2.raw),
+            Buffer.from(authorityCert),
+        ])
+    );
 }
 
 export function readTmdFromBuffer(buffer: Buffer): Tmd | null {
@@ -465,7 +824,7 @@ export function readTmdFromBuffer(buffer: Buffer): Tmd | null {
 
 export async function readTmd(dirPath: string): Promise<Tmd | null> {
     try {
-        const buffer = await readFile(path.join(dirPath, TITLE_TMD));
+        const buffer = await readFile(path.join(dirPath, TMD_TITLE_FILE));
         return readTmdFromBuffer(buffer);
     } catch {
         return null;
@@ -561,6 +920,55 @@ export async function readCommonKey(): Promise<Uint8Array> {
     return commonKeyPromise;
 }
 
+function extractTitleCertAuthority(ticket: Uint8Array): Uint8Array | null {
+    const end = TITLE_CERT_AUTHORITY_OFFSET + TITLE_CERT_AUTHORITY_SIZE;
+
+    if (ticket.length < end) {
+        return null;
+    }
+
+    return new Uint8Array(ticket.subarray(TITLE_CERT_AUTHORITY_OFFSET, end));
+}
+
+async function resolveTitleCertAuthority(
+    options: GeneratedCertOptions
+): Promise<Uint8Array> {
+    if (options.ticketBytes) {
+        const ticketCert = extractTitleCertAuthority(options.ticketBytes);
+        if (ticketCert) {
+            return ticketCert;
+        }
+    }
+
+    return readDefaultCert();
+}
+
+async function readDefaultCert(): Promise<Uint8Array> {
+    defaultCertPromise ??= downloadTicket(
+        NUS_BASE_URL,
+        DEFAULT_CERT_TITLE_ID
+    ).then((ticket) => {
+        if (
+            ticket.length <
+            TITLE_CERT_AUTHORITY_OFFSET + TITLE_CERT_AUTHORITY_SIZE
+        ) {
+            throw new TitleMetadataError(
+                'download_default_cert',
+                `Default cetk too small: got ${ticket.length}`
+            );
+        }
+
+        return new Uint8Array(
+            ticket.subarray(
+                TITLE_CERT_AUTHORITY_OFFSET,
+                TITLE_CERT_AUTHORITY_OFFSET + TITLE_CERT_AUTHORITY_SIZE
+            )
+        );
+    });
+
+    return defaultCertPromise;
+}
+
 async function readCommonKeyFile(filePath: string): Promise<Uint8Array> {
     const raw = await readFile(filePath, 'utf8');
     const normalized = raw.replace(/\s+/g, '');
@@ -573,6 +981,305 @@ async function readCommonKeyFile(filePath: string): Promise<Uint8Array> {
         );
     }
     return new Uint8Array(Buffer.from(normalized, 'hex'));
+}
+
+async function ensureContentTree({
+    appFile,
+    h3File,
+    content,
+    titleKey,
+    contentId,
+    downloadApp,
+    downloadH3,
+}: {
+    appFile: string;
+    h3File: string;
+    content: TmdContent;
+    titleKey: Uint8Array;
+    contentId: string;
+    downloadApp: () => Promise<Uint8Array>;
+    downloadH3: () => Promise<Uint8Array>;
+}): Promise<ContentTreeVerification> {
+    const existing = await verifyContentTree({
+        appFile,
+        h3File,
+        content,
+        titleKey,
+        contentId,
+    });
+
+    if (existing.status === 'ok') {
+        logExistingContentSkipped(contentId, content.size);
+        return existing;
+    }
+
+    const h3 = await downloadH3().catch((error: unknown) => {
+        if (isHttpErrorStatus(error, 404)) {
+            return null;
+        }
+
+        throw error;
+    });
+
+    if (h3 === null) {
+        return {
+            contentId,
+            status: 'missing-h3',
+        };
+    }
+
+    await Promise.all([
+        writeFile(appFile, await downloadApp()),
+        writeFile(h3File, h3),
+    ]);
+
+    return verifyContentTree({
+        appFile,
+        h3File,
+        content,
+        titleKey,
+        contentId,
+    });
+}
+
+async function verifyContentTree({
+    appFile,
+    h3File,
+    content,
+    titleKey,
+    contentId,
+}: {
+    appFile: string;
+    h3File: string;
+    content: TmdContent;
+    titleKey: Uint8Array;
+    contentId: string;
+}): Promise<ContentTreeVerification> {
+    try {
+        await assertExistingContentFileSize(appFile, content.size, contentId);
+        const [encryptedContent, h3] = await Promise.all([
+            readFile(appFile),
+            readFile(h3File),
+        ]);
+        verifyEncryptedContentTree(encryptedContent, h3, content, titleKey);
+
+        return {
+            contentId,
+            status: 'ok',
+        };
+    } catch (error) {
+        return {
+            contentId,
+            status: 'failed',
+            error: error instanceof Error ? error.message : String(error),
+        };
+    }
+}
+
+async function ensureContentHash({
+    appFile,
+    content,
+    titleKey,
+    contentId,
+    download,
+}: {
+    appFile: string;
+    content: TmdContent;
+    titleKey: Uint8Array;
+    contentId: string;
+    download: () => Promise<Uint8Array>;
+}): Promise<ContentTreeVerification> {
+    const existing = await verifyContentHash({
+        appFile,
+        content,
+        titleKey,
+        contentId,
+    });
+
+    if (existing.status === 'ok') {
+        logExistingContentSkipped(contentId, content.size);
+        return existing;
+    }
+
+    await writeFile(appFile, await download());
+
+    return verifyContentHash({
+        appFile,
+        content,
+        titleKey,
+        contentId,
+    });
+}
+
+async function verifyContentHash({
+    appFile,
+    content,
+    titleKey,
+    contentId,
+}: {
+    appFile: string;
+    content: TmdContent;
+    titleKey: Uint8Array;
+    contentId: string;
+}): Promise<ContentTreeVerification> {
+    try {
+        await assertExistingContentFileSize(appFile, content.size, contentId);
+        const encryptedContent = await readFile(appFile);
+        const decryptedContent = decryptContentWithIndex(
+            encryptedContent,
+            titleKey,
+            content.index
+        ).slice(0, Number(content.size));
+
+        assertHashEquals(
+            sha1(decryptedContent),
+            content.hash.slice(0, HASH_ENTRY_SIZE),
+            `Content hash mismatch for ${contentId}`
+        );
+
+        return {
+            contentId,
+            status: 'ok',
+        };
+    } catch (error) {
+        return {
+            contentId,
+            status: 'failed',
+            error: error instanceof Error ? error.message : String(error),
+        };
+    }
+}
+
+async function assertExistingContentFileSize(
+    appFile: string,
+    expectedSize: bigint,
+    contentId: string
+): Promise<void> {
+    const { size } = await stat(appFile);
+    if (BigInt(size) !== expectedSize) {
+        throw new Error(
+            `Content size mismatch for ${contentId}: expected ${expectedSize.toString()} bytes, got ${size} bytes`
+        );
+    }
+}
+
+function logExistingContentSkipped(contentId: string, size: bigint): void {
+    console.log(
+        `[metadata] existing content hash matches, skipping download: ${contentId} (${size.toString()} bytes)`
+    );
+}
+
+function verifyEncryptedContentTree(
+    encryptedContent: Uint8Array,
+    h3: Uint8Array,
+    content: TmdContent,
+    titleKey: Uint8Array
+): void {
+    assertHashEquals(
+        sha1(h3),
+        content.hash.slice(0, HASH_ENTRY_SIZE),
+        'TMD H3 hash mismatch'
+    );
+
+    for (
+        let blockOffset = 0, blockIndex = 0;
+        blockOffset < encryptedContent.length;
+        blockOffset += HASHED_BLOCK_SIZE, blockIndex += 1
+    ) {
+        const encryptedBlock = encryptedContent.slice(
+            blockOffset,
+            Math.min(blockOffset + HASHED_BLOCK_SIZE, encryptedContent.length)
+        );
+
+        if (encryptedBlock.length === 0) {
+            continue;
+        }
+
+        const hashArea = decryptContentWithIv(
+            encryptedBlock.slice(0, HASHED_BLOCK_DATA_OFFSET),
+            titleKey,
+            new Uint8Array(16)
+        );
+        const h0Index = blockIndex % HASH_ENTRIES_PER_LEVEL;
+        const dataIv = hashArea.slice(
+            HASH_H0_START + h0Index * HASH_ENTRY_SIZE,
+            HASH_H0_START + h0Index * HASH_ENTRY_SIZE + 0x10
+        );
+        const dataArea = decryptContentWithIv(
+            encryptedBlock.slice(HASHED_BLOCK_DATA_OFFSET),
+            titleKey,
+            dataIv
+        );
+
+        verifyHashArea(hashArea, dataArea, h3, blockIndex);
+    }
+}
+
+function verifyHashArea(
+    hashArea: Uint8Array,
+    dataArea: Uint8Array,
+    h3: Uint8Array,
+    blockIndex: number
+): void {
+    const h0 = hashArea.slice(HASH_H0_START, HASH_H1_START);
+    const h1 = hashArea.slice(HASH_H1_START, HASH_H2_START);
+    const h2 = hashArea.slice(HASH_H2_START, HASH_H2_END);
+    const h0Index = blockIndex % HASH_ENTRIES_PER_LEVEL;
+    const h1Index =
+        Math.floor(blockIndex / HASH_ENTRIES_PER_LEVEL) %
+        HASH_ENTRIES_PER_LEVEL;
+    const h2Index =
+        Math.floor(
+            blockIndex / (HASH_ENTRIES_PER_LEVEL * HASH_ENTRIES_PER_LEVEL)
+        ) % HASH_ENTRIES_PER_LEVEL;
+    const h3Index =
+        Math.floor(
+            blockIndex /
+                (HASH_ENTRIES_PER_LEVEL *
+                    HASH_ENTRIES_PER_LEVEL *
+                    HASH_ENTRIES_PER_LEVEL)
+        ) * HASH_ENTRY_SIZE;
+
+    assertHashEquals(
+        sha1(dataArea),
+        h0.slice(h0Index * HASH_ENTRY_SIZE, (h0Index + 1) * HASH_ENTRY_SIZE),
+        `H0 mismatch at block ${blockIndex}`
+    );
+    assertHashEquals(
+        sha1(h0),
+        h1.slice(h1Index * HASH_ENTRY_SIZE, (h1Index + 1) * HASH_ENTRY_SIZE),
+        `H1 mismatch at block ${blockIndex}`
+    );
+    assertHashEquals(
+        sha1(h1),
+        h2.slice(h2Index * HASH_ENTRY_SIZE, (h2Index + 1) * HASH_ENTRY_SIZE),
+        `H2 mismatch at block ${blockIndex}`
+    );
+    assertHashEquals(
+        sha1(h2),
+        h3.slice(h3Index, h3Index + HASH_ENTRY_SIZE),
+        `H3 mismatch at block ${blockIndex}`
+    );
+}
+
+function sha1(value: Uint8Array): Uint8Array {
+    return new Uint8Array(createHash('sha1').update(value).digest());
+}
+
+function assertHashEquals(
+    actual: Uint8Array,
+    expected: Uint8Array,
+    message: string
+): void {
+    if (expected.length !== actual.length) {
+        throw new Error(`${message}: expected hash is missing`);
+    }
+
+    for (let i = 0; i < actual.length; i += 1) {
+        if (actual[i] !== expected[i]) {
+            throw new Error(message);
+        }
+    }
 }
 
 export async function downloadTicket(
@@ -612,7 +1319,7 @@ export async function downloadContentH3(
 }
 
 export function getTicketUrl(baseUrl: string, titleId: string): string {
-    return buildDownloadUrl(baseUrl, titleId, CDN_TICKET_NAME);
+    return buildDownloadUrl(baseUrl, titleId, TIK_TITLE_FILE_CDN);
 }
 
 export function getTmdUrl(baseUrl: string, titleId: string): string {
@@ -869,8 +1576,7 @@ function parseFstEntries(decryptedFst: Uint8Array, tmd: Tmd): FstEntry[] {
             fullPath,
             isDirectory,
             contentId,
-            extractWithHash:
-                content !== undefined && (content.type & 0x2003) === 0x2003,
+            extractWithHash: content !== undefined && isHashedContent(content),
             fileOffset,
             shiftedFileOffset:
                 (flags & FST_CHANGE_OFFSET_FLAG) === 0
@@ -998,9 +1704,15 @@ function getRegionName(region: number): string {
 }
 
 function getSystemType(titleId: Uint8Array): SYSTEM_TYPE {
-    if (!titleId || titleId.length < 2) return SYSTEM_TYPE_UNKNOWN;
-    if (titleId[0] === 0x00 && titleId[1] === 0x05) return SYSTEM_TYPE_WIIU;
-    if (titleId[0] === 0x00 && titleId[1] === 0x01) return SYSTEM_TYPE_WII;
+    if (!titleId || titleId.length < 2) {
+        return SYSTEM_TYPE_UNKNOWN;
+    }
+    if (titleId[0] === 0x00 && titleId[1] === 0x05) {
+        return SYSTEM_TYPE_WIIU;
+    }
+    if (titleId[0] === 0x00 && titleId[1] === 0x01) {
+        return SYSTEM_TYPE_WII;
+    }
     return SYSTEM_TYPE_UNKNOWN;
 }
 
@@ -1014,6 +1726,10 @@ function looksLikeFst(value: Uint8Array | null): boolean {
         value.length >= 3 &&
         Buffer.from(value.subarray(0, 3)).toString('ascii') === FST_MAGIC
     );
+}
+
+function isHashedContent(content: TmdContent): boolean {
+    return (content.type & 0x2003) === 0x2003;
 }
 
 function startsWithXml(buffer: Uint8Array | null): boolean {
@@ -1068,6 +1784,35 @@ function parseMetaUnsignedInt(value: string | null): number | null {
     if (!value) return null;
     const parsed = Number.parseInt(value, 10);
     return Number.isFinite(parsed) ? parsed : null;
+}
+
+function safeDirectoryName(value: string): string {
+    const invalid = new Set(['<', '>', ':', '"', '/', '\\', '|', '?', '*']);
+    return (
+        [...value]
+            .filter((char) => !invalid.has(char) && char.charCodeAt(0) >= 32)
+            .join('')
+            .replace(/\s+/g, ' ')
+            .trim() || 'Unknown'
+    );
+}
+
+function assertByteLength(
+    value: Uint8Array,
+    expectedLength: number,
+    name: string
+): void {
+    if (value.length !== expectedLength) {
+        throw new Error(
+            `${name} must be ${expectedLength} bytes, got ${value.length}`
+        );
+    }
+}
+
+function assertUint16(value: number, name: string): void {
+    if (!Number.isInteger(value) || value < 0 || value > 0xffff) {
+        throw new Error(`${name} must be a uint16, got ${value}`);
+    }
 }
 
 async function getChildTitleMetadata(
@@ -1131,6 +1876,27 @@ function replaceTitlePrefix(
     }
 
     return `${normalizedPrefix}${normalizedTitleId.slice(8)}`;
+}
+
+function normalizeDownloadableTitleId(titleId: string): DownloadableTitle {
+    const normalizedTitleId = titleId.toLowerCase();
+
+    if (!/^[0-9a-f]{16}$/.test(normalizedTitleId)) {
+        throw new Error(`Invalid titleId: ${titleId}`);
+    }
+
+    switch (normalizedTitleId.slice(0, 8)) {
+        case '00050000':
+            return { titleId: normalizedTitleId, kind: 'Game' };
+        case '0005000e':
+            return { titleId: normalizedTitleId, kind: 'Update' };
+        case '0005000c':
+            return { titleId: normalizedTitleId, kind: 'DLC' };
+        default:
+            throw new Error(
+                `Unsupported downloadable title kind: ${normalizedTitleId}`
+            );
+    }
 }
 
 function buildDownloadUrl(
