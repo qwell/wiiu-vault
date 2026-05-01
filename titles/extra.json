@@ -6,6 +6,7 @@
         "productCode": "WUP-P-WAHJ",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -17,6 +18,7 @@
         "productCode": "WUP-P-AECE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/60220098dc02b97cf5b565c66b9806f5f19162e0238c7a2d9e73eb332289bd38.jpg",
+        "baseVersions": [0],
         "updates": [128],
         "dlc": [],
         "availableOnCdn": "No"
@@ -28,6 +30,7 @@
         "productCode": "WUP-P-ASLE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/9eddf6f6e4458429d902df85b3148eb2b86409bcaa1082688a04363d32612bee.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -39,6 +42,7 @@
         "productCode": "WUP-P-AMEE",
         "companyCode": "0069",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/722a0d1c61bceae5c3ab8935f6a0636a38661fd9d2c7c4f335b21f71d94b06b4.jpg",
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -50,6 +54,7 @@
         "productCode": "WUP-P-ASVE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/1e014fa31896529a0010de04cbc0afc53b73a0e1ab2f2d96c2365a71d4b6ad29.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -61,6 +66,7 @@
         "productCode": "WUP-P-ACAE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e3090cd8ff992a447c7ee70f517f13c2bc334037706bbfc94be6076a49052b35.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -72,6 +78,7 @@
         "productCode": "WUP-P-AMEP",
         "companyCode": "0069",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -83,6 +90,7 @@
         "productCode": "WUP-P-ATKE",
         "companyCode": "00AF",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/74eddc34dbdca0525b370a280b8a116fd794a45c0cfe12bfffa6e90ce49ed039.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -94,6 +102,7 @@
         "productCode": "WUP-P-ATKP",
         "companyCode": "00AF",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -105,6 +114,7 @@
         "productCode": "WUP-P-ASVP",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -116,6 +126,7 @@
         "productCode": "WUP-P-AF6E",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/e3cfcd35b1059626b533102d29d3fe0285f63d408ce9117ab09d6fa9184bbe87.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -127,6 +138,7 @@
         "productCode": "WUP-P-ASCX",
         "companyCode": "00WR",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -138,6 +150,7 @@
         "productCode": "WUP-P-AKFP",
         "companyCode": "0041",
         "iconUrl": null,
+        "baseVersions": [],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -149,6 +162,7 @@
         "productCode": "WUP-P-AMEJ",
         "companyCode": "0013",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -160,6 +174,7 @@
         "productCode": "WUP-P-AECP",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [128],
         "dlc": [],
         "availableOnCdn": "No"
@@ -171,6 +186,7 @@
         "productCode": "WUP-P-AECI",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [144],
         "dlc": [],
         "availableOnCdn": "No"
@@ -182,6 +198,7 @@
         "productCode": "WUP-P-ATKJ",
         "companyCode": "00AF",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -193,6 +210,7 @@
         "productCode": "WUP-P-AECD",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [144],
         "dlc": [],
         "availableOnCdn": "No"
@@ -204,6 +222,7 @@
         "productCode": "WUP-P-AFBE",
         "companyCode": "00GT",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/11e67996c3b41f035d7716b8023d624dea92d1eae16aff214d572a09ff77fb97.jpg",
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -215,6 +234,7 @@
         "productCode": "WUP-P-ABFE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/44f081e3877f15f3c6d7f7231e05475b44a0b344004a1c27dce9cab7a965f5de.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -226,6 +246,7 @@
         "productCode": "WUP-P-ASLP",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -237,6 +258,7 @@
         "productCode": "WUP-P-AFBP",
         "companyCode": "00GT",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -248,6 +270,7 @@
         "productCode": "WUP-P-ACAP",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -259,6 +282,7 @@
         "productCode": "WUP-P-AECJ",
         "companyCode": "00GD",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [96],
         "dlc": [],
         "availableOnCdn": "No"
@@ -270,6 +294,7 @@
         "productCode": "WUP-P-AWDE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/523935a6ac065a045ff40c4f0e0d70294e97f7b2235f8efbb5c7cb2dfec597e8.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -281,6 +306,7 @@
         "productCode": "WUP-P-AWDP",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -292,6 +318,7 @@
         "productCode": "WUP-P-ACCP",
         "companyCode": "00NK",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -303,6 +330,7 @@
         "productCode": "WUP-P-AF6P",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -314,6 +342,7 @@
         "productCode": "WUP-P-AS8P",
         "companyCode": "00GT",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -325,6 +354,7 @@
         "productCode": "WUP-P-AS8E",
         "companyCode": "00GT",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -336,6 +366,7 @@
         "productCode": "WUP-P-ADSP",
         "companyCode": "004Q",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [49],
         "dlc": [],
         "availableOnCdn": "No"
@@ -347,6 +378,7 @@
         "productCode": "WUP-P-ADSZ",
         "companyCode": "004Q",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [49],
         "dlc": [],
         "availableOnCdn": "No"
@@ -358,6 +390,7 @@
         "productCode": "WUP-P-ZABJ",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -369,6 +402,7 @@
         "productCode": "WUP-P-AH5P",
         "companyCode": "00NK",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -380,6 +414,7 @@
         "productCode": "WUP-P-ARSJ",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -391,6 +426,7 @@
         "productCode": "WUP-P-ARSE",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -402,6 +438,7 @@
         "productCode": "WUP-P-ARSP",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -413,6 +450,7 @@
         "productCode": "WUP-P-AS7J",
         "companyCode": "00GD",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -424,6 +462,7 @@
         "productCode": "WUP-P-ACEE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b0f2a40c4e9b3ff525923a8ed0ad796f10a9ba55c69fc9c6654f5e1a93c5bceb.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -435,6 +474,7 @@
         "productCode": "WUP-P-ACPE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/a63f0e31da3eae5eb13b58e7d7b898f2ea5892ceef3bed1fa827c05795840b6a.jpg",
+        "baseVersions": [0],
         "updates": [112],
         "dlc": [16],
         "availableOnCdn": "No"
@@ -446,6 +486,7 @@
         "productCode": "WUP-P-APFP",
         "companyCode": "00GT",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -457,6 +498,7 @@
         "productCode": "WUP-P-AZBP",
         "companyCode": "00GT",
         "iconUrl": null,
+        "baseVersions": [0, 16],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -468,6 +510,7 @@
         "productCode": "WUP-P-ANYJ",
         "companyCode": "00GD",
         "iconUrl": null,
+        "baseVersions": [],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -479,6 +522,7 @@
         "productCode": "WUP-P-ACPP",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [112],
         "dlc": [16],
         "availableOnCdn": "No"
@@ -490,6 +534,7 @@
         "productCode": "WUP-P-ACPI",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [112],
         "dlc": [16],
         "availableOnCdn": "No"
@@ -501,6 +546,7 @@
         "productCode": "WUP-P-ACPJ",
         "companyCode": "00GD",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [112],
         "dlc": [16],
         "availableOnCdn": "No"
@@ -512,6 +558,7 @@
         "productCode": "WUP-P-ADSJ",
         "companyCode": "00AF",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [17],
         "dlc": [],
         "availableOnCdn": "No"
@@ -523,6 +570,7 @@
         "productCode": "WUP-P-AFDJ",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -534,6 +582,7 @@
         "productCode": "WUP-P-AFDE",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [2],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -545,6 +594,7 @@
         "productCode": "WUP-P-AJ5J",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [16],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -556,6 +606,7 @@
         "productCode": "WUP-P-ADPP",
         "companyCode": "0041",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -567,6 +618,7 @@
         "productCode": "WUP-P-APWJ",
         "companyCode": "00AF",
         "iconUrl": null,
+        "baseVersions": [3],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -578,6 +630,7 @@
         "productCode": "WUP-P-AALJ",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -589,6 +642,7 @@
         "productCode": "WUP-P-BRSJ",
         "companyCode": "00AF",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [80],
         "dlc": [],
         "availableOnCdn": "No"
@@ -600,6 +654,7 @@
         "productCode": "WUP-P-APZE",
         "companyCode": "00WR",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ce7342a560bb58addcdcab9065c7d4df8c340db7e32d23132830d43e282b2714.jpg",
+        "baseVersions": [0],
         "updates": [320],
         "dlc": [128],
         "availableOnCdn": "No"
@@ -611,6 +666,7 @@
         "productCode": "WUP-P-APZP",
         "companyCode": "00WR",
         "iconUrl": null,
+        "baseVersions": [16],
         "updates": [352],
         "dlc": [112],
         "availableOnCdn": "No"
@@ -622,6 +678,7 @@
         "productCode": "WUP-P-WGDZ",
         "companyCode": "013A",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -633,6 +690,7 @@
         "productCode": "WUP-P-BDLJ",
         "companyCode": "00GD",
         "iconUrl": null,
+        "baseVersions": [],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -644,6 +702,7 @@
         "productCode": "WUP-P-AGNE",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/ac5e2f5eb958cea7c64ee0f975dbd59b22f3473b403f779ca8131d8b5f753eca.jpg",
+        "baseVersions": [0],
         "updates": [96],
         "dlc": [],
         "availableOnCdn": "No"
@@ -655,6 +714,7 @@
         "productCode": "WUP-P-AGNP",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [96],
         "dlc": [],
         "availableOnCdn": "No"
@@ -666,6 +726,7 @@
         "productCode": "WUP-P-AALE",
         "companyCode": "0001",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/cdaf3c8c4f7dde87911b5a718c8283a0aa30844e7a2ce1bb0cb76752d8758b42.jpg",
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -677,6 +738,7 @@
         "productCode": "WUP-P-AVAJ",
         "companyCode": "00HF",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -688,6 +750,7 @@
         "productCode": "WUP-P-AL5P",
         "companyCode": "0001",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -699,6 +762,7 @@
         "productCode": "WUP-P-WGSZ",
         "companyCode": "017F",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -710,6 +774,7 @@
         "productCode": "WUP-P-BD3J",
         "companyCode": "00AF",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [48],
         "dlc": [],
         "availableOnCdn": "No"
@@ -721,6 +786,7 @@
         "productCode": "WUP-P-BL6E",
         "companyCode": "0052",
         "iconUrl": "https://kanzashi-wup.cdn.nintendo.net/i/b5d3e29f535e44fafe3832bb53c0f86276df521b99a84c43070b9bbed988eb1e.jpg",
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -732,6 +798,7 @@
         "productCode": "WUP-P-BL6P",
         "companyCode": "0052",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -743,6 +810,7 @@
         "productCode": "WUP-P-AJ8P",
         "companyCode": "00VW",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -754,6 +822,7 @@
         "productCode": "WUP-P-BR5P",
         "companyCode": "00JX",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -765,6 +834,7 @@
         "productCode": "WUP-P-AJ8E",
         "companyCode": "0199",
         "iconUrl": null,
+        "baseVersions": [1],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -776,6 +846,7 @@
         "productCode": "WUP-P-BENE",
         "companyCode": "018X",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -787,6 +858,7 @@
         "productCode": "WUP-P-BAKE",
         "companyCode": "00TL",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -798,6 +870,7 @@
         "productCode": "WUP-P-AVEZ",
         "companyCode": "017M",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -809,6 +882,7 @@
         "productCode": "WUP-P-AXTJ",
         "companyCode": "00GD",
         "iconUrl": null,
+        "baseVersions": [],
         "updates": [],
         "dlc": [],
         "availableOnCdn": "No"
@@ -820,6 +894,7 @@
         "productCode": "WUP-P-AE9P",
         "companyCode": "0326",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
@@ -831,6 +906,7 @@
         "productCode": "WUP-P-HEHP",
         "companyCode": "0326",
         "iconUrl": null,
+        "baseVersions": [0],
         "updates": [16],
         "dlc": [],
         "availableOnCdn": "No"
