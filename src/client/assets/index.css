@@ -72,6 +72,9 @@ select {
 }
 
 .library-controls {
+    position: sticky;
+    top: 0;
+    z-index: 999;
     display: grid;
     grid-template-columns:
         max-content max-content minmax(220px, 420px)
@@ -81,6 +84,8 @@ select {
     row-gap: 2px;
     align-items: end;
     margin: 0px 0px 16px 0px;
+    padding: 4px 0px 8px 0px;
+    background: var(--bg);
 }
 
 .library-label {
