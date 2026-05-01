@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import http from 'node:http';
 import https from 'node:https';
 import path from 'node:path';
+import Zip from 'adm-zip';
 import { parse as CsvParse } from 'csv-parse/sync';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -82,6 +83,8 @@ const updateMetadataUrl = 'http://localhost:3000/api/title-update?titleId=%s';
 const dlcMetadataUrl = 'http://localhost:3000/api/title-dlc?titleId=%s';
 const samuraiContentsUrl =
     'https://samurai.wup.shop.nintendo.net/samurai/ws/US/contents/?shop_id=2&limit=10000';
+const wiiUTdbZipUrl = 'https://www.gametdb.com/wiiutdb.zip';
+const userAgent = 'Wii U Vault';
 
 const parallel = Number.parseInt(process.env.parallel ?? '16', 10);
 
@@ -183,6 +186,19 @@ async function fetchJson<T>(url: string): Promise<T | null> {
     } catch {
         return null;
     }
+}
+
+async function fetchBinary(url: string): Promise<Buffer> {
+    const response = await fetch(url, {
+        headers: {
+            'User-Agent': userAgent,
+        },
+    });
+    if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    return Buffer.from(await response.arrayBuffer());
 }
 
 async function fetchTextInsecure(url: string): Promise<string> {
@@ -482,7 +498,25 @@ async function mergeSamuraiIcons(): Promise<void> {
     console.log(`Icon data saved to ${iconsFile}`);
 }
 
+async function ensureWiiUTdbXml(): Promise<void> {
+    if (await fileExists(wiiUTdbInputFile)) {
+        return;
+    }
+
+    console.log(`Downloading ${wiiUTdbZipUrl}`);
+    const zip = new Zip(await fetchBinary(wiiUTdbZipUrl));
+    const entry = zip.getEntry('wiiutdb.xml');
+    if (!entry) {
+        throw new Error(`Missing wiiutdb.xml in ${wiiUTdbZipUrl}`);
+    }
+
+    await fs.writeFile(wiiUTdbInputFile, entry.getData());
+    console.log(`Extracted ${wiiUTdbInputFile}`);
+}
+
 async function convertWiiUTdb(): Promise<void> {
+    await ensureWiiUTdbXml();
+
     const xml = await fs.readFile(wiiUTdbInputFile, 'utf8');
     const json = parser.parse(xml) as WiiUTdbDatafile;
 
@@ -528,6 +562,8 @@ async function fileExists(file: string): Promise<boolean> {
 }
 
 async function main() {
+    await convertWiiUTdb();
+
     const excluded = titleIdSet(await readJsonArray(excludeFile));
     const titles = await loadTitles(excluded);
 
@@ -541,8 +577,6 @@ async function main() {
     }
 
     await mergeSamuraiIcons();
-
-    await convertWiiUTdb();
 
     const icons = (await readJsonArray(iconsFile)).filter(isIcon);
     await applyIcons(titlesFile, icons);
