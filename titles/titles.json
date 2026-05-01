@@ -1,7 +1,7 @@
 [
     {
         "titleId": "0005000010100600",
-        "name": "TEKKEN TAG TOURNAMENT 2\nWii U EDITION",
+        "name": "TEKKEN TAG TOURNAMENT 2 Wii U EDITION",
         "region": "JPN",
         "productCode": "WUP-P-AKNJ",
         "companyCode": "00AF",
@@ -12,7 +12,7 @@
     },
     {
         "titleId": "0005000010100d00",
-        "name": "カラオケJOYSOUND\nfor Wii U",
+        "name": "カラオケJOYSOUND for Wii U",
         "region": "JPN",
         "productCode": "WUP-N-WAHJ",
         "companyCode": "0001",
@@ -166,7 +166,7 @@
     },
     {
         "titleId": "0005000010102500",
-        "name": "Nintendo×JOYSOUND\nWii カラオケ U",
+        "name": "Nintendo×JOYSOUND Wii カラオケ U",
         "region": "JPN",
         "productCode": "WUP-N-WAJJ",
         "companyCode": "0001",
@@ -199,7 +199,7 @@
     },
     {
         "titleId": "0005000010104d00",
-        "name": "MONSTER HUNTER 3(tri-)G\nHD Ver.",
+        "name": "MONSTER HUNTER 3(tri-)G HD Ver.",
         "region": "JPN",
         "productCode": "WUP-P-AHDJ",
         "companyCode": "0008",
@@ -221,7 +221,7 @@
     },
     {
         "titleId": "0005000010106900",
-        "name": "Mario & Sonic at the Sochi 2014\nOlympic Winter Games",
+        "name": "Mario & Sonic at the Sochi 2014 Olympic Winter Games",
         "region": "JPN",
         "productCode": "WUP-P-AURJ",
         "companyCode": "0001",
@@ -342,7 +342,7 @@
     },
     {
         "titleId": "0005000010107700",
-        "name": "星のカービィ　夢の泉の物語",
+        "name": "星のカービィ 夢の泉の物語",
         "region": "JPN",
         "productCode": "WUP-N-FADJ",
         "companyCode": "0001",
@@ -562,7 +562,7 @@
     },
     {
         "titleId": "0005000010108b00",
-        "name": "Punch-Out!!\nFeaturing Mr. Dream",
+        "name": "Punch-Out!! Featuring Mr. Dream",
         "region": "USA",
         "productCode": "WUP-N-FAKE",
         "companyCode": "0001",
@@ -628,7 +628,7 @@
     },
     {
         "titleId": "0005000010109200",
-        "name": "Super Mario RPG:\nLegend of the Seven Stars",
+        "name": "Super Mario RPG: Legend of the Seven Stars",
         "region": "USA",
         "productCode": "WUP-N-JABE",
         "companyCode": "0001",
@@ -639,7 +639,7 @@
     },
     {
         "titleId": "0005000010109300",
-        "name": "Super Mario RPG:\nLegend of the Seven Stars",
+        "name": "Super Mario RPG: Legend of the Seven Stars",
         "region": "EUR",
         "productCode": "WUP-N-JABP",
         "companyCode": "0001",
@@ -694,7 +694,7 @@
     },
     {
         "titleId": "0005000010109800",
-        "name": "The Legend of Zelda:\nA Link to the Past",
+        "name": "The Legend of Zelda: A Link to the Past",
         "region": "USA",
         "productCode": "WUP-N-JADE",
         "companyCode": "0001",
@@ -705,7 +705,7 @@
     },
     {
         "titleId": "0005000010109900",
-        "name": "The Legend of Zelda:\nA Link to the Past",
+        "name": "The Legend of Zelda: A Link to the Past",
         "region": "EUR",
         "productCode": "WUP-N-JADP",
         "companyCode": "0001",
@@ -716,7 +716,7 @@
     },
     {
         "titleId": "0005000010109a00",
-        "name": "The Legend of Zelda:\nA Link to the Past",
+        "name": "The Legend of Zelda: A Link to the Past",
         "region": "FRA",
         "productCode": "WUP-N-JADF",
         "companyCode": "0001",
@@ -727,7 +727,7 @@
     },
     {
         "titleId": "0005000010109b00",
-        "name": "The Legend of Zelda:\nA Link to the Past",
+        "name": "The Legend of Zelda: A Link to the Past",
         "region": "GER",
         "productCode": "WUP-N-JADD",
         "companyCode": "0001",
@@ -771,7 +771,7 @@
     },
     {
         "titleId": "0005000010109f00",
-        "name": "ファイアーエムブレム　聖戦の系譜",
+        "name": "ファイアーエムブレム 聖戦の系譜",
         "region": "JPN",
         "productCode": "WUP-N-JAFJ",
         "companyCode": "0001",
@@ -782,7 +782,7 @@
     },
     {
         "titleId": "000500001010a000",
-        "name": "スーパードンキーコング2\nディクシー&ディディー",
+        "name": "スーパードンキーコング2 ディクシー&ディディー",
         "region": "JPN",
         "productCode": "WUP-N-JAGJ",
         "companyCode": "0001",
@@ -793,7 +793,7 @@
     },
     {
         "titleId": "000500001010a100",
-        "name": "Donkey Kong Country 2:\nDiddy's Kong Quest",
+        "name": "Donkey Kong Country 2: Diddy's Kong Quest",
         "region": "USA",
         "productCode": "WUP-N-JAGE",
         "companyCode": "0001",
@@ -804,7 +804,7 @@
     },
     {
         "titleId": "000500001010a200",
-        "name": "Donkey Kong Country 2:\nDiddy's Kong Quest",
+        "name": "Donkey Kong Country 2: Diddy's Kong Quest",
         "region": "EUR",
         "productCode": "WUP-N-JAGP",
         "companyCode": "0001",
@@ -815,7 +815,7 @@
     },
     {
         "titleId": "000500001010a300",
-        "name": "Donkey Kong Country 2:\nDiddy's Kong Quest",
+        "name": "Donkey Kong Country 2: Diddy's Kong Quest",
         "region": "GER",
         "productCode": "WUP-N-JAGD",
         "companyCode": "0001",
@@ -826,7 +826,7 @@
     },
     {
         "titleId": "000500001010a400",
-        "name": "ファイアーエムブレム　紋章の謎",
+        "name": "ファイアーエムブレム 紋章の謎",
         "region": "JPN",
         "productCode": "WUP-N-JAHJ",
         "companyCode": "0001",
@@ -903,7 +903,7 @@
     },
     {
         "titleId": "000500001010ab00",
-        "name": "Batman Arkham City:\nArmored Edition",
+        "name": "Batman Arkham City: Armored Edition",
         "region": "USA",
         "productCode": "WUP-P-ABTE",
         "companyCode": "00WR",
@@ -947,7 +947,7 @@
     },
     {
         "titleId": "000500001010af00",
-        "name": "Marvel Avengers™: \nBattle for Earth",
+        "name": "Marvel Avengers™: Battle for Earth",
         "region": "USA",
         "productCode": "WUP-P-AMVE",
         "companyCode": "0041",
@@ -991,7 +991,7 @@
     },
     {
         "titleId": "000500001010b300",
-        "name": "Sonic & All-Stars Racing\nTransformed",
+        "name": "Sonic & All-Stars Racing Transformed",
         "region": "USA",
         "productCode": "WUP-P-AS2E",
         "companyCode": "008P",
@@ -1024,7 +1024,7 @@
     },
     {
         "titleId": "000500001010b600",
-        "name": "Your Shape®\nFitness Evolved 2013",
+        "name": "Your Shape® Fitness Evolved 2013",
         "region": "USA",
         "productCode": "WUP-P-AYSE",
         "companyCode": "0041",
@@ -1035,7 +1035,7 @@
     },
     {
         "titleId": "000500001010c700",
-        "name": "Mario & Sonic at the Sochi 2014\nOlympic Winter Games",
+        "name": "Mario & Sonic at the Sochi 2014 Olympic Winter Games",
         "region": "USA",
         "productCode": "WUP-P-AURE",
         "companyCode": "0001",
@@ -1046,7 +1046,7 @@
     },
     {
         "titleId": "000500001010c800",
-        "name": "Mario & Sonic at the Sochi 2014\nOlympic Winter Games",
+        "name": "Mario & Sonic at the Sochi 2014 Olympic Winter Games",
         "region": "EUR",
         "productCode": "WUP-P-AURP",
         "companyCode": "0001",
@@ -1189,7 +1189,7 @@
     },
     {
         "titleId": "000500001010ee00",
-        "name": "FIFA 13 ",
+        "name": "FIFA 13",
         "region": "EUR",
         "productCode": "WUP-P-AF3P",
         "companyCode": "0069",
@@ -1244,7 +1244,7 @@
     },
     {
         "titleId": "000500001010f300",
-        "name": "Family Party\n30 Great Games Obstacle Arcade",
+        "name": "Family Party 30 Great Games Obstacle Arcade",
         "region": "USA",
         "productCode": "WUP-P-AFPE",
         "companyCode": "00G9",
@@ -1277,7 +1277,7 @@
     },
     {
         "titleId": "000500001010f700",
-        "name": "Your Shape®\nFitness Evolved 2013",
+        "name": "Your Shape® Fitness Evolved 2013",
         "region": "EUR",
         "productCode": "WUP-P-AYSP",
         "companyCode": "0041",
@@ -1288,7 +1288,7 @@
     },
     {
         "titleId": "000500001010f800",
-        "name": "TEKKEN TAG TOURNAMENT 2\nWii U EDITION",
+        "name": "TEKKEN TAG TOURNAMENT 2 Wii U EDITION",
         "region": "EUR",
         "productCode": "WUP-P-AKNP",
         "companyCode": "00AF",
@@ -1354,7 +1354,7 @@
     },
     {
         "titleId": "0005000010110000",
-        "name": "TEKKEN TAG TOURNAMENT 2\nWii U EDITION",
+        "name": "TEKKEN TAG TOURNAMENT 2 Wii U EDITION",
         "region": "USA",
         "productCode": "WUP-P-AKNE",
         "companyCode": "00AF",
@@ -1409,7 +1409,7 @@
     },
     {
         "titleId": "0005000010110800",
-        "name": "Marvel Avengers™: \nBattle for Earth",
+        "name": "Marvel Avengers™: Battle for Earth",
         "region": "EUR",
         "productCode": "WUP-P-AMVP",
         "companyCode": "0041",
@@ -1464,7 +1464,7 @@
     },
     {
         "titleId": "0005000010110e00",
-        "name": "Super Smash Bros.\nfor Wii U",
+        "name": "Super Smash Bros. for Wii U",
         "region": "JPN",
         "productCode": "WUP-P-AXFJ",
         "companyCode": "0001",
@@ -1519,7 +1519,7 @@
     },
     {
         "titleId": "0005000010111300",
-        "name": "Batman Arkham City:\nArmoured Edition",
+        "name": "Batman Arkham City: Armoured Edition",
         "region": "EUR",
         "productCode": "WUP-P-ABTP",
         "companyCode": "00WR",
@@ -1563,7 +1563,7 @@
     },
     {
         "titleId": "0005000010111b00",
-        "name": "3DS版モンスターハンター3G・\nパケットリレーツール",
+        "name": "3DS版モンスターハンター3G・ パケットリレーツール",
         "region": "JPN",
         "productCode": "WUP-P-WLYJ",
         "companyCode": "0008",
@@ -1574,7 +1574,7 @@
     },
     {
         "titleId": "0005000010111c00",
-        "name": "Romance of the \nThree Kingdoms 12",
+        "name": "Romance of the Three Kingdoms 12",
         "region": "JPN",
         "productCode": "WUP-P-AG9J",
         "companyCode": "00C8",
@@ -1596,7 +1596,7 @@
     },
     {
         "titleId": "0005000010111f00",
-        "name": "Sonic & All-Stars Racing\nTransformed",
+        "name": "Sonic & All-Stars Racing Transformed",
         "region": "EUR",
         "productCode": "WUP-P-AS2P",
         "companyCode": "008P",
@@ -1618,7 +1618,7 @@
     },
     {
         "titleId": "0005000010112200",
-        "name": "Trine 2\nDirector's Cut",
+        "name": "Trine 2 Director's Cut",
         "region": "EUR",
         "productCode": "WUP-P-WBDP",
         "companyCode": "00FZ",
@@ -1695,7 +1695,7 @@
     },
     {
         "titleId": "0005000010112900",
-        "name": "Batman Arkham City:\nArmoured Edition",
+        "name": "Batman Arkham City: Armoured Edition",
         "region": "JPN",
         "productCode": "WUP-P-ABTJ",
         "companyCode": "00WR",
@@ -1750,7 +1750,7 @@
     },
     {
         "titleId": "0005000010113100",
-        "name": "BIOHAZARD REVELATIONS\nUnveiled Edition",
+        "name": "BIOHAZARD REVELATIONS Unveiled Edition",
         "region": "JPN",
         "productCode": "WUP-P-ABHJ",
         "companyCode": "0008",
@@ -1761,7 +1761,7 @@
     },
     {
         "titleId": "0005000010113200",
-        "name": "Family Party\n30 Great Games Obstacle Arcade",
+        "name": "Family Party 30 Great Games Obstacle Arcade",
         "region": "EUR",
         "productCode": "WUP-P-AFPP",
         "companyCode": "00AF",
@@ -1827,7 +1827,7 @@
     },
     {
         "titleId": "0005000010113f00",
-        "name": "Xevious ",
+        "name": "Xevious",
         "region": "USA",
         "productCode": "WUP-N-FALE",
         "companyCode": "0001",
@@ -1948,7 +1948,7 @@
     },
     {
         "titleId": "0005000010114a00",
-        "name": "ダウンタウン熱血行進曲\nそれゆけ大運動会",
+        "name": "ダウンタウン熱血行進曲 それゆけ大運動会",
         "region": "JPN",
         "productCode": "WUP-N-FAQJ",
         "companyCode": "0001",
@@ -1959,7 +1959,7 @@
     },
     {
         "titleId": "0005000010114b00",
-        "name": "がんばれゴエモン\nゆき姫救出絵巻",
+        "name": "がんばれゴエモン ゆき姫救出絵巻",
         "region": "JPN",
         "productCode": "WUP-N-JALJ",
         "companyCode": "0001",
@@ -1970,7 +1970,7 @@
     },
     {
         "titleId": "0005000010114c00",
-        "name": "The Legend of\nThe Mystical Ninja",
+        "name": "The Legend of The Mystical Ninja",
         "region": "USA",
         "productCode": "WUP-N-JALE",
         "companyCode": "0001",
@@ -1981,7 +1981,7 @@
     },
     {
         "titleId": "0005000010114d00",
-        "name": "The Legend of\nThe Mystical Ninja",
+        "name": "The Legend of The Mystical Ninja",
         "region": "EUR",
         "productCode": "WUP-N-JALP",
         "companyCode": "0001",
@@ -1992,7 +1992,7 @@
     },
     {
         "titleId": "0005000010114e00",
-        "name": "The Legend of\nThe Mystical Ninja",
+        "name": "The Legend of The Mystical Ninja",
         "region": "GER",
         "productCode": "WUP-N-JALD",
         "companyCode": "0001",
@@ -2003,7 +2003,7 @@
     },
     {
         "titleId": "0005000010114f00",
-        "name": "ストリートファイターⅡ\nザ ワールド ウォーリアー",
+        "name": "ストリートファイターⅡ ザ ワールド ウォーリアー",
         "region": "JPN",
         "productCode": "WUP-N-JAMJ",
         "companyCode": "0001",
@@ -2014,7 +2014,7 @@
     },
     {
         "titleId": "0005000010115000",
-        "name": "Street Fighter Ⅱ\nThe World Warrior",
+        "name": "Street Fighter Ⅱ The World Warrior",
         "region": "USA",
         "productCode": "WUP-N-JAME",
         "companyCode": "0001",
@@ -2025,7 +2025,7 @@
     },
     {
         "titleId": "0005000010115100",
-        "name": "Street Fighter Ⅱ\nThe World Warrior",
+        "name": "Street Fighter Ⅱ The World Warrior",
         "region": "EUR",
         "productCode": "WUP-N-JAMP",
         "companyCode": "0001",
@@ -2168,7 +2168,7 @@
     },
     {
         "titleId": "0005000010116600",
-        "name": "Fist of the North Star: \nKen's Rage 2",
+        "name": "Fist of the North Star: Ken's Rage 2",
         "region": "JPN",
         "productCode": "WUP-P-AH9J",
         "companyCode": "00C8",
@@ -2223,7 +2223,7 @@
     },
     {
         "titleId": "0005000010118000",
-        "name": "SIMPLE Series for Wii U Vol.1\nTHE FamilyParty",
+        "name": "SIMPLE Series for Wii U Vol.1 THE FamilyParty",
         "region": "JPN",
         "productCode": "WUP-P-AFPJ",
         "companyCode": "00G9",
@@ -2443,7 +2443,7 @@
     },
     {
         "titleId": "000500001011a200",
-        "name": "がんばれゴエモン2\n奇天烈将軍マッギネス",
+        "name": "がんばれゴエモン2 奇天烈将軍マッギネス",
         "region": "JPN",
         "productCode": "WUP-N-JAUJ",
         "companyCode": "0001",
@@ -2454,7 +2454,7 @@
     },
     {
         "titleId": "000500001011a300",
-        "name": "スーパーストリートファイターⅡ\nザ ニューチャレンジャーズ",
+        "name": "スーパーストリートファイターⅡ ザ ニューチャレンジャーズ",
         "region": "JPN",
         "productCode": "WUP-N-JAVJ",
         "companyCode": "0001",
@@ -2465,7 +2465,7 @@
     },
     {
         "titleId": "000500001011a400",
-        "name": "Super Street Fighter Ⅱ\nThe New Challengers",
+        "name": "Super Street Fighter Ⅱ The New Challengers",
         "region": "USA",
         "productCode": "WUP-N-JAVE",
         "companyCode": "0001",
@@ -2476,7 +2476,7 @@
     },
     {
         "titleId": "000500001011a500",
-        "name": "Super Street Fighter Ⅱ\nThe New Challengers",
+        "name": "Super Street Fighter Ⅱ The New Challengers",
         "region": "EUR",
         "productCode": "WUP-N-JAVP",
         "companyCode": "0001",
@@ -2575,7 +2575,7 @@
     },
     {
         "titleId": "000500001011af00",
-        "name": "BIT.TRIP Presents... Runner2:\nFuture Legend of Rhythm Alien",
+        "name": "BIT.TRIP Presents... Runner2: Future Legend of Rhythm Alien",
         "region": "USA",
         "productCode": "WUP-P-WBTE",
         "companyCode": "00XY",
@@ -2597,7 +2597,7 @@
     },
     {
         "titleId": "000500001011b100",
-        "name": "Mighty Switch Force!™ \nHyper Drive Edition",
+        "name": "Mighty Switch Force!™ Hyper Drive Edition",
         "region": "USA",
         "productCode": "WUP-P-WHYE",
         "companyCode": "00WY",
@@ -2740,7 +2740,7 @@
     },
     {
         "titleId": "0005000010128200",
-        "name": "Mighty Switch Force!™ \nHyper Drive Edition",
+        "name": "Mighty Switch Force!™ Hyper Drive Edition",
         "region": "EUR",
         "productCode": "WUP-P-WHYP",
         "companyCode": "00WY",
@@ -2817,7 +2817,7 @@
     },
     {
         "titleId": "0005000010128a00",
-        "name": "Trine 2\nDirector's Cut",
+        "name": "Trine 2 Director's Cut",
         "region": "USA",
         "productCode": "WUP-P-WBDE",
         "companyCode": "00FZ",
@@ -2883,7 +2883,7 @@
     },
     {
         "titleId": "0005000010129600",
-        "name": "Wii U Panorama View\nTrailer",
+        "name": "Wii U Panorama View Trailer",
         "region": "JPN",
         "productCode": "WUP-P-SPGJ",
         "companyCode": "0001",
@@ -3026,7 +3026,7 @@
     },
     {
         "titleId": "000500001012a300",
-        "name": "がんばれゴエモン3\n獅子重禄兵衛のからくり卍固め",
+        "name": "がんばれゴエモン3 獅子重禄兵衛のからくり卍固め",
         "region": "JPN",
         "productCode": "WUP-N-JAXJ",
         "companyCode": "0001",
@@ -3037,7 +3037,7 @@
     },
     {
         "titleId": "000500001012a500",
-        "name": "ストリートファイターⅡ ターボ\nハイパー ファイティング",
+        "name": "ストリートファイターⅡ ターボ ハイパー ファイティング",
         "region": "JPN",
         "productCode": "WUP-N-JAYJ",
         "companyCode": "0001",
@@ -3048,7 +3048,7 @@
     },
     {
         "titleId": "000500001012a600",
-        "name": "Street Fighter II Turbo\nHyper Fighting",
+        "name": "Street Fighter II Turbo Hyper Fighting",
         "region": "USA",
         "productCode": "WUP-N-JAYE",
         "companyCode": "0001",
@@ -3092,7 +3092,7 @@
     },
     {
         "titleId": "000500001012ad00",
-        "name": "Street Fighter II Turbo\nHyper Fighting",
+        "name": "Street Fighter II Turbo Hyper Fighting",
         "region": "EUR",
         "productCode": "WUP-N-JAYP",
         "companyCode": "0001",
@@ -3114,7 +3114,7 @@
     },
     {
         "titleId": "000500001012b200",
-        "name": "DEUS EX: HUMAN REV.\nDIRECTOR'S CUT",
+        "name": "DEUS EX: HUMAN REV. DIRECTOR'S CUT",
         "region": "EUR",
         "productCode": "WUP-P-ADXP",
         "companyCode": "00GD",
@@ -3158,7 +3158,7 @@
     },
     {
         "titleId": "000500001012b800",
-        "name": "Fist of the North Star: \nKen's Rage 2",
+        "name": "Fist of the North Star: Ken's Rage 2",
         "region": "EUR",
         "productCode": "WUP-P-AH9P",
         "companyCode": "00C8",
@@ -3169,7 +3169,7 @@
     },
     {
         "titleId": "000500001012b900",
-        "name": "Fist of the North Star: \nKen's Rage 2",
+        "name": "Fist of the North Star: Ken's Rage 2",
         "region": "USA",
         "productCode": "WUP-P-AH9E",
         "companyCode": "00C8",
@@ -3180,7 +3180,7 @@
     },
     {
         "titleId": "000500001012ba00",
-        "name": "DEUS EX: HUMAN REV.\nDIRECTOR'S CUT",
+        "name": "DEUS EX: HUMAN REV. DIRECTOR'S CUT",
         "region": "USA",
         "productCode": "WUP-P-ADXE",
         "companyCode": "00GD",
@@ -3224,7 +3224,7 @@
     },
     {
         "titleId": "000500001012bf00",
-        "name": "Dungeons & Dragons:\nChronicles of Mystara",
+        "name": "Dungeons & Dragons: Chronicles of Mystara",
         "region": "EUR",
         "productCode": "WUP-P-WDDP",
         "companyCode": "0008",
@@ -3235,7 +3235,7 @@
     },
     {
         "titleId": "000500001012c000",
-        "name": "Dungeons & Dragons®:\nChronicles of Mystara™",
+        "name": "Dungeons & Dragons®: Chronicles of Mystara™",
         "region": "USA",
         "productCode": "WUP-P-WDDE",
         "companyCode": "0008",
@@ -3290,7 +3290,7 @@
     },
     {
         "titleId": "000500001012d300",
-        "name": "Wii Street U\npowered by Google",
+        "name": "Wii Street U powered by Google",
         "region": "JPN",
         "productCode": "WUP-P-WHXJ",
         "companyCode": "0001",
@@ -3301,7 +3301,7 @@
     },
     {
         "titleId": "000500001012d400",
-        "name": "Wii U Panorama View\nDouble-Decker Tour",
+        "name": "Wii U Panorama View Double-Decker Tour",
         "region": "JPN",
         "productCode": "WUP-P-WLNJ",
         "companyCode": "0001",
@@ -3312,7 +3312,7 @@
     },
     {
         "titleId": "000500001012d500",
-        "name": "Wii U Panorama View\nBird's-Eye View",
+        "name": "Wii U Panorama View Bird's-Eye View",
         "region": "JPN",
         "productCode": "WUP-P-WETJ",
         "companyCode": "0001",
@@ -3323,7 +3323,7 @@
     },
     {
         "titleId": "000500001012d600",
-        "name": "Wii U Panorama View\nCarnival in Rio",
+        "name": "Wii U Panorama View Carnival in Rio",
         "region": "JPN",
         "productCode": "WUP-P-WBRJ",
         "companyCode": "0001",
@@ -3334,7 +3334,7 @@
     },
     {
         "titleId": "000500001012d700",
-        "name": "Wii U Panorama View\nKyoto Sightseeing",
+        "name": "Wii U Panorama View Kyoto Sightseeing",
         "region": "JPN",
         "productCode": "WUP-P-WKYJ",
         "companyCode": "0001",
@@ -3400,7 +3400,7 @@
     },
     {
         "titleId": "000500001012e100",
-        "name": "ふぁみこんむかし話\n新･鬼ヶ島（前後編）",
+        "name": "ふぁみこんむかし話 新･鬼ヶ島（前後編）",
         "region": "JPN",
         "productCode": "WUP-N-FA5J",
         "companyCode": "0001",
@@ -3609,7 +3609,7 @@
     },
     {
         "titleId": "000500001012f700",
-        "name": "Super Mario Bros.\nThe Lost Levels",
+        "name": "Super Mario Bros. The Lost Levels",
         "region": "USA",
         "productCode": "WUP-N-FA9E",
         "companyCode": "0001",
@@ -3620,7 +3620,7 @@
     },
     {
         "titleId": "000500001012f800",
-        "name": "Super Mario Bros.\nThe Lost Levels",
+        "name": "Super Mario Bros. The Lost Levels",
         "region": "EUR",
         "productCode": "WUP-N-FA9P",
         "companyCode": "0001",
@@ -3664,7 +3664,7 @@
     },
     {
         "titleId": "000500001012fc00",
-        "name": "光神話　パルテナの鏡",
+        "name": "光神話 パルテナの鏡",
         "region": "JPN",
         "productCode": "WUP-N-FBBJ",
         "companyCode": "0001",
@@ -3730,7 +3730,7 @@
     },
     {
         "titleId": "0005000010130200",
-        "name": "ファミコン探偵倶楽部 PARTⅡ\nうしろに立つ少女",
+        "name": "ファミコン探偵倶楽部 PARTⅡ うしろに立つ少女",
         "region": "JPN",
         "productCode": "WUP-N-JA6J",
         "companyCode": "0001",
@@ -3873,7 +3873,7 @@
     },
     {
         "titleId": "0005000010131000",
-        "name": "Wii U Panorama View\nDouble-Decker Tour",
+        "name": "Wii U Panorama View Double-Decker Tour",
         "region": "USA",
         "productCode": "WUP-P-WLNE",
         "companyCode": "0001",
@@ -3884,7 +3884,7 @@
     },
     {
         "titleId": "0005000010131100",
-        "name": "Wii U Panorama View\nBird's-Eye View",
+        "name": "Wii U Panorama View Bird's-Eye View",
         "region": "USA",
         "productCode": "WUP-P-WETE",
         "companyCode": "0001",
@@ -3895,7 +3895,7 @@
     },
     {
         "titleId": "0005000010131200",
-        "name": "Wii U Panorama View\nCarnival in Rio",
+        "name": "Wii U Panorama View Carnival in Rio",
         "region": "USA",
         "productCode": "WUP-P-WBRE",
         "companyCode": "0001",
@@ -3906,7 +3906,7 @@
     },
     {
         "titleId": "0005000010131300",
-        "name": "Wii U Panorama View\nKyoto Sightseeing",
+        "name": "Wii U Panorama View Kyoto Sightseeing",
         "region": "USA",
         "productCode": "WUP-P-WKYE",
         "companyCode": "0001",
@@ -3917,7 +3917,7 @@
     },
     {
         "titleId": "0005000010131400",
-        "name": "Wii U Panorama View\nDouble-Decker Tour",
+        "name": "Wii U Panorama View Double-Decker Tour",
         "region": "EUR",
         "productCode": "WUP-P-WLNP",
         "companyCode": "0001",
@@ -3928,7 +3928,7 @@
     },
     {
         "titleId": "0005000010131500",
-        "name": "Wii U Panorama View\nBirds in Flight",
+        "name": "Wii U Panorama View Birds in Flight",
         "region": "EUR",
         "productCode": "WUP-P-WETP",
         "companyCode": "0001",
@@ -3939,7 +3939,7 @@
     },
     {
         "titleId": "0005000010131600",
-        "name": "Wii U Panorama View\nCarnival!",
+        "name": "Wii U Panorama View Carnival!",
         "region": "EUR",
         "productCode": "WUP-P-WBRP",
         "companyCode": "0001",
@@ -3950,7 +3950,7 @@
     },
     {
         "titleId": "0005000010131700",
-        "name": "Wii U Panorama View\nRickshaw Around Kyoto",
+        "name": "Wii U Panorama View Rickshaw Around Kyoto",
         "region": "EUR",
         "productCode": "WUP-P-WKYP",
         "companyCode": "0001",
@@ -3961,7 +3961,7 @@
     },
     {
         "titleId": "0005000010131900",
-        "name": "F1 RACE STARS\nPOWERED UP EDITION",
+        "name": "F1 RACE STARS POWERED UP EDITION",
         "region": "EUR",
         "productCode": "WUP-P-AF9P",
         "companyCode": "0036",
@@ -3983,7 +3983,7 @@
     },
     {
         "titleId": "0005000010131b00",
-        "name": "Wii U Panorama View\nTrailer",
+        "name": "Wii U Panorama View Trailer",
         "region": "USA",
         "productCode": "WUP-P-SPGE",
         "companyCode": "0001",
@@ -3994,7 +3994,7 @@
     },
     {
         "titleId": "0005000010131c00",
-        "name": "Wii U Panorama View\nTrailer",
+        "name": "Wii U Panorama View Trailer",
         "region": "EUR",
         "productCode": "WUP-P-SPGP",
         "companyCode": "0001",
@@ -4038,7 +4038,7 @@
     },
     {
         "titleId": "0005000010132000",
-        "name": "Wii Street U\npowered by Google",
+        "name": "Wii Street U powered by Google",
         "region": "USA",
         "productCode": "WUP-P-WHXE",
         "companyCode": "0001",
@@ -4049,7 +4049,7 @@
     },
     {
         "titleId": "0005000010132100",
-        "name": "Wii Street U\npowered by Google",
+        "name": "Wii Street U powered by Google",
         "region": "EUR",
         "productCode": "WUP-P-WHXP",
         "companyCode": "0001",
@@ -4082,7 +4082,7 @@
     },
     {
         "titleId": "0005000010132500",
-        "name": "Wii Fit U\nQuick Check",
+        "name": "Wii Fit U Quick Check",
         "region": "JPN",
         "productCode": "WUP-P-WB9J",
         "companyCode": "0001",
@@ -4093,7 +4093,7 @@
     },
     {
         "titleId": "0005000010132600",
-        "name": "Wii Fit U\nQuick Check",
+        "name": "Wii Fit U Quick Check",
         "region": "USA",
         "productCode": "WUP-P-WB9E",
         "companyCode": "0001",
@@ -4104,7 +4104,7 @@
     },
     {
         "titleId": "0005000010132700",
-        "name": "Wii Fit U\nQuick Check",
+        "name": "Wii Fit U Quick Check",
         "region": "EUR",
         "productCode": "WUP-P-WB9P",
         "companyCode": "0001",
@@ -4115,7 +4115,7 @@
     },
     {
         "titleId": "0005000010132800",
-        "name": "Unepic\nEnjoyUp Games",
+        "name": "Unepic EnjoyUp Games",
         "region": "USA",
         "productCode": "WUP-P-WEPE",
         "companyCode": "00UP",
@@ -4159,7 +4159,7 @@
     },
     {
         "titleId": "0005000010132c00",
-        "name": "Scribblenauts Unmasked\nA DC Comics Adventure",
+        "name": "Scribblenauts Unmasked A DC Comics Adventure",
         "region": "USA",
         "productCode": "WUP-P-ADCE",
         "companyCode": "00WR",
@@ -4170,7 +4170,7 @@
     },
     {
         "titleId": "0005000010132d00",
-        "name": "Scribblenauts Unmasked\nA DC Comics Adventure",
+        "name": "Scribblenauts Unmasked A DC Comics Adventure",
         "region": "EUR",
         "productCode": "WUP-P-ADCP",
         "companyCode": "00WR",
@@ -4181,7 +4181,7 @@
     },
     {
         "titleId": "0005000010132f00",
-        "name": "MONSTER HUNTER 3 ULTIMATE\nPacket Relay...for Nintendo 3DS",
+        "name": "MONSTER HUNTER 3 ULTIMATE Packet Relay...for Nintendo 3DS",
         "region": "EUR",
         "productCode": "WUP-P-WLYP",
         "companyCode": "0008",
@@ -4258,7 +4258,7 @@
     },
     {
         "titleId": "0005000010133600",
-        "name": "MONSTER HUNTER 3 ULTIMATE\nPacket Relay...for Nintendo 3DS",
+        "name": "MONSTER HUNTER 3 ULTIMATE Packet Relay...for Nintendo 3DS",
         "region": "USA",
         "productCode": "WUP-P-WLYE",
         "companyCode": "0008",
@@ -4302,7 +4302,7 @@
     },
     {
         "titleId": "0005000010133a00",
-        "name": "F1 RACE STARS\nPOWERED UP EDITION",
+        "name": "F1 RACE STARS POWERED UP EDITION",
         "region": "JPN",
         "productCode": "WUP-P-AF9J",
         "companyCode": "0036",
@@ -4401,7 +4401,7 @@
     },
     {
         "titleId": "0005000010134700",
-        "name": "Romance of The 3 Kingdoms Ⅳ \nWall of Fire",
+        "name": "Romance of The 3 Kingdoms Ⅳ Wall of Fire",
         "region": "USA",
         "productCode": "WUP-N-JBCE",
         "companyCode": "0001",
@@ -4445,7 +4445,7 @@
     },
     {
         "titleId": "0005000010134d00",
-        "name": "ファイアーエムブレム  トラキア776",
+        "name": "ファイアーエムブレム トラキア776",
         "region": "JPN",
         "productCode": "WUP-N-JBFJ",
         "companyCode": "0001",
@@ -4555,7 +4555,7 @@
     },
     {
         "titleId": "0005000010136000",
-        "name": "Romance of The 3 Kingdoms Ⅳ\nWall of Fire",
+        "name": "Romance of The 3 Kingdoms Ⅳ Wall of Fire",
         "region": "EUR",
         "productCode": "WUP-N-JBCP",
         "companyCode": "0001",
@@ -4577,7 +4577,7 @@
     },
     {
         "titleId": "0005000010136300",
-        "name": "BIT.TRIP Presents... Runner2:\nFuture Legend of Rhythm Alien",
+        "name": "BIT.TRIP Presents... Runner2: Future Legend of Rhythm Alien",
         "region": "EUR",
         "productCode": "WUP-P-WBTP",
         "companyCode": "00XY",
@@ -4654,7 +4654,7 @@
     },
     {
         "titleId": "0005000010136c00",
-        "name": "Batman™:\nArkham Origins",
+        "name": "Batman™: Arkham Origins",
         "region": "EUR",
         "productCode": "WUP-P-AZEP",
         "companyCode": "00WR",
@@ -4775,7 +4775,7 @@
     },
     {
         "titleId": "0005000010137c00",
-        "name": "Batman™:\nArkham Origins",
+        "name": "Batman™: Arkham Origins",
         "region": "USA",
         "productCode": "WUP-P-AZEE",
         "companyCode": "00WR",
@@ -4808,7 +4808,7 @@
     },
     {
         "titleId": "0005000010137f00",
-        "name": "Donkey Kong Country\nTropical Freeze",
+        "name": "Donkey Kong Country Tropical Freeze",
         "region": "USA",
         "productCode": "WUP-P-ARKE",
         "companyCode": "0001",
@@ -4830,7 +4830,7 @@
     },
     {
         "titleId": "0005000010138300",
-        "name": "Donkey Kong Country\nTropical Freeze",
+        "name": "Donkey Kong Country Tropical Freeze",
         "region": "EUR",
         "productCode": "WUP-P-ARKP",
         "companyCode": "0001",
@@ -4918,7 +4918,7 @@
     },
     {
         "titleId": "0005000010138d00",
-        "name": "F1 RACE STARS\nPOWERED UP EDITION",
+        "name": "F1 RACE STARS POWERED UP EDITION",
         "region": "USA",
         "productCode": "WUP-P-AF9E",
         "companyCode": "0036",
@@ -4962,7 +4962,7 @@
     },
     {
         "titleId": "0005000010139400",
-        "name": "Phineas and Ferb :\nQuest for Cool Stuff",
+        "name": "Phineas and Ferb : Quest for Cool Stuff",
         "region": "USA",
         "productCode": "WUP-P-APFE",
         "companyCode": "005G",
@@ -5083,7 +5083,7 @@
     },
     {
         "titleId": "0005000010140800",
-        "name": "ARC STYLE： BASEBALL!!SP ",
+        "name": "ARC STYLE： BASEBALL!!SP",
         "region": "JPN",
         "productCode": "WUP-P-WBSJ",
         "companyCode": "00JF",
@@ -5391,7 +5391,7 @@
     },
     {
         "titleId": "0005000010143300",
-        "name": "Hot Wheels™\nWorld’s Best Driver™",
+        "name": "Hot Wheels™ World’s Best Driver™",
         "region": "USA",
         "productCode": "WUP-P-AHWE",
         "companyCode": "00WR",
@@ -5402,7 +5402,7 @@
     },
     {
         "titleId": "0005000010143400",
-        "name": "THE LEGEND OF ZELDA\nThe Wind Waker HD",
+        "name": "THE LEGEND OF ZELDA The Wind Waker HD",
         "region": "JPN",
         "productCode": "WUP-P-BCZJ",
         "companyCode": "0001",
@@ -5413,7 +5413,7 @@
     },
     {
         "titleId": "0005000010143500",
-        "name": "THE LEGEND OF ZELDA\nThe Wind Waker HD",
+        "name": "THE LEGEND OF ZELDA The Wind Waker HD",
         "region": "USA",
         "productCode": "WUP-P-BCZE",
         "companyCode": "0001",
@@ -5424,7 +5424,7 @@
     },
     {
         "titleId": "0005000010143600",
-        "name": "THE LEGEND OF ZELDA\nThe Wind Waker HD",
+        "name": "THE LEGEND OF ZELDA The Wind Waker HD",
         "region": "EUR",
         "productCode": "WUP-P-BCZP",
         "companyCode": "0001",
@@ -5468,7 +5468,7 @@
     },
     {
         "titleId": "0005000010144000",
-        "name": "Adventure Time: Explore the \nDungeon Because I Don't Know!",
+        "name": "Adventure Time: Explore the Dungeon Because I Don't Know!",
         "region": "USA",
         "productCode": "WUP-P-ADVE",
         "companyCode": "00G9",
@@ -5479,7 +5479,7 @@
     },
     {
         "titleId": "0005000010144800",
-        "name": "Donkey Kong Country\nTropical Freeze",
+        "name": "Donkey Kong Country Tropical Freeze",
         "region": "JPN",
         "productCode": "WUP-P-ARKJ",
         "companyCode": "0001",
@@ -5512,7 +5512,7 @@
     },
     {
         "titleId": "0005000010144f00",
-        "name": "Super Smash Bros.\nfor Wii U",
+        "name": "Super Smash Bros. for Wii U",
         "region": "USA",
         "productCode": "WUP-P-AXFE",
         "companyCode": "0001",
@@ -5523,7 +5523,7 @@
     },
     {
         "titleId": "0005000010145000",
-        "name": "Super Smash Bros.\nfor Wii U",
+        "name": "Super Smash Bros. for Wii U",
         "region": "EUR",
         "productCode": "WUP-P-AXFP",
         "companyCode": "0001",
@@ -5534,7 +5534,7 @@
     },
     {
         "titleId": "0005000010145100",
-        "name": "Hot Wheels™\nWorld’s Best Driver",
+        "name": "Hot Wheels™ World’s Best Driver",
         "region": "EUR",
         "productCode": "WUP-P-AHWP",
         "companyCode": "00WR",
@@ -5589,7 +5589,7 @@
     },
     {
         "titleId": "0005000010145800",
-        "name": "Unepic\nEnjoyUp Games",
+        "name": "Unepic EnjoyUp Games",
         "region": "EUR",
         "productCode": "WUP-P-WEPP",
         "companyCode": "00UP",
@@ -5699,7 +5699,7 @@
     },
     {
         "titleId": "0005000010146300",
-        "name": "PAC-MAN\nand the Ghostly Adventures",
+        "name": "PAC-MAN and the Ghostly Adventures",
         "region": "USA",
         "productCode": "WUP-P-APCE",
         "companyCode": "00AF",
@@ -5721,7 +5721,7 @@
     },
     {
         "titleId": "0005000010146900",
-        "name": "SpongeBob SquarePants:\nPlankton’s Robotic Revenge",
+        "name": "SpongeBob SquarePants: Plankton’s Robotic Revenge",
         "region": "USA",
         "productCode": "WUP-P-AS5E",
         "companyCode": "0052",
@@ -5798,7 +5798,7 @@
     },
     {
         "titleId": "0005000010147900",
-        "name": "PAC-MAN\nand the Ghostly Adventures",
+        "name": "PAC-MAN and the Ghostly Adventures",
         "region": "EUR",
         "productCode": "WUP-P-APCP",
         "companyCode": "00AF",
@@ -5831,7 +5831,7 @@
     },
     {
         "titleId": "0005000010147d00",
-        "name": "SpongeBob SquarePants:\nPlankton’s Robotic Revenge",
+        "name": "SpongeBob SquarePants: Plankton’s Robotic Revenge",
         "region": "EUR",
         "productCode": "WUP-P-AS5P",
         "companyCode": "0052",
@@ -5864,7 +5864,7 @@
     },
     {
         "titleId": "0005000010148000",
-        "name": "ONE PIECE\nUNLIMITED WORLD R",
+        "name": "ONE PIECE UNLIMITED WORLD R",
         "region": "JPN",
         "productCode": "WUP-P-AUNJ",
         "companyCode": "00AF",
@@ -5875,7 +5875,7 @@
     },
     {
         "titleId": "0005000010148200",
-        "name": "Rock 'N Racing\nOff Road",
+        "name": "Rock 'N Racing Off Road",
         "region": "USA",
         "productCode": "WUP-P-WAEE",
         "companyCode": "00UP",
@@ -5886,7 +5886,7 @@
     },
     {
         "titleId": "0005000010148500",
-        "name": "Abyss\nEnjoyUp Games",
+        "name": "Abyss EnjoyUp Games",
         "region": "USA",
         "productCode": "WUP-P-WAGE",
         "companyCode": "00UP",
@@ -5908,7 +5908,7 @@
     },
     {
         "titleId": "0005000010149000",
-        "name": "Romance of the Three Kingdoms \n12 with Powerup kit",
+        "name": "Romance of the Three Kingdoms 12 with Powerup kit",
         "region": "JPN",
         "productCode": "WUP-P-APUJ",
         "companyCode": "00C8",
@@ -5941,7 +5941,7 @@
     },
     {
         "titleId": "0005000010149300",
-        "name": "Mario vs. Donkey Kong\nTipping Stars",
+        "name": "Mario vs. Donkey Kong Tipping Stars",
         "region": "USA",
         "productCode": "WUP-P-WAFE",
         "companyCode": "0001",
@@ -5963,7 +5963,7 @@
     },
     {
         "titleId": "0005000010149500",
-        "name": "Scram Kitty\nand his Buddy on Rails",
+        "name": "Scram Kitty and his Buddy on Rails",
         "region": "USA",
         "productCode": "WUP-P-WKTE",
         "companyCode": "00CS",
@@ -6260,7 +6260,7 @@
     },
     {
         "titleId": "000500001014b700",
-        "name": "New SUPER MARIO BROS. U + \nNew SUPER LUIGI U",
+        "name": "New SUPER MARIO BROS. U + New SUPER LUIGI U",
         "region": "USA",
         "productCode": "WUP-P-ATWE",
         "companyCode": "0001",
@@ -6271,7 +6271,7 @@
     },
     {
         "titleId": "000500001014b800",
-        "name": "New SUPER MARIO BROS. U + \nNew SUPER LUIGI U",
+        "name": "New SUPER MARIO BROS. U + New SUPER LUIGI U",
         "region": "EUR",
         "productCode": "WUP-P-ATWP",
         "companyCode": "0001",
@@ -6282,7 +6282,7 @@
     },
     {
         "titleId": "000500001014bf00",
-        "name": "@SIMPLE DLseries for Wii U\nVol.1 THE Escape Trick",
+        "name": "@SIMPLE DLseries for Wii U Vol.1 THE Escape Trick",
         "region": "JPN",
         "productCode": "WUP-P-WD4J",
         "companyCode": "00G9",
@@ -6304,7 +6304,7 @@
     },
     {
         "titleId": "000500001014c100",
-        "name": "TRANSFORMERS:\nRise of the Dark Spark",
+        "name": "TRANSFORMERS: Rise of the Dark Spark",
         "region": "USA",
         "productCode": "WUP-P-AYEE",
         "companyCode": "0052",
@@ -6326,7 +6326,7 @@
     },
     {
         "titleId": "000500001014c600",
-        "name": "Giana Sisters\nTwisted Dreams",
+        "name": "Giana Sisters Twisted Dreams",
         "region": "EUR",
         "productCode": "WUP-P-WGSP",
         "companyCode": "00CX",
@@ -6370,7 +6370,7 @@
     },
     {
         "titleId": "000500001014ca00",
-        "name": "The Legend of Zelda™: \nHyrule Historia",
+        "name": "The Legend of Zelda™: Hyrule Historia",
         "region": "USA",
         "productCode": "WUP-N-SNAE",
         "companyCode": "00CR",
@@ -6381,7 +6381,7 @@
     },
     {
         "titleId": "000500001014cb00",
-        "name": "Giana Sisters\nTwisted Dreams",
+        "name": "Giana Sisters Twisted Dreams",
         "region": "USA",
         "productCode": "WUP-P-WGSE",
         "companyCode": "00CX",
@@ -6425,7 +6425,7 @@
     },
     {
         "titleId": "000500001014d100",
-        "name": "Scram Kitty\nand his Buddy on Rails",
+        "name": "Scram Kitty and his Buddy on Rails",
         "region": "EUR",
         "productCode": "WUP-P-WKTP",
         "companyCode": "00CS",
@@ -6447,7 +6447,7 @@
     },
     {
         "titleId": "000500001014d600",
-        "name": "Trine 2\nDirector's Cut",
+        "name": "Trine 2 Director's Cut",
         "region": "JPN",
         "productCode": "WUP-P-WBDJ",
         "companyCode": "0001",
@@ -6513,7 +6513,7 @@
     },
     {
         "titleId": "000500001014de00",
-        "name": "The LEGO® Movie\nVideogame",
+        "name": "The LEGO® Movie Videogame",
         "region": "USA",
         "productCode": "WUP-P-ALAE",
         "companyCode": "00WR",
@@ -6535,7 +6535,7 @@
     },
     {
         "titleId": "000500001014e000",
-        "name": "The LEGO® Movie\nVideogame",
+        "name": "The LEGO® Movie Videogame",
         "region": "EUR",
         "productCode": "WUP-P-ALAP",
         "companyCode": "00WR",
@@ -6546,7 +6546,7 @@
     },
     {
         "titleId": "000500001014e100",
-        "name": "Adventure Time: Explore the \nDungeon Because I Don't Know!",
+        "name": "Adventure Time: Explore the Dungeon Because I Don't Know!",
         "region": "EUR",
         "productCode": "WUP-P-ADVP",
         "companyCode": "00AF",
@@ -6579,7 +6579,7 @@
     },
     {
         "titleId": "000500001014f100",
-        "name": "Mighty Switch Force! 2™ ",
+        "name": "Mighty Switch Force! 2™",
         "region": "EUR",
         "productCode": "WUP-P-WM2P",
         "companyCode": "00WY",
@@ -6590,7 +6590,7 @@
     },
     {
         "titleId": "000500001014f300",
-        "name": "PAC-MAN\nand the Ghostly Adventures",
+        "name": "PAC-MAN and the Ghostly Adventures",
         "region": "JPN",
         "productCode": "WUP-P-APCJ",
         "companyCode": "00AF",
@@ -6623,7 +6623,7 @@
     },
     {
         "titleId": "000500001014fc00",
-        "name": "Mighty Switch Force! 2™ ",
+        "name": "Mighty Switch Force! 2™",
         "region": "USA",
         "productCode": "WUP-P-WM2E",
         "companyCode": "00WY",
@@ -6788,7 +6788,7 @@
     },
     {
         "titleId": "0005000010150f00",
-        "name": "ダウンタウンスペシャル\nくにおくんの時代劇だよ全員集合！",
+        "name": "ダウンタウンスペシャル くにおくんの時代劇だよ全員集合！",
         "region": "JPN",
         "productCode": "WUP-N-FBZJ",
         "companyCode": "0001",
@@ -7107,7 +7107,7 @@
     },
     {
         "titleId": "0005000010153900",
-        "name": "ドラキュラⅡ\n呪いの封印",
+        "name": "ドラキュラⅡ 呪いの封印",
         "region": "JPN",
         "productCode": "WUP-N-FB8J",
         "companyCode": "0001",
@@ -7173,7 +7173,7 @@
     },
     {
         "titleId": "0005000010154000",
-        "name": "ファイナルファンタジーUSA\nミスティッククエスト",
+        "name": "ファイナルファンタジーUSA ミスティッククエスト",
         "region": "JPN",
         "productCode": "WUP-N-JB7J",
         "companyCode": "0001",
@@ -7195,7 +7195,7 @@
     },
     {
         "titleId": "0005000010154600",
-        "name": "Batman™:\nArkham Origins",
+        "name": "Batman™: Arkham Origins",
         "region": "JPN",
         "productCode": "WUP-P-AZEJ",
         "companyCode": "00WR",
@@ -7206,7 +7206,7 @@
     },
     {
         "titleId": "0005000010154900",
-        "name": "Angry Bunnies:\nColossal Carrot Crusade",
+        "name": "Angry Bunnies: Colossal Carrot Crusade",
         "region": "EUR",
         "productCode": "WUP-P-WBEP",
         "companyCode": "00YR",
@@ -7250,7 +7250,7 @@
     },
     {
         "titleId": "0005000010154d00",
-        "name": "The Mysterious Cities of Gold:\nSecret Paths",
+        "name": "The Mysterious Cities of Gold: Secret Paths",
         "region": "EUR",
         "productCode": "WUP-P-WC3P",
         "companyCode": "00BU",
@@ -7261,7 +7261,7 @@
     },
     {
         "titleId": "0005000010154e00",
-        "name": "Luv Me Buddies\nWonderland",
+        "name": "Luv Me Buddies Wonderland",
         "region": "EUR",
         "productCode": "WUP-P-ALVP",
         "companyCode": "00YF",
@@ -7305,7 +7305,7 @@
     },
     {
         "titleId": "0005000010156500",
-        "name": "The Mysterious Cities of Gold:\nSecret Paths",
+        "name": "The Mysterious Cities of Gold: Secret Paths",
         "region": "USA",
         "productCode": "WUP-P-WC3E",
         "companyCode": "00BU",
@@ -7316,7 +7316,7 @@
     },
     {
         "titleId": "0005000010156600",
-        "name": "F-ZERO\nFOR GAMEBOY ADVANCE",
+        "name": "F-ZERO FOR GAMEBOY ADVANCE",
         "region": "JPN",
         "productCode": "WUP-N-PAAJ",
         "companyCode": "0001",
@@ -7327,7 +7327,7 @@
     },
     {
         "titleId": "0005000010156700",
-        "name": "F-Zero\nMaximum Velocity",
+        "name": "F-Zero Maximum Velocity",
         "region": "USA",
         "productCode": "WUP-N-PAAE",
         "companyCode": "0001",
@@ -7338,7 +7338,7 @@
     },
     {
         "titleId": "0005000010156800",
-        "name": "F-ZERO\nMAXIMUM VELOCITY",
+        "name": "F-ZERO MAXIMUM VELOCITY",
         "region": "EUR",
         "productCode": "WUP-N-PAAP",
         "companyCode": "0001",
@@ -7360,7 +7360,7 @@
     },
     {
         "titleId": "0005000010156a00",
-        "name": "Yoshi's Island:\nSuper Mario Advance 3",
+        "name": "Yoshi's Island: Super Mario Advance 3",
         "region": "USA",
         "productCode": "WUP-N-PABE",
         "companyCode": "0001",
@@ -7371,7 +7371,7 @@
     },
     {
         "titleId": "0005000010156b00",
-        "name": "Yoshi's Island:\nSuper Mario Advance 3",
+        "name": "Yoshi's Island: Super Mario Advance 3",
         "region": "EUR",
         "productCode": "WUP-N-PABP",
         "companyCode": "0001",
@@ -7393,7 +7393,7 @@
     },
     {
         "titleId": "0005000010156e00",
-        "name": "WarioWare, Inc.: \nMega Microgame$",
+        "name": "WarioWare, Inc.: Mega Microgame$",
         "region": "USA",
         "productCode": "WUP-N-PACE",
         "companyCode": "0001",
@@ -7459,7 +7459,7 @@
     },
     {
         "titleId": "0005000010157400",
-        "name": "Mario & Luigi:\nSuperstar Saga",
+        "name": "Mario & Luigi: Superstar Saga",
         "region": "USA",
         "productCode": "WUP-N-PAEE",
         "companyCode": "0001",
@@ -7470,7 +7470,7 @@
     },
     {
         "titleId": "0005000010157500",
-        "name": "Mario & Luigi:\nSuperstar Saga",
+        "name": "Mario & Luigi: Superstar Saga",
         "region": "EUR",
         "productCode": "WUP-N-PAEP",
         "companyCode": "0001",
@@ -7580,7 +7580,7 @@
     },
     {
         "titleId": "0005000010158500",
-        "name": "ファミコン探偵倶楽部\n消えた後継者(前後編)",
+        "name": "ファミコン探偵倶楽部 消えた後継者(前後編)",
         "region": "JPN",
         "productCode": "WUP-N-FCAJ",
         "companyCode": "0001",
@@ -7657,7 +7657,7 @@
     },
     {
         "titleId": "0005000010158c00",
-        "name": "がんばれゴエモン！\nからくり道中",
+        "name": "がんばれゴエモン！ からくり道中",
         "region": "JPN",
         "productCode": "WUP-N-FCDJ",
         "companyCode": "0001",
@@ -7833,7 +7833,7 @@
     },
     {
         "titleId": "000500001015b400",
-        "name": "Sonic & All-Stars Racing\nTransformed",
+        "name": "Sonic & All-Stars Racing Transformed",
         "region": "JPN",
         "productCode": "WUP-P-AS2J",
         "companyCode": "008P",
@@ -8229,7 +8229,7 @@
     },
     {
         "titleId": "000500001015db00",
-        "name": "Mario vs. Donkey\nKong",
+        "name": "Mario vs. Donkey Kong",
         "region": "USA",
         "productCode": "WUP-N-PAGE",
         "companyCode": "0001",
@@ -8262,7 +8262,7 @@
     },
     {
         "titleId": "000500001015de00",
-        "name": "Kirby & The Amazing\nMirror",
+        "name": "Kirby & The Amazing Mirror",
         "region": "USA",
         "productCode": "WUP-N-PAHE",
         "companyCode": "0001",
@@ -8284,7 +8284,7 @@
     },
     {
         "titleId": "000500001015e000",
-        "name": "ゲームボーイウォーズアドバンス\n1+2",
+        "name": "ゲームボーイウォーズアドバンス 1+2",
         "region": "JPN",
         "productCode": "WUP-N-PAJJ",
         "companyCode": "0001",
@@ -8328,7 +8328,7 @@
     },
     {
         "titleId": "000500001015e400",
-        "name": "The Legend of Zelda:\nThe Minish Cap",
+        "name": "The Legend of Zelda: The Minish Cap",
         "region": "USA",
         "productCode": "WUP-N-PAKE",
         "companyCode": "0001",
@@ -8339,7 +8339,7 @@
     },
     {
         "titleId": "000500001015e500",
-        "name": "The Legend of Zelda:\nThe Minish Cap",
+        "name": "The Legend of Zelda: The Minish Cap",
         "region": "EUR",
         "productCode": "WUP-N-PAKP",
         "companyCode": "0001",
@@ -8361,7 +8361,7 @@
     },
     {
         "titleId": "000500001015eb00",
-        "name": "Mighty Switch Force!™ \nHyper Drive Edition",
+        "name": "Mighty Switch Force!™ Hyper Drive Edition",
         "region": "JPN",
         "productCode": "WUP-P-WHYJ",
         "companyCode": "00R7",
@@ -8372,7 +8372,7 @@
     },
     {
         "titleId": "000500001015ed00",
-        "name": "@SIMPLE DLseries for Wii U\nVol.2 THE Escape Trick2",
+        "name": "@SIMPLE DLseries for Wii U Vol.2 THE Escape Trick2",
         "region": "JPN",
         "productCode": "WUP-P-WE2J",
         "companyCode": "00G9",
@@ -8416,7 +8416,7 @@
     },
     {
         "titleId": "000500001015f200",
-        "name": "ファイアーエムブレム\n暗黒竜と光の剣",
+        "name": "ファイアーエムブレム 暗黒竜と光の剣",
         "region": "JPN",
         "productCode": "WUP-N-FCGJ",
         "companyCode": "0001",
@@ -8438,7 +8438,7 @@
     },
     {
         "titleId": "000500001015f400",
-        "name": "Castlevania III:  Dracula's Curse",
+        "name": "Castlevania III: Dracula's Curse",
         "region": "USA",
         "productCode": "WUP-N-FCHE",
         "companyCode": "0001",
@@ -8482,7 +8482,7 @@
     },
     {
         "titleId": "000500001015fa00",
-        "name": "熱血高校ドッジボール部　サッカー編",
+        "name": "熱血高校ドッジボール部 サッカー編",
         "region": "JPN",
         "productCode": "WUP-N-FCLJ",
         "companyCode": "0001",
@@ -8493,7 +8493,7 @@
     },
     {
         "titleId": "000500001015fb00",
-        "name": "飛龍の拳　奥義の書",
+        "name": "飛龍の拳 奥義の書",
         "region": "JPN",
         "productCode": "WUP-N-FCMJ",
         "companyCode": "0001",
@@ -8658,7 +8658,7 @@
     },
     {
         "titleId": "0005000010160a00",
-        "name": "いけいけ！熱血ホッケー部\n「すべってころんで大乱闘」",
+        "name": "いけいけ！熱血ホッケー部 「すべってころんで大乱闘」",
         "region": "JPN",
         "productCode": "WUP-N-FCRJ",
         "companyCode": "0001",
@@ -8669,7 +8669,7 @@
     },
     {
         "titleId": "0005000010160b00",
-        "name": "ロックマン6\n史上最大の戦い!!",
+        "name": "ロックマン6 史上最大の戦い!!",
         "region": "JPN",
         "productCode": "WUP-N-FCSJ",
         "companyCode": "0001",
@@ -8768,7 +8768,7 @@
     },
     {
         "titleId": "0005000010161400",
-        "name": "ツインビー\nレインボーベルアドベンチャー",
+        "name": "ツインビー レインボーベルアドベンチャー",
         "region": "JPN",
         "productCode": "WUP-N-JCFJ",
         "companyCode": "0001",
@@ -8779,7 +8779,7 @@
     },
     {
         "titleId": "0005000010161500",
-        "name": "Pop'n TwinBee\nRAINBOW BELL ADVENTURES",
+        "name": "Pop'n TwinBee RAINBOW BELL ADVENTURES",
         "region": "EUR",
         "productCode": "WUP-N-JCFP",
         "companyCode": "0001",
@@ -9879,7 +9879,7 @@
     },
     {
         "titleId": "0005000010168400",
-        "name": "Yie Ar Kung-Fu II\nThe Emperor Yie-Gah",
+        "name": "Yie Ar Kung-Fu II The Emperor Yie-Gah",
         "region": "JPN",
         "productCode": "WUP-N-MNDJ",
         "companyCode": "00J8",
@@ -9945,7 +9945,7 @@
     },
     {
         "titleId": "0005000010168a00",
-        "name": "NEMESIS3\nTHE EVE OF DESTRUCTION",
+        "name": "NEMESIS3 THE EVE OF DESTRUCTION",
         "region": "JPN",
         "productCode": "WUP-N-MNKJ",
         "companyCode": "00J8",
@@ -10000,7 +10000,7 @@
     },
     {
         "titleId": "0005000010169600",
-        "name": "Unepic\nEnjoyUp Games",
+        "name": "Unepic EnjoyUp Games",
         "region": "SPA",
         "productCode": "WUP-P-WEPS",
         "companyCode": "00UP",
@@ -10044,7 +10044,7 @@
     },
     {
         "titleId": "0005000010169a00",
-        "name": "Mario Tennis: Power\nTour",
+        "name": "Mario Tennis: Power Tour",
         "region": "USA",
         "productCode": "WUP-N-PAPE",
         "companyCode": "0001",
@@ -10077,7 +10077,7 @@
     },
     {
         "titleId": "0005000010169d00",
-        "name": "Super Mario Advance 4:\nSuper Mario Bros. 3",
+        "name": "Super Mario Advance 4: Super Mario Bros. 3",
         "region": "USA",
         "productCode": "WUP-N-PAQE",
         "companyCode": "0001",
@@ -10088,7 +10088,7 @@
     },
     {
         "titleId": "0005000010169e00",
-        "name": "Super Mario Advance 4:\nSuper Mario Bros. 3",
+        "name": "Super Mario Advance 4: Super Mario Bros. 3",
         "region": "EUR",
         "productCode": "WUP-N-PAQP",
         "companyCode": "0001",
@@ -10099,7 +10099,7 @@
     },
     {
         "titleId": "0005000010169f00",
-        "name": "ワリオランドアドバンス\nヨーキのお宝",
+        "name": "ワリオランドアドバンス ヨーキのお宝",
         "region": "JPN",
         "productCode": "WUP-N-PARJ",
         "companyCode": "0001",
@@ -10154,7 +10154,7 @@
     },
     {
         "titleId": "000500001016a400",
-        "name": "LEGO® Batman™ 3\nBeyond Gotham",
+        "name": "LEGO® Batman™ 3 Beyond Gotham",
         "region": "EUR",
         "productCode": "WUP-P-BTMP",
         "companyCode": "00WR",
@@ -10253,7 +10253,7 @@
     },
     {
         "titleId": "000500001016ad00",
-        "name": "LEGO® Batman™ 3\nBeyond Gotham",
+        "name": "LEGO® Batman™ 3 Beyond Gotham",
         "region": "USA",
         "productCode": "WUP-P-BTME",
         "companyCode": "00WR",
@@ -10429,7 +10429,7 @@
     },
     {
         "titleId": "000500001016be00",
-        "name": "ロックマン5\nブルースの罠!?",
+        "name": "ロックマン5 ブルースの罠!?",
         "region": "JPN",
         "productCode": "WUP-N-FC5J",
         "companyCode": "0001",
@@ -10473,7 +10473,7 @@
     },
     {
         "titleId": "000500001016c200",
-        "name": "Gargoyle's Quest II:\nThe Demon Darkness",
+        "name": "Gargoyle's Quest II: The Demon Darkness",
         "region": "USA",
         "productCode": "WUP-N-FC6E",
         "companyCode": "0001",
@@ -10484,7 +10484,7 @@
     },
     {
         "titleId": "000500001016c300",
-        "name": "Gargoyle's Quest II:\nThe Demon Darkness",
+        "name": "Gargoyle's Quest II: The Demon Darkness",
         "region": "EUR",
         "productCode": "WUP-N-FC6P",
         "companyCode": "0001",
@@ -10572,7 +10572,7 @@
     },
     {
         "titleId": "000500001016d100",
-        "name": "KLONOA:\nEmpire of Dreams",
+        "name": "KLONOA: Empire of Dreams",
         "region": "USA",
         "productCode": "WUP-N-PANE",
         "companyCode": "0001",
@@ -10594,7 +10594,7 @@
     },
     {
         "titleId": "000500001016d300",
-        "name": "Batman™: Arkham Origins\nBlackgate - Deluxe Edition",
+        "name": "Batman™: Arkham Origins Blackgate - Deluxe Edition",
         "region": "EUR",
         "productCode": "WUP-P-WBMP",
         "companyCode": "00WR",
@@ -10715,7 +10715,7 @@
     },
     {
         "titleId": "000500001016df00",
-        "name": "Batman™: Arkham Origins\nBlackgate - Deluxe Edition",
+        "name": "Batman™: Arkham Origins Blackgate - Deluxe Edition",
         "region": "USA",
         "productCode": "WUP-P-WBME",
         "companyCode": "00WR",
@@ -10759,7 +10759,7 @@
     },
     {
         "titleId": "000500001016e300",
-        "name": "GravBlocks+\nFrom Nothing Game Studios",
+        "name": "GravBlocks+ From Nothing Game Studios",
         "region": "USA",
         "productCode": "WUP-P-WGRE",
         "companyCode": "008S",
@@ -10836,7 +10836,7 @@
     },
     {
         "titleId": "000500001016ef00",
-        "name": "Angry Bunnies:\nColossal Carrot Crusade",
+        "name": "Angry Bunnies: Colossal Carrot Crusade",
         "region": "USA",
         "productCode": "WUP-P-WBEE",
         "companyCode": "00YR",
@@ -10847,7 +10847,7 @@
     },
     {
         "titleId": "000500001016f100",
-        "name": "悪魔城ドラキュラ\n～サークル オブ ザ ムーン～",
+        "name": "悪魔城ドラキュラ ～サークル オブ ザ ムーン～",
         "region": "JPN",
         "productCode": "WUP-N-PASJ",
         "companyCode": "0001",
@@ -10858,7 +10858,7 @@
     },
     {
         "titleId": "000500001016f200",
-        "name": "Castlevania\nCircle of the Moon",
+        "name": "Castlevania Circle of the Moon",
         "region": "USA",
         "productCode": "WUP-N-PASE",
         "companyCode": "0001",
@@ -10880,7 +10880,7 @@
     },
     {
         "titleId": "000500001016f400",
-        "name": "Kirby:\nNightmare in Dream Land",
+        "name": "Kirby: Nightmare in Dream Land",
         "region": "USA",
         "productCode": "WUP-N-PATE",
         "companyCode": "0001",
@@ -10902,7 +10902,7 @@
     },
     {
         "titleId": "000500001016f600",
-        "name": "Super Mario World:\nSuper Mario Advance 2",
+        "name": "Super Mario World: Super Mario Advance 2",
         "region": "USA",
         "productCode": "WUP-N-PAUE",
         "companyCode": "0001",
@@ -10946,7 +10946,7 @@
     },
     {
         "titleId": "000500001016fa00",
-        "name": "Metroid: Zero\nMission",
+        "name": "Metroid: Zero Mission",
         "region": "USA",
         "productCode": "WUP-N-PAWE",
         "companyCode": "0001",
@@ -11001,7 +11001,7 @@
     },
     {
         "titleId": "000500001016ff00",
-        "name": "Flowerworks HD\nFollie's Adventure",
+        "name": "Flowerworks HD Follie's Adventure",
         "region": "USA",
         "productCode": "WUP-P-WFWE",
         "companyCode": "00NT",
@@ -11023,7 +11023,7 @@
     },
     {
         "titleId": "0005000010170200",
-        "name": "Pier Solar\nand the Great Architects",
+        "name": "Pier Solar and the Great Architects",
         "region": "USA",
         "productCode": "WUP-P-WGAE",
         "companyCode": "007Z",
@@ -11100,7 +11100,7 @@
     },
     {
         "titleId": "0005000010170c00",
-        "name": "DOUBLE DRAGON II:\nThe Revenge",
+        "name": "DOUBLE DRAGON II: The Revenge",
         "region": "USA",
         "productCode": "WUP-N-FC8E",
         "companyCode": "0001",
@@ -11111,7 +11111,7 @@
     },
     {
         "titleId": "0005000010170d00",
-        "name": "DOUBLE DRAGON II:\nThe Revenge",
+        "name": "DOUBLE DRAGON II: The Revenge",
         "region": "EUR",
         "productCode": "WUP-N-FC8P",
         "companyCode": "0001",
@@ -11232,7 +11232,7 @@
     },
     {
         "titleId": "0005000010171a00",
-        "name": "くにおくんのドッジボールだよ\n全員集合！",
+        "name": "くにおくんのドッジボールだよ 全員集合！",
         "region": "JPN",
         "productCode": "WUP-N-JCKJ",
         "companyCode": "0001",
@@ -11364,7 +11364,7 @@
     },
     {
         "titleId": "0005000010172c00",
-        "name": "Kirby:\nNightmare in Dream Land",
+        "name": "Kirby: Nightmare in Dream Land",
         "region": "EUR",
         "productCode": "WUP-N-PATP",
         "companyCode": "0001",
@@ -11375,7 +11375,7 @@
     },
     {
         "titleId": "0005000010172d00",
-        "name": "Super Mario World:\nSuper Mario Advance 2",
+        "name": "Super Mario World: Super Mario Advance 2",
         "region": "EUR",
         "productCode": "WUP-N-PAUP",
         "companyCode": "0001",
@@ -11408,7 +11408,7 @@
     },
     {
         "titleId": "0005000010173000",
-        "name": "Nintendo Game Seminar 2013\nStudent Works",
+        "name": "Nintendo Game Seminar 2013 Student Works",
         "region": "JPN",
         "productCode": "WUP-P-WGXJ",
         "companyCode": "0001",
@@ -11430,7 +11430,7 @@
     },
     {
         "titleId": "0005000010173200",
-        "name": "Another World\n20th Anniversary Edition",
+        "name": "Another World 20th Anniversary Edition",
         "region": "EUR",
         "productCode": "WUP-P-WEUP",
         "companyCode": "00UC",
@@ -11441,7 +11441,7 @@
     },
     {
         "titleId": "0005000010173300",
-        "name": "Stealth Inc 2\nA Game of Clones",
+        "name": "Stealth Inc 2 A Game of Clones",
         "region": "EUR",
         "productCode": "WUP-P-WCGP",
         "companyCode": "00UB",
@@ -11452,7 +11452,7 @@
     },
     {
         "titleId": "0005000010173400",
-        "name": "TRANSFORMERS:\nRise of the Dark Spark",
+        "name": "TRANSFORMERS: Rise of the Dark Spark",
         "region": "EUR",
         "productCode": "WUP-P-AYEP",
         "companyCode": "0052",
@@ -11474,7 +11474,7 @@
     },
     {
         "titleId": "0005000010173600",
-        "name": "Super Mario\nAdvance",
+        "name": "Super Mario Advance",
         "region": "USA",
         "productCode": "WUP-N-PAXE",
         "companyCode": "0001",
@@ -11573,7 +11573,7 @@
     },
     {
         "titleId": "0005000010173f00",
-        "name": "PAC-MAN\nCOLLECTION",
+        "name": "PAC-MAN COLLECTION",
         "region": "EUR",
         "productCode": "WUP-N-PAYP",
         "companyCode": "0001",
@@ -11804,7 +11804,7 @@
     },
     {
         "titleId": "0005000010175500",
-        "name": "Another World\nOut of This World",
+        "name": "Another World Out of This World",
         "region": "USA",
         "productCode": "WUP-P-WEUE",
         "companyCode": "00UC",
@@ -11859,7 +11859,7 @@
     },
     {
         "titleId": "0005000010175b00",
-        "name": "Sonic Boom:\nRise of Lyric",
+        "name": "Sonic Boom: Rise of Lyric",
         "region": "USA",
         "productCode": "WUP-P-BSSE",
         "companyCode": "008P",
@@ -11870,7 +11870,7 @@
     },
     {
         "titleId": "0005000010175c00",
-        "name": "ONE PIECE\nUnlimited World Red",
+        "name": "ONE PIECE Unlimited World Red",
         "region": "USA",
         "productCode": "WUP-P-AUNE",
         "companyCode": "00AF",
@@ -11881,7 +11881,7 @@
     },
     {
         "titleId": "0005000010175d00",
-        "name": "ONE PIECE\nUnlimited World Red",
+        "name": "ONE PIECE Unlimited World Red",
         "region": "EUR",
         "productCode": "WUP-P-AUNP",
         "companyCode": "00AF",
@@ -11892,7 +11892,7 @@
     },
     {
         "titleId": "0005000010175e00",
-        "name": "Giana Sisters\nTwisted Dreams",
+        "name": "Giana Sisters Twisted Dreams",
         "region": "JPN",
         "productCode": "WUP-P-WGSJ",
         "companyCode": "00T6",
@@ -11925,7 +11925,7 @@
     },
     {
         "titleId": "0005000010176100",
-        "name": "Castlevania\nHarmony of Dissonance",
+        "name": "Castlevania Harmony of Dissonance",
         "region": "USA",
         "productCode": "WUP-N-PA5E",
         "companyCode": "0001",
@@ -11936,7 +11936,7 @@
     },
     {
         "titleId": "0005000010176200",
-        "name": "Castlevania\nHarmony of Dissonance",
+        "name": "Castlevania Harmony of Dissonance",
         "region": "EUR",
         "productCode": "WUP-N-PA5P",
         "companyCode": "0001",
@@ -11969,7 +11969,7 @@
     },
     {
         "titleId": "0005000010176500",
-        "name": "Stealth Inc 2\nA Game of Clones",
+        "name": "Stealth Inc 2 A Game of Clones",
         "region": "USA",
         "productCode": "WUP-P-WCGE",
         "companyCode": "00UB",
@@ -12002,7 +12002,7 @@
     },
     {
         "titleId": "0005000010176800",
-        "name": "Guacamelee! Super Turbo\nChampionship Edition",
+        "name": "Guacamelee! Super Turbo Championship Edition",
         "region": "USA",
         "productCode": "WUP-P-WGCE",
         "companyCode": "00V4",
@@ -12123,7 +12123,7 @@
     },
     {
         "titleId": "0005000010177400",
-        "name": "Luv Me Buddies\nWonderland",
+        "name": "Luv Me Buddies Wonderland",
         "region": "USA",
         "productCode": "WUP-P-ALVE",
         "companyCode": "00YF",
@@ -12167,7 +12167,7 @@
     },
     {
         "titleId": "0005000010177800",
-        "name": "Sonic Boom:\nRise of Lyric",
+        "name": "Sonic Boom: Rise of Lyric",
         "region": "EUR",
         "productCode": "WUP-P-BSSP",
         "companyCode": "008P",
@@ -12233,7 +12233,7 @@
     },
     {
         "titleId": "0005000010177e00",
-        "name": "Street Fighter 2010:\nThe Final Fight",
+        "name": "Street Fighter 2010: The Final Fight",
         "region": "USA",
         "productCode": "WUP-N-FDLE",
         "companyCode": "0001",
@@ -12244,7 +12244,7 @@
     },
     {
         "titleId": "0005000010177f00",
-        "name": "Street Fighter 2010:\nThe Final Fight",
+        "name": "Street Fighter 2010: The Final Fight",
         "region": "EUR",
         "productCode": "WUP-N-FDLP",
         "companyCode": "0001",
@@ -12398,7 +12398,7 @@
     },
     {
         "titleId": "0005000010178e00",
-        "name": "Mario vs. Donkey Kong\nTipping Stars",
+        "name": "Mario vs. Donkey Kong Tipping Stars",
         "region": "EUR",
         "productCode": "WUP-P-WAFP",
         "companyCode": "0001",
@@ -12431,7 +12431,7 @@
     },
     {
         "titleId": "0005000010179200",
-        "name": "Mario vs. Donkey Kong\nTipping Stars",
+        "name": "Mario vs. Donkey Kong Tipping Stars",
         "region": "JPN",
         "productCode": "WUP-P-WAFJ",
         "companyCode": "0001",
@@ -12486,7 +12486,7 @@
     },
     {
         "titleId": "0005000010179700",
-        "name": "Guacamelee! Super Turbo\nChampionship Edition",
+        "name": "Guacamelee! Super Turbo Championship Edition",
         "region": "EUR",
         "productCode": "WUP-P-WGCP",
         "companyCode": "00V4",
@@ -12519,7 +12519,7 @@
     },
     {
         "titleId": "0005000010179b00",
-        "name": "Brain Age: Train Your\nBrain In Minutes A Day",
+        "name": "Brain Age: Train Your Brain In Minutes A Day",
         "region": "USA",
         "productCode": "WUP-N-DAAE",
         "companyCode": "0001",
@@ -12530,7 +12530,7 @@
     },
     {
         "titleId": "0005000010179c00",
-        "name": "Dr Kawashima's Brain Training\nHow Old Is Your Brain?",
+        "name": "Dr Kawashima's Brain Training How Old Is Your Brain?",
         "region": "EUR",
         "productCode": "WUP-N-DAAP",
         "companyCode": "0001",
@@ -12607,7 +12607,7 @@
     },
     {
         "titleId": "000500001017a300",
-        "name": "MEGAMAN\nBATTLE CHIP CHALLENGE",
+        "name": "MEGAMAN BATTLE CHIP CHALLENGE",
         "region": "EUR",
         "productCode": "WUP-N-PA9P",
         "companyCode": "0001",
@@ -12783,7 +12783,7 @@
     },
     {
         "titleId": "000500001017b600",
-        "name": "ご当地鉄道\n～ご当地キャラと日本全国の旅～",
+        "name": "ご当地鉄道 ～ご当地キャラと日本全国の旅～",
         "region": "JPN",
         "productCode": "WUP-P-BLTJ",
         "companyCode": "00AF",
@@ -12948,7 +12948,7 @@
     },
     {
         "titleId": "000500001017ca00",
-        "name": "TOKI TORI 2+\n秘められた謎と不思議な島",
+        "name": "TOKI TORI 2+ 秘められた謎と不思議な島",
         "region": "JPN",
         "productCode": "WUP-P-WAAJ",
         "companyCode": "00TF",
@@ -12992,7 +12992,7 @@
     },
     {
         "titleId": "000500001017cf00",
-        "name": "Fire Emblem:\nThe Sacred Stones",
+        "name": "Fire Emblem: The Sacred Stones",
         "region": "USA",
         "productCode": "WUP-N-PBBE",
         "companyCode": "0001",
@@ -13036,7 +13036,7 @@
     },
     {
         "titleId": "000500001017d300",
-        "name": "Mario Kart:\nSuper Circuit",
+        "name": "Mario Kart: Super Circuit",
         "region": "USA",
         "productCode": "WUP-N-PBDE",
         "companyCode": "0001",
@@ -13179,7 +13179,7 @@
     },
     {
         "titleId": "000500001017e500",
-        "name": "PAC-MAN\nand the Ghostly Adventures 2",
+        "name": "PAC-MAN and the Ghostly Adventures 2",
         "region": "EUR",
         "productCode": "WUP-P-BPMP",
         "companyCode": "00AF",
@@ -13190,7 +13190,7 @@
     },
     {
         "titleId": "000500001017e600",
-        "name": "PAC-MAN\nand the Ghostly Adventures 2",
+        "name": "PAC-MAN and the Ghostly Adventures 2",
         "region": "USA",
         "productCode": "WUP-P-BPME",
         "companyCode": "00AF",
@@ -13234,7 +13234,7 @@
     },
     {
         "titleId": "000500001017ed00",
-        "name": "Flowerworks HD\nFollie's Adventure",
+        "name": "Flowerworks HD Follie's Adventure",
         "region": "EUR",
         "productCode": "WUP-P-WFWP",
         "companyCode": "00NT",
@@ -13311,7 +13311,7 @@
     },
     {
         "titleId": "000500001017f400",
-        "name": "びっくり熱血新記録！\nはるかなる金メダル",
+        "name": "びっくり熱血新記録！ はるかなる金メダル",
         "region": "JPN",
         "productCode": "WUP-N-FDSJ",
         "companyCode": "0001",
@@ -13322,7 +13322,7 @@
     },
     {
         "titleId": "000500001017f500",
-        "name": "Crash 'n the Boys\nStreet Challenge",
+        "name": "Crash 'n the Boys Street Challenge",
         "region": "USA",
         "productCode": "WUP-N-FDSE",
         "companyCode": "0001",
@@ -13333,7 +13333,7 @@
     },
     {
         "titleId": "000500001017f600",
-        "name": "Crash 'n the Boys\nStreet Challenge",
+        "name": "Crash 'n the Boys Street Challenge",
         "region": "EUR",
         "productCode": "WUP-N-FDSP",
         "companyCode": "0001",
@@ -13388,7 +13388,7 @@
     },
     {
         "titleId": "000500001017fb00",
-        "name": "スーパードンキーコング3\n謎のクレミス島",
+        "name": "スーパードンキーコング3 謎のクレミス島",
         "region": "JPN",
         "productCode": "WUP-N-JCXJ",
         "companyCode": "0001",
@@ -13399,7 +13399,7 @@
     },
     {
         "titleId": "000500001017fc00",
-        "name": "Donkey Kong Country 3:\nDixie Kong's Double Trouble",
+        "name": "Donkey Kong Country 3: Dixie Kong's Double Trouble",
         "region": "USA",
         "productCode": "WUP-N-JCXE",
         "companyCode": "0001",
@@ -13410,7 +13410,7 @@
     },
     {
         "titleId": "000500001017fd00",
-        "name": "Donkey Kong Country 3:\nDixie Kong's Double Trouble",
+        "name": "Donkey Kong Country 3: Dixie Kong's Double Trouble",
         "region": "EUR",
         "productCode": "WUP-N-JCXP",
         "companyCode": "0001",
@@ -13421,7 +13421,7 @@
     },
     {
         "titleId": "000500001017fe00",
-        "name": "ヘラクレスの栄光Ⅳ\n神々からの贈り物",
+        "name": "ヘラクレスの栄光Ⅳ 神々からの贈り物",
         "region": "JPN",
         "productCode": "WUP-N-JCYJ",
         "companyCode": "0001",
@@ -13454,7 +13454,7 @@
     },
     {
         "titleId": "0005000010180100",
-        "name": "MEGA MAN\nBATTLE CHIP CHALLENGE",
+        "name": "MEGA MAN BATTLE CHIP CHALLENGE",
         "region": "USA",
         "productCode": "WUP-N-PA9E",
         "companyCode": "0001",
@@ -13575,7 +13575,7 @@
     },
     {
         "titleId": "0005000010181100",
-        "name": "Mario Party\nAdvance",
+        "name": "Mario Party Advance",
         "region": "USA",
         "productCode": "WUP-N-PBFE",
         "companyCode": "0001",
@@ -13619,7 +13619,7 @@
     },
     {
         "titleId": "0005000010181b00",
-        "name": "Zombie Brigade:\nNo Brain No Gain",
+        "name": "Zombie Brigade: No Brain No Gain",
         "region": "EUR",
         "productCode": "WUP-P-BNRP",
         "companyCode": "00YR",
@@ -13630,7 +13630,7 @@
     },
     {
         "titleId": "0005000010181c00",
-        "name": "Zombie Brigade:\nNo Brain No Gain",
+        "name": "Zombie Brigade: No Brain No Gain",
         "region": "USA",
         "productCode": "WUP-P-BNRE",
         "companyCode": "00YR",
@@ -13652,7 +13652,7 @@
     },
     {
         "titleId": "0005000010182300",
-        "name": "PAC-MAN\nand the Ghostly Adventures 2",
+        "name": "PAC-MAN and the Ghostly Adventures 2",
         "region": "JPN",
         "productCode": "WUP-P-BPMJ",
         "companyCode": "00AF",
@@ -13663,7 +13663,7 @@
     },
     {
         "titleId": "0005000010182400",
-        "name": "わいわい！みんなでシューティング\nクラフトアイランドからの脱出！",
+        "name": "わいわい！みんなでシューティング クラフトアイランドからの脱出！",
         "region": "JPN",
         "productCode": "WUP-P-ACCJ",
         "companyCode": "00TF",
@@ -13828,7 +13828,7 @@
     },
     {
         "titleId": "0005000010183500",
-        "name": "ポケモンピンボール\nルビー&サファイア",
+        "name": "ポケモンピンボール ルビー&サファイア",
         "region": "JPN",
         "productCode": "WUP-N-PBHJ",
         "companyCode": "0001",
@@ -13839,7 +13839,7 @@
     },
     {
         "titleId": "0005000010183600",
-        "name": "Pokémon Pinball:\nRuby & Sapphire",
+        "name": "Pokémon Pinball: Ruby & Sapphire",
         "region": "USA",
         "productCode": "WUP-N-PBHE",
         "companyCode": "0001",
@@ -13850,7 +13850,7 @@
     },
     {
         "titleId": "0005000010183700",
-        "name": "Pokémon Pinball:\nRuby & Sapphire",
+        "name": "Pokémon Pinball: Ruby & Sapphire",
         "region": "EUR",
         "productCode": "WUP-N-PBHP",
         "companyCode": "0001",
@@ -13916,7 +13916,7 @@
     },
     {
         "titleId": "0005000010184000",
-        "name": "Castlevania\nAria of Sorrow",
+        "name": "Castlevania Aria of Sorrow",
         "region": "EUR",
         "productCode": "WUP-N-PBJP",
         "companyCode": "0001",
@@ -13927,7 +13927,7 @@
     },
     {
         "titleId": "0005000010184200",
-        "name": "風のクロノアG2\nドリームチャンプ･トーナメント",
+        "name": "風のクロノアG2 ドリームチャンプ･トーナメント",
         "region": "JPN",
         "productCode": "WUP-N-PBKJ",
         "companyCode": "0001",
@@ -13938,7 +13938,7 @@
     },
     {
         "titleId": "0005000010184300",
-        "name": "KLONOA 2\nDream Champ Tournament",
+        "name": "KLONOA 2 Dream Champ Tournament",
         "region": "USA",
         "productCode": "WUP-N-PBKE",
         "companyCode": "0001",
@@ -14015,7 +14015,7 @@
     },
     {
         "titleId": "0005000010185100",
-        "name": "Nintendo Land\n(Trial)",
+        "name": "Nintendo Land (Trial)",
         "region": "JPN",
         "productCode": "WUP-N-SZLJ",
         "companyCode": "0001",
@@ -14026,7 +14026,7 @@
     },
     {
         "titleId": "0005000010185200",
-        "name": "New SUPER MARIO BROS. U\n(Trial)",
+        "name": "New SUPER MARIO BROS. U (Trial)",
         "region": "JPN",
         "productCode": "WUP-N-SZMJ",
         "companyCode": "0001",
@@ -14037,7 +14037,7 @@
     },
     {
         "titleId": "0005000010185300",
-        "name": "PIKMIN 3\n(Trial)",
+        "name": "PIKMIN 3 (Trial)",
         "region": "JPN",
         "productCode": "WUP-N-SZPJ",
         "companyCode": "0001",
@@ -14048,7 +14048,7 @@
     },
     {
         "titleId": "0005000010185400",
-        "name": "THE LEGEND OF ZELDA\nThe Wind Waker HD (Trial)",
+        "name": "THE LEGEND OF ZELDA The Wind Waker HD (Trial)",
         "region": "JPN",
         "productCode": "WUP-N-SZZJ",
         "companyCode": "0001",
@@ -14059,7 +14059,7 @@
     },
     {
         "titleId": "0005000010185500",
-        "name": "Game & Wario\n(Trial)",
+        "name": "Game & Wario (Trial)",
         "region": "JPN",
         "productCode": "WUP-N-SSAJ",
         "companyCode": "0001",
@@ -14070,7 +14070,7 @@
     },
     {
         "titleId": "0005000010185600",
-        "name": "The Wonderful 101\n(Trial)",
+        "name": "The Wonderful 101 (Trial)",
         "region": "JPN",
         "productCode": "WUP-N-SZCJ",
         "companyCode": "0001",
@@ -14147,7 +14147,7 @@
     },
     {
         "titleId": "0005000010186100",
-        "name": "POOYAN\nプーヤン",
+        "name": "POOYAN プーヤン",
         "region": "JPN",
         "productCode": "WUP-N-FDZJ",
         "companyCode": "0001",
@@ -14169,7 +14169,7 @@
     },
     {
         "titleId": "0005000010186300",
-        "name": "THE ADVENTURES OF\nBAYOU BiLLY",
+        "name": "THE ADVENTURES OF BAYOU BiLLY",
         "region": "USA",
         "productCode": "WUP-N-FD2E",
         "companyCode": "0001",
@@ -14180,7 +14180,7 @@
     },
     {
         "titleId": "0005000010186400",
-        "name": "THE ADVENTURES OF\nBAYOU BiLLY",
+        "name": "THE ADVENTURES OF BAYOU BiLLY",
         "region": "EUR",
         "productCode": "WUP-N-FD2P",
         "companyCode": "0001",
@@ -14191,7 +14191,7 @@
     },
     {
         "titleId": "0005000010186500",
-        "name": "AXELAY\nアクスレイ",
+        "name": "AXELAY アクスレイ",
         "region": "JPN",
         "productCode": "WUP-N-JCZJ",
         "companyCode": "0001",
@@ -14290,7 +14290,7 @@
     },
     {
         "titleId": "0005000010187000",
-        "name": "Pier Solar\nand the Great Architects",
+        "name": "Pier Solar and the Great Architects",
         "region": "EUR",
         "productCode": "WUP-P-WGAP",
         "companyCode": "007Z",
@@ -14345,7 +14345,7 @@
     },
     {
         "titleId": "0005000010187b00",
-        "name": "Planes\nFire & Rescue",
+        "name": "Planes Fire & Rescue",
         "region": "USA",
         "productCode": "WUP-P-AFRE",
         "companyCode": "00VZ",
@@ -14367,7 +14367,7 @@
     },
     {
         "titleId": "0005000010188000",
-        "name": "ことばのパズル\nもじぴったんアドバンス",
+        "name": "ことばのパズル もじぴったんアドバンス",
         "region": "JPN",
         "productCode": "WUP-N-PBMJ",
         "companyCode": "0001",
@@ -14389,7 +14389,7 @@
     },
     {
         "titleId": "0005000010188200",
-        "name": "MEGA MAN\nBATTLE NETWORK 2",
+        "name": "MEGA MAN BATTLE NETWORK 2",
         "region": "USA",
         "productCode": "WUP-N-PBPE",
         "companyCode": "0001",
@@ -14422,7 +14422,7 @@
     },
     {
         "titleId": "0005000010188500",
-        "name": "MEGA MAN\nBATTLE NETWORK 3 WHITE",
+        "name": "MEGA MAN BATTLE NETWORK 3 WHITE",
         "region": "USA",
         "productCode": "WUP-N-PBQE",
         "companyCode": "0001",
@@ -14433,7 +14433,7 @@
     },
     {
         "titleId": "0005000010188600",
-        "name": "MEGAMAN\nBATTLE NETWORK 3 WHITE",
+        "name": "MEGAMAN BATTLE NETWORK 3 WHITE",
         "region": "EUR",
         "productCode": "WUP-N-PBQP",
         "companyCode": "0001",
@@ -14455,7 +14455,7 @@
     },
     {
         "titleId": "0005000010188800",
-        "name": "MEGA MAN\nBATTLE NETWORK 3 BLUE",
+        "name": "MEGA MAN BATTLE NETWORK 3 BLUE",
         "region": "USA",
         "productCode": "WUP-N-PBRE",
         "companyCode": "0001",
@@ -14466,7 +14466,7 @@
     },
     {
         "titleId": "0005000010188900",
-        "name": "MEGAMAN\nBATTLE NETWORK 3 BLUE",
+        "name": "MEGAMAN BATTLE NETWORK 3 BLUE",
         "region": "EUR",
         "productCode": "WUP-N-PBRP",
         "companyCode": "0001",
@@ -14598,7 +14598,7 @@
     },
     {
         "titleId": "0005000010189c00",
-        "name": "Trine\nEnchanted Edition",
+        "name": "Trine Enchanted Edition",
         "region": "EUR",
         "productCode": "WUP-P-BTEP",
         "companyCode": "00FZ",
@@ -14620,7 +14620,7 @@
     },
     {
         "titleId": "0005000010189e00",
-        "name": "Trine\nEnchanted Edition",
+        "name": "Trine Enchanted Edition",
         "region": "USA",
         "productCode": "WUP-P-BTEE",
         "companyCode": "00FZ",
@@ -14686,7 +14686,7 @@
     },
     {
         "titleId": "000500001018a800",
-        "name": "SMART Adventures\nMission Math",
+        "name": "SMART Adventures Mission Math",
         "region": "EUR",
         "productCode": "WUP-P-ADMP",
         "companyCode": "00JR",
@@ -14763,7 +14763,7 @@
     },
     {
         "titleId": "000500001018b200",
-        "name": "ＥＳＰＥＲ　ＤＲＥＡＭ\nエスパードリーム",
+        "name": "ＥＳＰＥＲ ＤＲＥＡＭ エスパードリーム",
         "region": "JPN",
         "productCode": "WUP-N-FD4J",
         "companyCode": "0001",
@@ -14785,7 +14785,7 @@
     },
     {
         "titleId": "000500001018b400",
-        "name": "もえろツインビー\nシナモン博士を救え！",
+        "name": "もえろツインビー シナモン博士を救え！",
         "region": "JPN",
         "productCode": "WUP-N-FD6J",
         "companyCode": "0001",
@@ -14917,7 +14917,7 @@
     },
     {
         "titleId": "000500001018c400",
-        "name": "藤子・F・不二雄キャラクターズ\n大集合！SFドタバタパーティー！！",
+        "name": "藤子・F・不二雄キャラクターズ 大集合！SFドタバタパーティー！！",
         "region": "JPN",
         "productCode": "WUP-P-BSFJ",
         "companyCode": "00AF",
@@ -14972,7 +14972,7 @@
     },
     {
         "titleId": "000500001018cb00",
-        "name": "Lone Survivor\nThe Director's Cut",
+        "name": "Lone Survivor The Director's Cut",
         "region": "EUR",
         "productCode": "WUP-P-BSWP",
         "companyCode": "00UB",
@@ -14983,7 +14983,7 @@
     },
     {
         "titleId": "000500001018cc00",
-        "name": "Planes\nFire & Rescue",
+        "name": "Planes Fire & Rescue",
         "region": "EUR",
         "productCode": "WUP-P-AFRP",
         "companyCode": "00VZ",
@@ -14994,7 +14994,7 @@
     },
     {
         "titleId": "000500001018cd00",
-        "name": "Cake Ninja 3:\nThe Legend Continues",
+        "name": "Cake Ninja 3: The Legend Continues",
         "region": "EUR",
         "productCode": "WUP-P-ACNP",
         "companyCode": "00YR",
@@ -15005,7 +15005,7 @@
     },
     {
         "titleId": "000500001018cf00",
-        "name": "Adventures of Pip\nBy Tic Toc Games",
+        "name": "Adventures of Pip By Tic Toc Games",
         "region": "USA",
         "productCode": "WUP-P-BAPE",
         "companyCode": "011X",
@@ -15027,7 +15027,7 @@
     },
     {
         "titleId": "000500001018d100",
-        "name": "Lone Survivor\nThe Director's Cut",
+        "name": "Lone Survivor The Director's Cut",
         "region": "USA",
         "productCode": "WUP-P-ALSE",
         "companyCode": "00UB",
@@ -15049,7 +15049,7 @@
     },
     {
         "titleId": "000500001018d400",
-        "name": "CAKE NINJA 3:\nTHE LEGEND CONTINUES",
+        "name": "CAKE NINJA 3: THE LEGEND CONTINUES",
         "region": "USA",
         "productCode": "WUP-P-ACNE",
         "companyCode": "00YR",
@@ -15302,7 +15302,7 @@
     },
     {
         "titleId": "000500001018f400",
-        "name": "Angry Video Game Nerd\nAdventures",
+        "name": "Angry Video Game Nerd Adventures",
         "region": "USA",
         "productCode": "WUP-P-AVGE",
         "companyCode": "012C",
@@ -15335,7 +15335,7 @@
     },
     {
         "titleId": "000500001018f800",
-        "name": "SMART Adventures\nMission Math",
+        "name": "SMART Adventures Mission Math",
         "region": "USA",
         "productCode": "WUP-P-ADME",
         "companyCode": "00JR",
@@ -15390,7 +15390,7 @@
     },
     {
         "titleId": "000500001018ff00",
-        "name": "Harvest Moon:\nMore Friends of Mineral Town",
+        "name": "Harvest Moon: More Friends of Mineral Town",
         "region": "USA",
         "productCode": "WUP-N-PBVE",
         "companyCode": "0001",
@@ -15401,7 +15401,7 @@
     },
     {
         "titleId": "0005000010190000",
-        "name": "Harvest Moon:\nFriends of Mineral Town",
+        "name": "Harvest Moon: Friends of Mineral Town",
         "region": "USA",
         "productCode": "WUP-N-PBWE",
         "companyCode": "0001",
@@ -15412,7 +15412,7 @@
     },
     {
         "titleId": "0005000010190300",
-        "name": "M & S at the Rio 2016\nOlympic Games",
+        "name": "M & S at the Rio 2016 Olympic Games",
         "region": "JPN",
         "productCode": "WUP-P-ABJJ",
         "companyCode": "0001",
@@ -15456,7 +15456,7 @@
     },
     {
         "titleId": "0005000010190900",
-        "name": "かんしゃく玉なげカン太郎の\n東海道五十三次",
+        "name": "かんしゃく玉なげカン太郎の 東海道五十三次",
         "region": "JPN",
         "productCode": "WUP-N-FEEJ",
         "companyCode": "0001",
@@ -15500,7 +15500,7 @@
     },
     {
         "titleId": "0005000010190e00",
-        "name": "Genghis Khan II:\nClan of the Grey Wolf",
+        "name": "Genghis Khan II: Clan of the Grey Wolf",
         "region": "USA",
         "productCode": "WUP-N-JC7E",
         "companyCode": "0001",
@@ -15533,7 +15533,7 @@
     },
     {
         "titleId": "0005000010191100",
-        "name": "SUPER E.D.F.\nEARTH DEFENSE FORCE",
+        "name": "SUPER E.D.F. EARTH DEFENSE FORCE",
         "region": "JPN",
         "productCode": "WUP-N-JDAJ",
         "companyCode": "0001",
@@ -15544,7 +15544,7 @@
     },
     {
         "titleId": "0005000010191200",
-        "name": "SUPER E.D.F.\nEarth Defense Force",
+        "name": "SUPER E.D.F. Earth Defense Force",
         "region": "USA",
         "productCode": "WUP-N-JDAE",
         "companyCode": "0001",
@@ -15588,7 +15588,7 @@
     },
     {
         "titleId": "0005000010191800",
-        "name": "Rock 'N Racing\nOff Road",
+        "name": "Rock 'N Racing Off Road",
         "region": "EUR",
         "productCode": "WUP-P-WAEP",
         "companyCode": "00UP",
@@ -15599,7 +15599,7 @@
     },
     {
         "titleId": "0005000010191f00",
-        "name": "Sonic Toon:\nAncients' Secret Treasure",
+        "name": "Sonic Toon: Ancients' Secret Treasure",
         "region": "JPN",
         "productCode": "WUP-P-BSSJ",
         "companyCode": "008P",
@@ -15621,7 +15621,7 @@
     },
     {
         "titleId": "0005000010192100",
-        "name": "The LEGO® Movie\nVideogame",
+        "name": "The LEGO® Movie Videogame",
         "region": "JPN",
         "productCode": "WUP-P-ALAJ",
         "companyCode": "00WR",
@@ -15665,7 +15665,7 @@
     },
     {
         "titleId": "0005000010192700",
-        "name": "ロックマン エグゼ 4\nトーナメント ブルームーン",
+        "name": "ロックマン エグゼ 4 トーナメント ブルームーン",
         "region": "JPN",
         "productCode": "WUP-N-PBXJ",
         "companyCode": "0001",
@@ -15676,7 +15676,7 @@
     },
     {
         "titleId": "0005000010192800",
-        "name": "MEGA MAN BATTLE NETWORK 4\nBLUE MOON",
+        "name": "MEGA MAN BATTLE NETWORK 4 BLUE MOON",
         "region": "USA",
         "productCode": "WUP-N-PBXE",
         "companyCode": "0001",
@@ -15687,7 +15687,7 @@
     },
     {
         "titleId": "0005000010192900",
-        "name": "MEGAMAN BATTLE NETWORK 4\nBLUE MOON",
+        "name": "MEGAMAN BATTLE NETWORK 4 BLUE MOON",
         "region": "EUR",
         "productCode": "WUP-N-PBXP",
         "companyCode": "0001",
@@ -15698,7 +15698,7 @@
     },
     {
         "titleId": "0005000010192a00",
-        "name": "ロックマン エグゼ 4\nトーナメント レッドサン",
+        "name": "ロックマン エグゼ 4 トーナメント レッドサン",
         "region": "JPN",
         "productCode": "WUP-N-PBYJ",
         "companyCode": "0001",
@@ -15709,7 +15709,7 @@
     },
     {
         "titleId": "0005000010192b00",
-        "name": "MEGA MAN BATTLE NETWORK 4\nRED SUN",
+        "name": "MEGA MAN BATTLE NETWORK 4 RED SUN",
         "region": "USA",
         "productCode": "WUP-N-PBYE",
         "companyCode": "0001",
@@ -15720,7 +15720,7 @@
     },
     {
         "titleId": "0005000010192c00",
-        "name": "MEGAMAN BATTLE NETWORK 4\nRED SUN",
+        "name": "MEGAMAN BATTLE NETWORK 4 RED SUN",
         "region": "EUR",
         "productCode": "WUP-N-PBYP",
         "companyCode": "0001",
@@ -15918,7 +15918,7 @@
     },
     {
         "titleId": "0005000010194c00",
-        "name": "Konami's Soccer ",
+        "name": "Konami's Soccer",
         "region": "JPN",
         "productCode": "WUP-N-MNRJ",
         "companyCode": "00J8",
@@ -16138,7 +16138,7 @@
     },
     {
         "titleId": "0005000010196500",
-        "name": "がんばれゴエモン外伝 \nきえた黄金キセル",
+        "name": "がんばれゴエモン外伝 きえた黄金キセル",
         "region": "JPN",
         "productCode": "WUP-N-FEKJ",
         "companyCode": "0001",
@@ -16226,7 +16226,7 @@
     },
     {
         "titleId": "0005000010197100",
-        "name": "ミスタードリラーエース\nふしぎなパクテリア",
+        "name": "ミスタードリラーエース ふしぎなパクテリア",
         "region": "JPN",
         "productCode": "WUP-N-PB4J",
         "companyCode": "0001",
@@ -16259,7 +16259,7 @@
     },
     {
         "titleId": "0005000010197700",
-        "name": "イトル・デューの伝説\n失われた島と謎の城",
+        "name": "イトル・デューの伝説 失われた島と謎の城",
         "region": "JPN",
         "productCode": "WUP-P-WDWJ",
         "companyCode": "00TF",
@@ -16314,7 +16314,7 @@
     },
     {
         "titleId": "0005000010198000",
-        "name": "メダロット弐CORE\nクワガタVer.",
+        "name": "メダロット弐CORE クワガタVer.",
         "region": "JPN",
         "productCode": "WUP-N-PB5J",
         "companyCode": "0001",
@@ -16347,7 +16347,7 @@
     },
     {
         "titleId": "0005000010198300",
-        "name": "メダロット弐CORE\nカブトVer.",
+        "name": "メダロット弐CORE カブトVer.",
         "region": "JPN",
         "productCode": "WUP-N-PB6J",
         "companyCode": "0001",
@@ -16578,7 +16578,7 @@
     },
     {
         "titleId": "0005000010199b00",
-        "name": "The Legend of Zelda:\nOcarina of Time",
+        "name": "The Legend of Zelda: Ocarina of Time",
         "region": "USA",
         "productCode": "WUP-N-NADE",
         "companyCode": "0001",
@@ -16589,7 +16589,7 @@
     },
     {
         "titleId": "0005000010199c00",
-        "name": "The Legend of Zelda: \nOcarina of Time",
+        "name": "The Legend of Zelda: Ocarina of Time",
         "region": "EUR",
         "productCode": "WUP-N-NADP",
         "companyCode": "0001",
@@ -16644,7 +16644,7 @@
     },
     {
         "titleId": "000500001019a600",
-        "name": "BADLAND\nGame of the year edition",
+        "name": "BADLAND Game of the year edition",
         "region": "USA",
         "productCode": "WUP-P-BADE",
         "companyCode": "0137",
@@ -16666,7 +16666,7 @@
     },
     {
         "titleId": "000500001019a800",
-        "name": "Citadale\nThe Legends Trilogy",
+        "name": "Citadale The Legends Trilogy",
         "region": "USA",
         "productCode": "WUP-P-BRKE",
         "companyCode": "00VA",
@@ -16754,7 +16754,7 @@
     },
     {
         "titleId": "000500001019bc00",
-        "name": "SUPER STREET FIGHTER Ⅱ\nTURBO REVIVAL",
+        "name": "SUPER STREET FIGHTER Ⅱ TURBO REVIVAL",
         "region": "EUR",
         "productCode": "WUP-N-PB9P",
         "companyCode": "0001",
@@ -16765,7 +16765,7 @@
     },
     {
         "titleId": "000500001019bd00",
-        "name": "SUPER STREET FIGHTER Ⅱ\nTURBO REVIVAL",
+        "name": "SUPER STREET FIGHTER Ⅱ TURBO REVIVAL",
         "region": "USA",
         "productCode": "WUP-N-PB9E",
         "companyCode": "0001",
@@ -16809,7 +16809,7 @@
     },
     {
         "titleId": "000500001019c800",
-        "name": "THE LEGEND OF ZELDA\nTwilight Princess HD",
+        "name": "THE LEGEND OF ZELDA Twilight Princess HD",
         "region": "JPN",
         "productCode": "WUP-P-AZAJ",
         "companyCode": "0001",
@@ -17084,7 +17084,7 @@
     },
     {
         "titleId": "000500001019e200",
-        "name": "PokéPark Wii\nPikachu's Adventure",
+        "name": "PokéPark Wii Pikachu's Adventure",
         "region": "JPN",
         "productCode": "WUP-N-VAJJ",
         "companyCode": "0001",
@@ -17095,7 +17095,7 @@
     },
     {
         "titleId": "000500001019e300",
-        "name": "PokéPark Wii:\nPikachu’s Adventure",
+        "name": "PokéPark Wii: Pikachu’s Adventure",
         "region": "USA",
         "productCode": "WUP-N-VAJE",
         "companyCode": "0001",
@@ -17106,7 +17106,7 @@
     },
     {
         "titleId": "000500001019e400",
-        "name": "PokéPark Wii\nPikachu's Adventure",
+        "name": "PokéPark Wii Pikachu's Adventure",
         "region": "EUR",
         "productCode": "WUP-N-VAJP",
         "companyCode": "0001",
@@ -17117,7 +17117,7 @@
     },
     {
         "titleId": "000500001019e500",
-        "name": "THE LEGEND OF ZELDA\nTwilight Princess HD",
+        "name": "THE LEGEND OF ZELDA Twilight Princess HD",
         "region": "USA",
         "productCode": "WUP-P-AZAE",
         "companyCode": "0001",
@@ -17128,7 +17128,7 @@
     },
     {
         "titleId": "000500001019e600",
-        "name": "THE LEGEND OF ZELDA\nTwilight Princess HD",
+        "name": "THE LEGEND OF ZELDA Twilight Princess HD",
         "region": "EUR",
         "productCode": "WUP-P-AZAP",
         "companyCode": "0001",
@@ -17205,7 +17205,7 @@
     },
     {
         "titleId": "000500001019f200",
-        "name": "MEGAMAN BATTLE NETWORK 5\nTEAM COLONEL",
+        "name": "MEGAMAN BATTLE NETWORK 5 TEAM COLONEL",
         "region": "EUR",
         "productCode": "WUP-N-PCBP",
         "companyCode": "0001",
@@ -17216,7 +17216,7 @@
     },
     {
         "titleId": "000500001019f300",
-        "name": "MEGA MAN BATTLE NETWORK 5\nTEAM COLONEL",
+        "name": "MEGA MAN BATTLE NETWORK 5 TEAM COLONEL",
         "region": "USA",
         "productCode": "WUP-N-PCBE",
         "companyCode": "0001",
@@ -17227,7 +17227,7 @@
     },
     {
         "titleId": "000500001019f500",
-        "name": "ロックマン エグゼ 5\nチーム オブ カーネル",
+        "name": "ロックマン エグゼ 5 チーム オブ カーネル",
         "region": "JPN",
         "productCode": "WUP-N-PCBJ",
         "companyCode": "0001",
@@ -17238,7 +17238,7 @@
     },
     {
         "titleId": "000500001019f600",
-        "name": "MEGAMAN BATTLE NETWORK 5\nTEAM PROTOMAN",
+        "name": "MEGAMAN BATTLE NETWORK 5 TEAM PROTOMAN",
         "region": "EUR",
         "productCode": "WUP-N-PCCP",
         "companyCode": "0001",
@@ -17249,7 +17249,7 @@
     },
     {
         "titleId": "000500001019f700",
-        "name": "MEGA MAN BATTLE NETWORK 5\nTEAM PROTOMAN",
+        "name": "MEGA MAN BATTLE NETWORK 5 TEAM PROTOMAN",
         "region": "USA",
         "productCode": "WUP-N-PCCE",
         "companyCode": "0001",
@@ -17260,7 +17260,7 @@
     },
     {
         "titleId": "000500001019f800",
-        "name": "ロックマン エグゼ 5\nチーム オブ ブルース",
+        "name": "ロックマン エグゼ 5 チーム オブ ブルース",
         "region": "JPN",
         "productCode": "WUP-N-PCCJ",
         "companyCode": "0001",
@@ -17271,7 +17271,7 @@
     },
     {
         "titleId": "000500001019f900",
-        "name": "スーパーチャイニーズ2\nドラゴンキッド",
+        "name": "スーパーチャイニーズ2 ドラゴンキッド",
         "region": "JPN",
         "productCode": "WUP-N-FEMJ",
         "companyCode": "0001",
@@ -17601,7 +17601,7 @@
     },
     {
         "titleId": "00050000101a2300",
-        "name": "Mario & Luigi:\nPartners in Time",
+        "name": "Mario & Luigi: Partners in Time",
         "region": "EUR",
         "productCode": "WUP-N-DAHP",
         "companyCode": "0001",
@@ -17678,7 +17678,7 @@
     },
     {
         "titleId": "00050000101a2d00",
-        "name": "LEGO® MARVEL\nSuper Heroes",
+        "name": "LEGO® MARVEL Super Heroes",
         "region": "JPN",
         "productCode": "WUP-P-ALMJ",
         "companyCode": "00WR",
@@ -17711,7 +17711,7 @@
     },
     {
         "titleId": "00050000101a3000",
-        "name": "Advance Wars 2:\nBlack Hole Rising",
+        "name": "Advance Wars 2: Black Hole Rising",
         "region": "EUR",
         "productCode": "WUP-N-PCDP",
         "companyCode": "0001",
@@ -17722,7 +17722,7 @@
     },
     {
         "titleId": "00050000101a3100",
-        "name": "Advance Wars 2:\nBlack Hole Rising",
+        "name": "Advance Wars 2: Black Hole Rising",
         "region": "USA",
         "productCode": "WUP-N-PCDE",
         "companyCode": "0001",
@@ -17953,7 +17953,7 @@
     },
     {
         "titleId": "00050000101a4e00",
-        "name": "Cube Life:\nPixel Action Heroes",
+        "name": "Cube Life: Pixel Action Heroes",
         "region": "EUR",
         "productCode": "WUP-P-BZPP",
         "companyCode": "00YR",
@@ -17964,7 +17964,7 @@
     },
     {
         "titleId": "00050000101a4f00",
-        "name": "Cube Life:\nPixel Action Heroes",
+        "name": "Cube Life: Pixel Action Heroes",
         "region": "USA",
         "productCode": "WUP-P-BZPE",
         "companyCode": "00YR",
@@ -17975,7 +17975,7 @@
     },
     {
         "titleId": "00050000101a5200",
-        "name": "ドンキーコング\nジャングルクライマー",
+        "name": "ドンキーコング ジャングルクライマー",
         "region": "JPN",
         "productCode": "WUP-N-DAJJ",
         "companyCode": "0001",
@@ -18096,7 +18096,7 @@
     },
     {
         "titleId": "00050000101a5d00",
-        "name": "BADLAND\nGame of the year edition",
+        "name": "BADLAND Game of the year edition",
         "region": "EUR",
         "productCode": "WUP-P-BADP",
         "companyCode": "0137",
@@ -18140,7 +18140,7 @@
     },
     {
         "titleId": "00050000101a6100",
-        "name": "Shantae: Risky's Revenge\nDirector's Cut",
+        "name": "Shantae: Risky's Revenge Director's Cut",
         "region": "USA",
         "productCode": "WUP-P-ARRE",
         "companyCode": "00WY",
@@ -18162,7 +18162,7 @@
     },
     {
         "titleId": "00050000101a6300",
-        "name": "Cube Life:\nIsland Survival",
+        "name": "Cube Life: Island Survival",
         "region": "EUR",
         "productCode": "WUP-P-ACUP",
         "companyCode": "00YR",
@@ -18173,7 +18173,7 @@
     },
     {
         "titleId": "00050000101a6400",
-        "name": "Cube Life:\nIsland Survival",
+        "name": "Cube Life: Island Survival",
         "region": "USA",
         "productCode": "WUP-P-ACUE",
         "companyCode": "00YR",
@@ -18184,7 +18184,7 @@
     },
     {
         "titleId": "00050000101a6500",
-        "name": "Kung Fu Panda\nShowdown of Legendary Legends",
+        "name": "Kung Fu Panda Showdown of Legendary Legends",
         "region": "USA",
         "productCode": "WUP-P-BKFE",
         "companyCode": "00VZ",
@@ -18316,7 +18316,7 @@
     },
     {
         "titleId": "00050000101a7a00",
-        "name": "FRONT LINE\nフロントライン",
+        "name": "FRONT LINE フロントライン",
         "region": "JPN",
         "productCode": "WUP-N-FEYJ",
         "companyCode": "0001",
@@ -18349,7 +18349,7 @@
     },
     {
         "titleId": "00050000101a7d00",
-        "name": "ダライアスツイン\nDARIUS TWIN",
+        "name": "ダライアスツイン DARIUS TWIN",
         "region": "JPN",
         "productCode": "WUP-N-JDJJ",
         "companyCode": "0001",
@@ -18415,7 +18415,7 @@
     },
     {
         "titleId": "00050000101a8300",
-        "name": "Journey of a\nSpecial Average Balloon",
+        "name": "Journey of a Special Average Balloon",
         "region": "USA",
         "productCode": "WUP-P-AJBE",
         "companyCode": "010E",
@@ -18514,7 +18514,7 @@
     },
     {
         "titleId": "00050000101a9600",
-        "name": "Shantae: Risky's Revenge\nDirector's Cut",
+        "name": "Shantae: Risky's Revenge Director's Cut",
         "region": "EUR",
         "productCode": "WUP-P-ARRP",
         "companyCode": "00WY",
@@ -18547,7 +18547,7 @@
     },
     {
         "titleId": "00050000101a9a00",
-        "name": "シャイニング・フォース\n黒き竜の復活",
+        "name": "シャイニング・フォース 黒き竜の復活",
         "region": "JPN",
         "productCode": "WUP-N-PCMJ",
         "companyCode": "0001",
@@ -18635,7 +18635,7 @@
     },
     {
         "titleId": "00050000101aa500",
-        "name": "Kung Fu Panda\nShowdown of Legendary Legends",
+        "name": "Kung Fu Panda Showdown of Legendary Legends",
         "region": "EUR",
         "productCode": "WUP-P-BKFP",
         "companyCode": "00VZ",
@@ -18668,7 +18668,7 @@
     },
     {
         "titleId": "00050000101ab100",
-        "name": "Outer World\n20th Anniversary Edition",
+        "name": "Outer World 20th Anniversary Edition",
         "region": "JPN",
         "productCode": "WUP-P-WEUJ",
         "companyCode": "00R0",
@@ -18811,7 +18811,7 @@
     },
     {
         "titleId": "00050000101ac700",
-        "name": "Adventure Time\nFinn and Jake Investigations",
+        "name": "Adventure Time Finn and Jake Investigations",
         "region": "USA",
         "productCode": "WUP-P-BFNE",
         "companyCode": "00VZ",
@@ -18921,7 +18921,7 @@
     },
     {
         "titleId": "00050000101ad300",
-        "name": "Medabots AX: Metabee ",
+        "name": "Medabots AX: Metabee",
         "region": "USA",
         "productCode": "WUP-N-PCQE",
         "companyCode": "0001",
@@ -19020,7 +19020,7 @@
     },
     {
         "titleId": "00050000101ae400",
-        "name": "CONTRA ADVANCE\nTHE ALIEN WARS EX",
+        "name": "CONTRA ADVANCE THE ALIEN WARS EX",
         "region": "EUR",
         "productCode": "WUP-N-PCSP",
         "companyCode": "0001",
@@ -19031,7 +19031,7 @@
     },
     {
         "titleId": "00050000101ae500",
-        "name": "CONTRA ADVANCE\nTHE ALIEN WARS EX",
+        "name": "CONTRA ADVANCE THE ALIEN WARS EX",
         "region": "USA",
         "productCode": "WUP-N-PCSE",
         "companyCode": "0001",
@@ -19075,7 +19075,7 @@
     },
     {
         "titleId": "00050000101ae900",
-        "name": "コナミ ワイワイレーシング \nアドバンス",
+        "name": "コナミ ワイワイレーシング アドバンス",
         "region": "JPN",
         "productCode": "WUP-N-PCTJ",
         "companyCode": "0001",
@@ -19130,7 +19130,7 @@
     },
     {
         "titleId": "00050000101afa00",
-        "name": "Tilelicious\nDelicious Tiles",
+        "name": "Tilelicious Delicious Tiles",
         "region": "USA",
         "productCode": "WUP-P-BTSE",
         "companyCode": "0157",
@@ -19163,7 +19163,7 @@
     },
     {
         "titleId": "00050000101afe00",
-        "name": "Adventure Time\nFinn and Jake Investigations",
+        "name": "Adventure Time Finn and Jake Investigations",
         "region": "EUR",
         "productCode": "WUP-P-BFNP",
         "companyCode": "00VZ",
@@ -19196,7 +19196,7 @@
     },
     {
         "titleId": "00050000101b0100",
-        "name": "Funk of Titans\nEnjoyUp Games",
+        "name": "Funk of Titans EnjoyUp Games",
         "region": "USA",
         "productCode": "WUP-P-BFSE",
         "companyCode": "00UP",
@@ -19284,7 +19284,7 @@
     },
     {
         "titleId": "00050000101b0a00",
-        "name": "Sin & Punishment:\nStar Successor",
+        "name": "Sin & Punishment: Star Successor",
         "region": "USA",
         "productCode": "WUP-N-VALE",
         "companyCode": "0001",
@@ -19295,7 +19295,7 @@
     },
     {
         "titleId": "00050000101b0b00",
-        "name": "Sin & Punishment:\nSuccessor of the Skies",
+        "name": "Sin & Punishment: Successor of the Skies",
         "region": "EUR",
         "productCode": "WUP-N-VALP",
         "companyCode": "0001",
@@ -19306,7 +19306,7 @@
     },
     {
         "titleId": "00050000101b0f00",
-        "name": "The Legend of Zelda:\nSkyward Sword",
+        "name": "The Legend of Zelda: Skyward Sword",
         "region": "JPN",
         "productCode": "WUP-N-VANJ",
         "companyCode": "0001",
@@ -19317,7 +19317,7 @@
     },
     {
         "titleId": "00050000101b1000",
-        "name": "The Legend of Zelda:\nSkyward Sword",
+        "name": "The Legend of Zelda: Skyward Sword",
         "region": "USA",
         "productCode": "WUP-N-VANE",
         "companyCode": "0001",
@@ -19328,7 +19328,7 @@
     },
     {
         "titleId": "00050000101b1100",
-        "name": "The Legend of Zelda:\nSkyward Sword",
+        "name": "The Legend of Zelda: Skyward Sword",
         "region": "EUR",
         "productCode": "WUP-N-VANP",
         "companyCode": "0001",
@@ -19493,7 +19493,7 @@
     },
     {
         "titleId": "00050000101b2700",
-        "name": "LEGO® Batman™ 3\nBeyond Gotham",
+        "name": "LEGO® Batman™ 3 Beyond Gotham",
         "region": "JPN",
         "productCode": "WUP-P-BTMJ",
         "companyCode": "00WR",
@@ -19515,7 +19515,7 @@
     },
     {
         "titleId": "00050000101b2900",
-        "name": "Dragon Fantasy\nThe Black Tome of Ice",
+        "name": "Dragon Fantasy The Black Tome of Ice",
         "region": "USA",
         "productCode": "WUP-P-AFYE",
         "companyCode": "00XY",
@@ -19526,7 +19526,7 @@
     },
     {
         "titleId": "00050000101b2a00",
-        "name": "Dragon Fantasy\nThe Volumes of Westeria",
+        "name": "Dragon Fantasy The Volumes of Westeria",
         "region": "USA",
         "productCode": "WUP-P-ADWE",
         "companyCode": "00XY",
@@ -19559,7 +19559,7 @@
     },
     {
         "titleId": "00050000101b2f00",
-        "name": "任天堂ゲームセミナー2014\nドキドキ手紙リレー",
+        "name": "任天堂ゲームセミナー2014 ドキドキ手紙リレー",
         "region": "JPN",
         "productCode": "WUP-P-BDKJ",
         "companyCode": "0001",
@@ -19570,7 +19570,7 @@
     },
     {
         "titleId": "00050000101b3000",
-        "name": "任天堂ゲームセミナー2014\nミチコジャンプ！",
+        "name": "任天堂ゲームセミナー2014 ミチコジャンプ！",
         "region": "JPN",
         "productCode": "WUP-P-BMJJ",
         "companyCode": "0001",
@@ -19581,7 +19581,7 @@
     },
     {
         "titleId": "00050000101b3100",
-        "name": "任天堂ゲームセミナー2014\nジカンサタンサ",
+        "name": "任天堂ゲームセミナー2014 ジカンサタンサ",
         "region": "JPN",
         "productCode": "WUP-P-BYSJ",
         "companyCode": "0001",
@@ -19603,7 +19603,7 @@
     },
     {
         "titleId": "00050000101b3600",
-        "name": "任天堂ゲームセミナー2014\nアルクラッシュ",
+        "name": "任天堂ゲームセミナー2014 アルクラッシュ",
         "region": "JPN",
         "productCode": "WUP-P-ALTJ",
         "companyCode": "0001",
@@ -19614,7 +19614,7 @@
     },
     {
         "titleId": "00050000101b3700",
-        "name": "ファイアーエムブレム\n新・暗黒竜と光の剣",
+        "name": "ファイアーエムブレム 新・暗黒竜と光の剣",
         "region": "JPN",
         "productCode": "WUP-N-DANJ",
         "companyCode": "0001",
@@ -19636,7 +19636,7 @@
     },
     {
         "titleId": "00050000101b3900",
-        "name": "Fire Emblem:\nShadow Dragon",
+        "name": "Fire Emblem: Shadow Dragon",
         "region": "EUR",
         "productCode": "WUP-N-DANP",
         "companyCode": "0001",
@@ -19680,7 +19680,7 @@
     },
     {
         "titleId": "00050000101b3d00",
-        "name": "DISNEY INFINITY 3.0:\nPLAY WITHOUT LIMITS",
+        "name": "DISNEY INFINITY 3.0: PLAY WITHOUT LIMITS",
         "region": "EUR",
         "productCode": "WUP-P-BD3P",
         "companyCode": "004Q",
@@ -19691,7 +19691,7 @@
     },
     {
         "titleId": "00050000101b3e00",
-        "name": "DISNEY INFINITY 3.0:\nPLAY WITHOUT LIMITS",
+        "name": "DISNEY INFINITY 3.0: PLAY WITHOUT LIMITS",
         "region": "EUR",
         "productCode": "WUP-P-BD3Z",
         "companyCode": "004Q",
@@ -19702,7 +19702,7 @@
     },
     {
         "titleId": "00050000101b4100",
-        "name": "amiibo tap\nNintendo's Greatest Bits",
+        "name": "amiibo tap Nintendo's Greatest Bits",
         "region": "JPN",
         "productCode": "WUP-P-AAVJ",
         "companyCode": "0001",
@@ -19713,7 +19713,7 @@
     },
     {
         "titleId": "00050000101b4200",
-        "name": "amiibo tap\nNintendo's Greatest Bits",
+        "name": "amiibo tap Nintendo's Greatest Bits",
         "region": "USA",
         "productCode": "WUP-P-AAVE",
         "companyCode": "0001",
@@ -19724,7 +19724,7 @@
     },
     {
         "titleId": "00050000101b4300",
-        "name": "amiibo Touch & Play\nNintendo Classics Highlights",
+        "name": "amiibo Touch & Play Nintendo Classics Highlights",
         "region": "EUR",
         "productCode": "WUP-P-AAVP",
         "companyCode": "0001",
@@ -19801,7 +19801,7 @@
     },
     {
         "titleId": "00050000101b4e00",
-        "name": "Funk of Titans\nEnjoyUp Games",
+        "name": "Funk of Titans EnjoyUp Games",
         "region": "EUR",
         "productCode": "WUP-P-BFSP",
         "companyCode": "00UP",
@@ -19834,7 +19834,7 @@
     },
     {
         "titleId": "00050000101b5100",
-        "name": "Kirby and the\nRainbow Paintbrush",
+        "name": "Kirby and the Rainbow Paintbrush",
         "region": "EUR",
         "productCode": "WUP-P-AXYP",
         "companyCode": "0001",
@@ -20131,7 +20131,7 @@
     },
     {
         "titleId": "00050000101b8c00",
-        "name": "The Legend of Zelda:\nSpirit Tracks",
+        "name": "The Legend of Zelda: Spirit Tracks",
         "region": "USA",
         "productCode": "WUP-N-DARE",
         "companyCode": "0001",
@@ -20142,7 +20142,7 @@
     },
     {
         "titleId": "00050000101b8d00",
-        "name": "The Legend of Zelda:\nSpirit Tracks",
+        "name": "The Legend of Zelda: Spirit Tracks",
         "region": "EUR",
         "productCode": "WUP-N-DARP",
         "companyCode": "0001",
@@ -20296,7 +20296,7 @@
     },
     {
         "titleId": "00050000101ba100",
-        "name": "Best way to motivate kids\nManabiGet!",
+        "name": "Best way to motivate kids ManabiGet!",
         "region": "JPN",
         "productCode": "WUP-N-AGAJ",
         "companyCode": "015R",
@@ -20362,7 +20362,7 @@
     },
     {
         "titleId": "00050000101baf00",
-        "name": "The Legend of Zelda: \nMajora's Mask",
+        "name": "The Legend of Zelda: Majora's Mask",
         "region": "USA",
         "productCode": "WUP-N-NANE",
         "companyCode": "0001",
@@ -20373,7 +20373,7 @@
     },
     {
         "titleId": "00050000101bb000",
-        "name": "The Legend of Zelda: \nMajora's Mask",
+        "name": "The Legend of Zelda: Majora's Mask",
         "region": "EUR",
         "productCode": "WUP-N-NANP",
         "companyCode": "0001",
@@ -20406,7 +20406,7 @@
     },
     {
         "titleId": "00050000101bb300",
-        "name": "ZaciSa: Defense of the\nCrayon Dimension!",
+        "name": "ZaciSa: Defense of the Crayon Dimension!",
         "region": "EUR",
         "productCode": "WUP-P-WLSP",
         "companyCode": "008V",
@@ -20736,7 +20736,7 @@
     },
     {
         "titleId": "00050000101bd900",
-        "name": "ZACK & WIKI\nQuest for Barbaros' Treasure",
+        "name": "ZACK & WIKI Quest for Barbaros' Treasure",
         "region": "JPN",
         "productCode": "WUP-N-VBEJ",
         "companyCode": "0001",
@@ -20747,7 +20747,7 @@
     },
     {
         "titleId": "00050000101bda00",
-        "name": "ZACK & WIKI: QUEST\nFOR BARBAROS' TREASURE",
+        "name": "ZACK & WIKI: QUEST FOR BARBAROS' TREASURE",
         "region": "USA",
         "productCode": "WUP-N-VBEE",
         "companyCode": "0001",
@@ -20758,7 +20758,7 @@
     },
     {
         "titleId": "00050000101bdb00",
-        "name": "ZACK & WIKI\nQuest for Barbaros' Treasure",
+        "name": "ZACK & WIKI Quest for Barbaros' Treasure",
         "region": "EUR",
         "productCode": "WUP-N-VBEP",
         "companyCode": "0001",
@@ -20813,7 +20813,7 @@
     },
     {
         "titleId": "00050000101be000",
-        "name": "Wario Land: \nThe Shake Dimension",
+        "name": "Wario Land: The Shake Dimension",
         "region": "EUR",
         "productCode": "WUP-N-VBGP",
         "companyCode": "0001",
@@ -21000,7 +21000,7 @@
     },
     {
         "titleId": "00050000101c0100",
-        "name": "MEGA MAN BATTLE NETWORK 6\nCYBEAST FALZAR",
+        "name": "MEGA MAN BATTLE NETWORK 6 CYBEAST FALZAR",
         "region": "EUR",
         "productCode": "WUP-N-PC3P",
         "companyCode": "0001",
@@ -21011,7 +21011,7 @@
     },
     {
         "titleId": "00050000101c0200",
-        "name": "MEGA MAN BATTLE NETWORK 6\nCYBEAST FALZAR",
+        "name": "MEGA MAN BATTLE NETWORK 6 CYBEAST FALZAR",
         "region": "USA",
         "productCode": "WUP-N-PC3E",
         "companyCode": "0001",
@@ -21022,7 +21022,7 @@
     },
     {
         "titleId": "00050000101c0300",
-        "name": "ロックマン エグゼ 6\n電脳獣ファルザー",
+        "name": "ロックマン エグゼ 6 電脳獣ファルザー",
         "region": "JPN",
         "productCode": "WUP-N-PC3J",
         "companyCode": "0001",
@@ -21033,7 +21033,7 @@
     },
     {
         "titleId": "00050000101c0400",
-        "name": "MEGA MAN BATTLE NETWORK 6\nCYBEAST GREGAR",
+        "name": "MEGA MAN BATTLE NETWORK 6 CYBEAST GREGAR",
         "region": "EUR",
         "productCode": "WUP-N-PC4P",
         "companyCode": "0001",
@@ -21044,7 +21044,7 @@
     },
     {
         "titleId": "00050000101c0500",
-        "name": "MEGA MAN BATTLE NETWORK 6\nCYBEAST GREGAR",
+        "name": "MEGA MAN BATTLE NETWORK 6 CYBEAST GREGAR",
         "region": "USA",
         "productCode": "WUP-N-PC4E",
         "companyCode": "0001",
@@ -21055,7 +21055,7 @@
     },
     {
         "titleId": "00050000101c0600",
-        "name": "ロックマン エグゼ 6\n電脳獣グレイガ",
+        "name": "ロックマン エグゼ 6 電脳獣グレイガ",
         "region": "JPN",
         "productCode": "WUP-N-PC4J",
         "companyCode": "0001",
@@ -21143,7 +21143,7 @@
     },
     {
         "titleId": "00050000101c2100",
-        "name": "LOST REAVERS\nBETA TEST VERSION",
+        "name": "LOST REAVERS BETA TEST VERSION",
         "region": "JPN",
         "productCode": "WUP-P-SBPJ",
         "companyCode": "00AF",
@@ -21154,7 +21154,7 @@
     },
     {
         "titleId": "00050000101c2200",
-        "name": "Ninja Gaiden II:\nThe Dark Sword of Chaos",
+        "name": "Ninja Gaiden II: The Dark Sword of Chaos",
         "region": "USA",
         "productCode": "WUP-N-FE5E",
         "companyCode": "0001",
@@ -21165,7 +21165,7 @@
     },
     {
         "titleId": "00050000101c2300",
-        "name": "Ninja Gaiden II:\nThe Dark Sword of Chaos",
+        "name": "Ninja Gaiden II: The Dark Sword of Chaos",
         "region": "EUR",
         "productCode": "WUP-N-FE5P",
         "companyCode": "0001",
@@ -21176,7 +21176,7 @@
     },
     {
         "titleId": "00050000101c2400",
-        "name": "Ninja Gaiden III:\nThe Ancient Ship of Doom",
+        "name": "Ninja Gaiden III: The Ancient Ship of Doom",
         "region": "USA",
         "productCode": "WUP-N-FE6E",
         "companyCode": "0001",
@@ -21187,7 +21187,7 @@
     },
     {
         "titleId": "00050000101c2500",
-        "name": "Ninja Gaiden III:\nThe Ancient Ship of Doom",
+        "name": "Ninja Gaiden III: The Ancient Ship of Doom",
         "region": "EUR",
         "productCode": "WUP-N-FE6P",
         "companyCode": "0001",
@@ -21220,7 +21220,7 @@
     },
     {
         "titleId": "00050000101c2800",
-        "name": "Double Dragon III:\nThe Sacred Stones",
+        "name": "Double Dragon III: The Sacred Stones",
         "region": "USA",
         "productCode": "WUP-N-FE8E",
         "companyCode": "0001",
@@ -21231,7 +21231,7 @@
     },
     {
         "titleId": "00050000101c2900",
-        "name": "Double Dragon III:\nThe Sacred Stones",
+        "name": "Double Dragon III: The Sacred Stones",
         "region": "EUR",
         "productCode": "WUP-N-FE8P",
         "companyCode": "0001",
@@ -21242,7 +21242,7 @@
     },
     {
         "titleId": "00050000101c2a00",
-        "name": "Pac-Man 2:\nThe New Adventures",
+        "name": "Pac-Man 2: The New Adventures",
         "region": "USA",
         "productCode": "WUP-N-JDKE",
         "companyCode": "0001",
@@ -21253,7 +21253,7 @@
     },
     {
         "titleId": "00050000101c2b00",
-        "name": "Pac-Man 2:\nThe New Adventures",
+        "name": "Pac-Man 2: The New Adventures",
         "region": "EUR",
         "productCode": "WUP-N-JDKP",
         "companyCode": "0001",
@@ -21264,7 +21264,7 @@
     },
     {
         "titleId": "00050000101c2e00",
-        "name": "メタルスレイダーグローリー\nディレクターズカット",
+        "name": "メタルスレイダーグローリー ディレクターズカット",
         "region": "JPN",
         "productCode": "WUP-N-JDLJ",
         "companyCode": "0001",
@@ -21341,7 +21341,7 @@
     },
     {
         "titleId": "00050000101c3700",
-        "name": "The Legend of Zelda:\nPhantom Hourglass",
+        "name": "The Legend of Zelda: Phantom Hourglass",
         "region": "USA",
         "productCode": "WUP-N-DATE",
         "companyCode": "0001",
@@ -21352,7 +21352,7 @@
     },
     {
         "titleId": "00050000101c3800",
-        "name": "The Legend of Zelda:\nPhantom Hourglass",
+        "name": "The Legend of Zelda: Phantom Hourglass",
         "region": "EUR",
         "productCode": "WUP-N-DATP",
         "companyCode": "0001",
@@ -21374,7 +21374,7 @@
     },
     {
         "titleId": "00050000101c3a00",
-        "name": "ロックマン エグゼ 4.5 \nリアルオペレーション",
+        "name": "ロックマン エグゼ 4.5 リアルオペレーション",
         "region": "JPN",
         "productCode": "WUP-N-PC5J",
         "companyCode": "0001",
@@ -21462,7 +21462,7 @@
     },
     {
         "titleId": "00050000101c4200",
-        "name": "The Peanuts® Movie:\nSnoopy's Grand Adventure",
+        "name": "The Peanuts® Movie: Snoopy's Grand Adventure",
         "region": "USA",
         "productCode": "WUP-P-BPEE",
         "companyCode": "0052",
@@ -21583,7 +21583,7 @@
     },
     {
         "titleId": "00050000101c5600",
-        "name": "LOST REAVERS\nBETA TEST VERSION",
+        "name": "LOST REAVERS BETA TEST VERSION",
         "region": "EUR",
         "productCode": "WUP-P-SBPP",
         "companyCode": "00AF",
@@ -21594,7 +21594,7 @@
     },
     {
         "titleId": "00050000101c5700",
-        "name": "Abyss\nCosen",
+        "name": "Abyss Cosen",
         "region": "JPN",
         "productCode": "WUP-P-WAGJ",
         "companyCode": "00W4",
@@ -21704,7 +21704,7 @@
     },
     {
         "titleId": "00050000101c6100",
-        "name": "Mini Mario & Friends\namiibo Challenge",
+        "name": "Mini Mario & Friends amiibo Challenge",
         "region": "JPN",
         "productCode": "WUP-P-AP5J",
         "companyCode": "0001",
@@ -21715,7 +21715,7 @@
     },
     {
         "titleId": "00050000101c6200",
-        "name": "Mini Mario & Friends\namiibo Challenge",
+        "name": "Mini Mario & Friends amiibo Challenge",
         "region": "USA",
         "productCode": "WUP-P-AP5E",
         "companyCode": "0001",
@@ -21726,7 +21726,7 @@
     },
     {
         "titleId": "00050000101c6300",
-        "name": "Mini Mario & Friends\namiibo Challenge",
+        "name": "Mini Mario & Friends amiibo Challenge",
         "region": "EUR",
         "productCode": "WUP-P-AP5P",
         "companyCode": "0001",
@@ -21836,7 +21836,7 @@
     },
     {
         "titleId": "00050000101c7400",
-        "name": "Momonga\nPinball Adventures",
+        "name": "Momonga Pinball Adventures",
         "region": "EUR",
         "productCode": "WUP-P-AMPP",
         "companyCode": "0164",
@@ -21858,7 +21858,7 @@
     },
     {
         "titleId": "00050000101c7b00",
-        "name": "Chronicles of Teddy\nHarmony of Exidus",
+        "name": "Chronicles of Teddy Harmony of Exidus",
         "region": "USA",
         "productCode": "WUP-P-AF2E",
         "companyCode": "00XS",
@@ -21902,7 +21902,7 @@
     },
     {
         "titleId": "00050000101c8100",
-        "name": "WICKED MONSTERS BLAST! HD \nPLUS",
+        "name": "WICKED MONSTERS BLAST! HD PLUS",
         "region": "USA",
         "productCode": "WUP-P-AWME",
         "companyCode": "00YT",
@@ -21913,7 +21913,7 @@
     },
     {
         "titleId": "00050000101c8200",
-        "name": "Momonga\nPinball Adventures",
+        "name": "Momonga Pinball Adventures",
         "region": "USA",
         "productCode": "WUP-P-AMPE",
         "companyCode": "0164",
@@ -21924,7 +21924,7 @@
     },
     {
         "titleId": "00050000101c8300",
-        "name": "マリオvs.ドンキーコング2\nミニミニ大行進！",
+        "name": "マリオvs.ドンキーコング2 ミニミニ大行進！",
         "region": "JPN",
         "productCode": "WUP-N-DAUJ",
         "companyCode": "0001",
@@ -21935,7 +21935,7 @@
     },
     {
         "titleId": "00050000101c8400",
-        "name": "Mario vs. Donkey Kong 2:\nMarch of the Minis",
+        "name": "Mario vs. Donkey Kong 2: March of the Minis",
         "region": "USA",
         "productCode": "WUP-N-DAUE",
         "companyCode": "0001",
@@ -21946,7 +21946,7 @@
     },
     {
         "titleId": "00050000101c8500",
-        "name": "Mario vs. Donkey Kong 2:\nMarch of the Minis",
+        "name": "Mario vs. Donkey Kong 2: March of the Minis",
         "region": "EUR",
         "productCode": "WUP-N-DAUP",
         "companyCode": "0001",
@@ -22001,7 +22001,7 @@
     },
     {
         "titleId": "00050000101c8b00",
-        "name": "WICKED MONSTERS BLAST! HD\nPLUS",
+        "name": "WICKED MONSTERS BLAST! HD PLUS",
         "region": "EUR",
         "productCode": "WUP-P-AWMP",
         "companyCode": "00YT",
@@ -22012,7 +22012,7 @@
     },
     {
         "titleId": "00050000101c8d00",
-        "name": "Monster High\nNew Ghoul in School",
+        "name": "Monster High New Ghoul in School",
         "region": "USA",
         "productCode": "WUP-P-BMSE",
         "companyCode": "00VZ",
@@ -22034,7 +22034,7 @@
     },
     {
         "titleId": "00050000101c9300",
-        "name": "The Legend of Zelda\nBreath of the Wild",
+        "name": "The Legend of Zelda Breath of the Wild",
         "region": "JPN",
         "productCode": "WUP-P-ALZJ",
         "companyCode": "0001",
@@ -22045,7 +22045,7 @@
     },
     {
         "titleId": "00050000101c9400",
-        "name": "The Legend of Zelda\nBreath of the Wild",
+        "name": "The Legend of Zelda Breath of the Wild",
         "region": "USA",
         "productCode": "WUP-P-ALZE",
         "companyCode": "0001",
@@ -22056,7 +22056,7 @@
     },
     {
         "titleId": "00050000101c9500",
-        "name": "The Legend of Zelda\nBreath of the Wild",
+        "name": "The Legend of Zelda Breath of the Wild",
         "region": "EUR",
         "productCode": "WUP-P-ALZP",
         "companyCode": "0001",
@@ -22199,7 +22199,7 @@
     },
     {
         "titleId": "00050000101ca900",
-        "name": "Monster High\nNew Ghoul in School",
+        "name": "Monster High New Ghoul in School",
         "region": "EUR",
         "productCode": "WUP-P-BMSP",
         "companyCode": "00VZ",
@@ -22210,7 +22210,7 @@
     },
     {
         "titleId": "00050000101caa00",
-        "name": "マッドアタック！\nマックスVS泥々星人",
+        "name": "マッドアタック！ マックスVS泥々星人",
         "region": "JPN",
         "productCode": "WUP-P-WMMJ",
         "companyCode": "00TF",
@@ -22309,7 +22309,7 @@
     },
     {
         "titleId": "00050000101cc100",
-        "name": "スクリューブレイカー\n轟振どりるれろ",
+        "name": "スクリューブレイカー 轟振どりるれろ",
         "region": "JPN",
         "productCode": "WUP-N-PDEJ",
         "companyCode": "0001",
@@ -22353,7 +22353,7 @@
     },
     {
         "titleId": "00050000101cc500",
-        "name": "ポケモン不思議のダンジョン\n青の救助隊",
+        "name": "ポケモン不思議のダンジョン 青の救助隊",
         "region": "JPN",
         "productCode": "WUP-N-DAXJ",
         "companyCode": "0001",
@@ -22364,7 +22364,7 @@
     },
     {
         "titleId": "00050000101cc700",
-        "name": "Pokémon Mystery Dungeon:\nBlue Rescue Team",
+        "name": "Pokémon Mystery Dungeon: Blue Rescue Team",
         "region": "USA",
         "productCode": "WUP-N-DAXE",
         "companyCode": "0001",
@@ -22375,7 +22375,7 @@
     },
     {
         "titleId": "00050000101cc800",
-        "name": "Pokémon Mystery Dungeon:\nBlue Rescue Team",
+        "name": "Pokémon Mystery Dungeon: Blue Rescue Team",
         "region": "EUR",
         "productCode": "WUP-N-DAXP",
         "companyCode": "0001",
@@ -22397,7 +22397,7 @@
     },
     {
         "titleId": "00050000101ccd00",
-        "name": "The Rivers of Alice\nExtended version",
+        "name": "The Rivers of Alice Extended version",
         "region": "USA",
         "productCode": "WUP-P-BRAE",
         "companyCode": "00DW",
@@ -22595,7 +22595,7 @@
     },
     {
         "titleId": "00050000101cfc00",
-        "name": "KEYTARI\n8-bit Music Maker",
+        "name": "KEYTARI 8-bit Music Maker",
         "region": "USA",
         "productCode": "WUP-P-AKEE",
         "companyCode": "0142",
@@ -22650,7 +22650,7 @@
     },
     {
         "titleId": "00050000101d0600",
-        "name": "Fatal Frame: \nMaiden of Black Water",
+        "name": "Fatal Frame: Maiden of Black Water",
         "region": "USA",
         "productCode": "WUP-P-AL5E",
         "companyCode": "0001",
@@ -22694,7 +22694,7 @@
     },
     {
         "titleId": "00050000101d0a00",
-        "name": "Pokémon Mystery Dungeon:\nRed Rescue Team",
+        "name": "Pokémon Mystery Dungeon: Red Rescue Team",
         "region": "EUR",
         "productCode": "WUP-N-PDGP",
         "companyCode": "0001",
@@ -22705,7 +22705,7 @@
     },
     {
         "titleId": "00050000101d0b00",
-        "name": "ポケモン不思議のダンジョン\n赤の救助隊",
+        "name": "ポケモン不思議のダンジョン 赤の救助隊",
         "region": "JPN",
         "productCode": "WUP-N-PDGJ",
         "companyCode": "0001",
@@ -22716,7 +22716,7 @@
     },
     {
         "titleId": "00050000101d0c00",
-        "name": "Pokémon Mystery Dungeon:\nRed Rescue Team",
+        "name": "Pokémon Mystery Dungeon: Red Rescue Team",
         "region": "USA",
         "productCode": "WUP-N-PDGE",
         "companyCode": "0001",
@@ -22749,7 +22749,7 @@
     },
     {
         "titleId": "00050000101d1000",
-        "name": "Barbie and Her Sisters\nPuppy Rescue",
+        "name": "Barbie and Her Sisters Puppy Rescue",
         "region": "USA",
         "productCode": "WUP-P-BRQE",
         "companyCode": "00VZ",
@@ -22837,7 +22837,7 @@
     },
     {
         "titleId": "00050000101d1d00",
-        "name": "Barbie and Her Sisters\nPuppy Rescue",
+        "name": "Barbie and Her Sisters Puppy Rescue",
         "region": "EUR",
         "productCode": "WUP-P-BRQP",
         "companyCode": "00VZ",
@@ -22925,7 +22925,7 @@
     },
     {
         "titleId": "00050000101d2600",
-        "name": "ファイナルファンタジーI・II\nアドバンス",
+        "name": "ファイナルファンタジーI・II アドバンス",
         "region": "JPN",
         "productCode": "WUP-N-PDLJ",
         "companyCode": "0001",
@@ -22936,7 +22936,7 @@
     },
     {
         "titleId": "00050000101d2700",
-        "name": "沈黙の遺跡　～エストポリス外伝～",
+        "name": "沈黙の遺跡 ～エストポリス外伝～",
         "region": "JPN",
         "productCode": "WUP-N-PDMJ",
         "companyCode": "0001",
@@ -22991,7 +22991,7 @@
     },
     {
         "titleId": "00050000101d2c00",
-        "name": "Bike Rider UltraDX\nWORLD TOUR",
+        "name": "Bike Rider UltraDX WORLD TOUR",
         "region": "JPN",
         "productCode": "WUP-P-ATXJ",
         "companyCode": "00SA",
@@ -23002,7 +23002,7 @@
     },
     {
         "titleId": "00050000101d2d00",
-        "name": "Bike Rider UltraDX\nGALAXY TOUR",
+        "name": "Bike Rider UltraDX GALAXY TOUR",
         "region": "JPN",
         "productCode": "WUP-P-ATQJ",
         "companyCode": "00SA",
@@ -23024,7 +23024,7 @@
     },
     {
         "titleId": "00050000101d3000",
-        "name": "Taiko no Tatsujin Atsumete★\nTomodachiDaisakusen!",
+        "name": "Taiko no Tatsujin Atsumete★ TomodachiDaisakusen!",
         "region": "JPN",
         "productCode": "WUP-P-BT3J",
         "companyCode": "00AF",
@@ -23123,7 +23123,7 @@
     },
     {
         "titleId": "00050000101d3f00",
-        "name": "Project Zero:\nMaiden of Black Water",
+        "name": "Project Zero: Maiden of Black Water",
         "region": "EUR",
         "productCode": "WUP-P-AL5Z",
         "companyCode": "0001",
@@ -23244,7 +23244,7 @@
     },
     {
         "titleId": "00050000101d5000",
-        "name": "The Peanuts® Movie:\nSnoopy's Grand Adventure",
+        "name": "The Peanuts® Movie: Snoopy's Grand Adventure",
         "region": "EUR",
         "productCode": "WUP-P-BPEP",
         "companyCode": "0052",
@@ -23343,7 +23343,7 @@
     },
     {
         "titleId": "00050000101d5c00",
-        "name": "ファイナルファンタジーVI\nアドバンス",
+        "name": "ファイナルファンタジーVI アドバンス",
         "region": "JPN",
         "productCode": "WUP-N-PDQJ",
         "companyCode": "0001",
@@ -23354,7 +23354,7 @@
     },
     {
         "titleId": "00050000101d5d00",
-        "name": "ファイナルファンタジーV\nアドバンス",
+        "name": "ファイナルファンタジーV アドバンス",
         "region": "JPN",
         "productCode": "WUP-N-PDRJ",
         "companyCode": "0001",
@@ -23365,7 +23365,7 @@
     },
     {
         "titleId": "00050000101d5e00",
-        "name": "ファイナルファンタジーIV\nアドバンス",
+        "name": "ファイナルファンタジーIV アドバンス",
         "region": "JPN",
         "productCode": "WUP-N-PDSJ",
         "companyCode": "0001",
@@ -23651,7 +23651,7 @@
     },
     {
         "titleId": "00050000101d8d00",
-        "name": "Rock 'N Racing\nOff Road DX",
+        "name": "Rock 'N Racing Off Road DX",
         "region": "USA",
         "productCode": "WUP-P-ARXE",
         "companyCode": "00UP",
@@ -23662,7 +23662,7 @@
     },
     {
         "titleId": "00050000101d8f00",
-        "name": "LOST REAVERS\nBETA TEST VERSION",
+        "name": "LOST REAVERS BETA TEST VERSION",
         "region": "USA",
         "productCode": "WUP-P-SBPE",
         "companyCode": "00AF",
@@ -23684,7 +23684,7 @@
     },
     {
         "titleId": "00050000101d9200",
-        "name": "The Rivers of Alice\nExtended version",
+        "name": "The Rivers of Alice Extended version",
         "region": "EUR",
         "productCode": "WUP-P-BRAP",
         "companyCode": "00DW",
@@ -23717,7 +23717,7 @@
     },
     {
         "titleId": "00050000101d9600",
-        "name": "Rock 'N Racing\nOff Road DX",
+        "name": "Rock 'N Racing Off Road DX",
         "region": "EUR",
         "productCode": "WUP-P-ARXP",
         "companyCode": "00UP",
@@ -23739,7 +23739,7 @@
     },
     {
         "titleId": "00050000101d9900",
-        "name": "ファイナルファンタジータクティクス\nアドバンス",
+        "name": "ファイナルファンタジータクティクス アドバンス",
         "region": "JPN",
         "productCode": "WUP-N-PDTJ",
         "companyCode": "0001",
@@ -23783,7 +23783,7 @@
     },
     {
         "titleId": "00050000101d9e00",
-        "name": "Bike Rider UltraDX\nWORLD TOUR",
+        "name": "Bike Rider UltraDX WORLD TOUR",
         "region": "EUR",
         "productCode": "WUP-P-ATXP",
         "companyCode": "00SA",
@@ -23904,7 +23904,7 @@
     },
     {
         "titleId": "00050000101daa00",
-        "name": "LEGO® STAR WARS™\nThe Force Awakens",
+        "name": "LEGO® STAR WARS™ The Force Awakens",
         "region": "EUR",
         "productCode": "WUP-P-BLGP",
         "companyCode": "00WR",
@@ -23915,7 +23915,7 @@
     },
     {
         "titleId": "00050000101dab00",
-        "name": "LEGO® STAR WARS™\nThe Force Awakens",
+        "name": "LEGO® STAR WARS™ The Force Awakens",
         "region": "USA",
         "productCode": "WUP-P-BLGE",
         "companyCode": "00WR",
@@ -23948,7 +23948,7 @@
     },
     {
         "titleId": "00050000101daf00",
-        "name": "Chronicles of Teddy\nHarmony of Exidus",
+        "name": "Chronicles of Teddy Harmony of Exidus",
         "region": "EUR",
         "productCode": "WUP-P-AF2P",
         "companyCode": "00XS",
@@ -23959,7 +23959,7 @@
     },
     {
         "titleId": "00050000101db000",
-        "name": "Oddworld\nNew 'n' Tasty",
+        "name": "Oddworld New 'n' Tasty",
         "region": "USA",
         "productCode": "WUP-P-ANWE",
         "companyCode": "0185",
@@ -24014,7 +24014,7 @@
     },
     {
         "titleId": "00050000101dbb00",
-        "name": "Oddworld\nNew 'n' Tasty",
+        "name": "Oddworld New 'n' Tasty",
         "region": "EUR",
         "productCode": "WUP-P-ANWP",
         "companyCode": "0185",
@@ -24047,7 +24047,7 @@
     },
     {
         "titleId": "00050000101dbf00",
-        "name": "Angry Video Game Nerd\nAdventures",
+        "name": "Angry Video Game Nerd Adventures",
         "region": "EUR",
         "productCode": "WUP-P-AVGP",
         "companyCode": "012C",
@@ -24135,7 +24135,7 @@
     },
     {
         "titleId": "00050000101dd300",
-        "name": "Rock 'N Racing\nOff Road",
+        "name": "Rock 'N Racing Off Road",
         "region": "JPN",
         "productCode": "WUP-P-WAEJ",
         "companyCode": "00W4",
@@ -24168,7 +24168,7 @@
     },
     {
         "titleId": "00050000101dd600",
-        "name": "Bit Trip Presents... \nRunner2: リズム星人の爆走",
+        "name": "Bit Trip Presents... Runner2: リズム星人の爆走",
         "region": "JPN",
         "productCode": "WUP-P-WBTJ",
         "companyCode": "0119",
@@ -24245,7 +24245,7 @@
     },
     {
         "titleId": "00050000101de400",
-        "name": "ザ　バインディング　オブ\nアイザック：リバース",
+        "name": "ザ バインディング オブ アイザック：リバース",
         "region": "JPN",
         "productCode": "WUP-P-BRXJ",
         "companyCode": "0119",
@@ -24355,7 +24355,7 @@
     },
     {
         "titleId": "00050000101e0000",
-        "name": "U-EXPLORE\nSPACE ADVENTURES",
+        "name": "U-EXPLORE SPACE ADVENTURES",
         "region": "JPN",
         "productCode": "WUP-P-AFSJ",
         "companyCode": "00TF",
@@ -24377,7 +24377,7 @@
     },
     {
         "titleId": "00050000101e0600",
-        "name": "FINAL FANTASY TACTICS\nADVANCE",
+        "name": "FINAL FANTASY TACTICS ADVANCE",
         "region": "EUR",
         "productCode": "WUP-N-PDTP",
         "companyCode": "0001",
@@ -24421,7 +24421,7 @@
     },
     {
         "titleId": "00050000101e0c00",
-        "name": "ポケモン不思議のダンジョン\n空の探検隊",
+        "name": "ポケモン不思議のダンジョン 空の探検隊",
         "region": "JPN",
         "productCode": "WUP-N-DA4J",
         "companyCode": "0001",
@@ -24432,7 +24432,7 @@
     },
     {
         "titleId": "00050000101e0d00",
-        "name": "Pokémon Mystery Dungeon:\nExplorers of Sky",
+        "name": "Pokémon Mystery Dungeon: Explorers of Sky",
         "region": "USA",
         "productCode": "WUP-N-DA4E",
         "companyCode": "0001",
@@ -24443,7 +24443,7 @@
     },
     {
         "titleId": "00050000101e0e00",
-        "name": "Pokémon Mystery Dungeon:\nExplorers of Sky",
+        "name": "Pokémon Mystery Dungeon: Explorers of Sky",
         "region": "EUR",
         "productCode": "WUP-N-DA4P",
         "companyCode": "0001",
@@ -24465,7 +24465,7 @@
     },
     {
         "titleId": "00050000101e1000",
-        "name": "Pokémon Ranger:\nShadow of Almia",
+        "name": "Pokémon Ranger: Shadow of Almia",
         "region": "USA",
         "productCode": "WUP-N-DA5E",
         "companyCode": "0001",
@@ -24476,7 +24476,7 @@
     },
     {
         "titleId": "00050000101e1100",
-        "name": "Pokémon Ranger:\nShadows of Almia",
+        "name": "Pokémon Ranger: Shadows of Almia",
         "region": "EUR",
         "productCode": "WUP-N-DA5P",
         "companyCode": "0001",
@@ -24531,7 +24531,7 @@
     },
     {
         "titleId": "00050000101e1900",
-        "name": "Rynn's Adventure\nTrouble In The Enchanted Forest",
+        "name": "Rynn's Adventure Trouble In The Enchanted Forest",
         "region": "USA",
         "productCode": "WUP-P-AR6E",
         "companyCode": "018R",
@@ -24883,7 +24883,7 @@
     },
     {
         "titleId": "00050000101e5300",
-        "name": "M & S at the Rio 2016\nOlympic Games",
+        "name": "M & S at the Rio 2016 Olympic Games",
         "region": "USA",
         "productCode": "WUP-P-ABJE",
         "companyCode": "0001",
@@ -24894,7 +24894,7 @@
     },
     {
         "titleId": "00050000101e5400",
-        "name": "M & S at the Rio 2016\nOlympic Games",
+        "name": "M & S at the Rio 2016 Olympic Games",
         "region": "EUR",
         "productCode": "WUP-P-ABJP",
         "companyCode": "0001",
@@ -25015,7 +25015,7 @@
     },
     {
         "titleId": "00050000101e6700",
-        "name": "Ogre Battle 64: \nPerson of Lordly Caliber",
+        "name": "Ogre Battle 64: Person of Lordly Caliber",
         "region": "USA",
         "productCode": "WUP-N-NAUE",
         "companyCode": "0001",
@@ -25026,7 +25026,7 @@
     },
     {
         "titleId": "00050000101e6800",
-        "name": "わがままファッション\nGIRLS MODE",
+        "name": "わがままファッション GIRLS MODE",
         "region": "JPN",
         "productCode": "WUP-N-DA6J",
         "companyCode": "0001",
@@ -25048,7 +25048,7 @@
     },
     {
         "titleId": "00050000101e6a00",
-        "name": "Nintendo presents:\nStyle Boutique",
+        "name": "Nintendo presents: Style Boutique",
         "region": "EUR",
         "productCode": "WUP-N-DA6P",
         "companyCode": "0001",
@@ -25103,7 +25103,7 @@
     },
     {
         "titleId": "00050000101e7000",
-        "name": "Pokémon Ranger:\nGuardian Signs",
+        "name": "Pokémon Ranger: Guardian Signs",
         "region": "USA",
         "productCode": "WUP-N-DA9E",
         "companyCode": "0001",
@@ -25114,7 +25114,7 @@
     },
     {
         "titleId": "00050000101e7100",
-        "name": "Pokémon Ranger:\nGuardian Signs",
+        "name": "Pokémon Ranger: Guardian Signs",
         "region": "EUR",
         "productCode": "WUP-N-DA9P",
         "companyCode": "0001",
@@ -25411,7 +25411,7 @@
     },
     {
         "titleId": "00050000101e9c00",
-        "name": "Cube Life:\nIsland Survival",
+        "name": "Cube Life: Island Survival",
         "region": "JPN",
         "productCode": "WUP-P-ACUJ",
         "companyCode": "00S6",
@@ -25433,7 +25433,7 @@
     },
     {
         "titleId": "00050000101ea000",
-        "name": "LEGO® STAR WARS™\nThe Force Awakens",
+        "name": "LEGO® STAR WARS™ The Force Awakens",
         "region": "JPN",
         "productCode": "WUP-P-BLGJ",
         "companyCode": "00WR",
@@ -25466,7 +25466,7 @@
     },
     {
         "titleId": "00050000101ea400",
-        "name": "A Day at the Carnival\nby Thornbury Software LLC",
+        "name": "A Day at the Carnival by Thornbury Software LLC",
         "region": "USA",
         "productCode": "WUP-P-BRFE",
         "companyCode": "0195",
@@ -25488,7 +25488,7 @@
     },
     {
         "titleId": "00050000101ea900",
-        "name": "Armored ACORNs\nAction Squirrel Squad",
+        "name": "Armored ACORNs Action Squirrel Squad",
         "region": "USA",
         "productCode": "WUP-P-BNBE",
         "companyCode": "019K",
@@ -25587,7 +25587,7 @@
     },
     {
         "titleId": "00050000101eb600",
-        "name": "ACT IT OUT!\nA Game of Charades",
+        "name": "ACT IT OUT! A Game of Charades",
         "region": "EUR",
         "productCode": "WUP-P-WGQP",
         "companyCode": "019A",
@@ -25697,7 +25697,7 @@
     },
     {
         "titleId": "00050000101ec500",
-        "name": "ACT IT OUT!\nA Game of Charades",
+        "name": "ACT IT OUT! A Game of Charades",
         "region": "USA",
         "productCode": "WUP-P-WGQE",
         "companyCode": "019A",
@@ -25763,7 +25763,7 @@
     },
     {
         "titleId": "00050000101ecc00",
-        "name": "バイオハザード \nアンブレラ・クロニクルズ",
+        "name": "バイオハザード アンブレラ・クロニクルズ",
         "region": "JPN",
         "productCode": "WUP-N-VBWJ",
         "companyCode": "0001",
@@ -25774,7 +25774,7 @@
     },
     {
         "titleId": "00050000101ecd00",
-        "name": "Resident Evil:\nThe Umbrella Chronicles",
+        "name": "Resident Evil: The Umbrella Chronicles",
         "region": "USA",
         "productCode": "WUP-N-VBWE",
         "companyCode": "0001",
@@ -25807,7 +25807,7 @@
     },
     {
         "titleId": "00050000101ed100",
-        "name": "Wiiであそぶ\nドンキーコングジャングルビート",
+        "name": "Wiiであそぶ ドンキーコングジャングルビート",
         "region": "JPN",
         "productCode": "WUP-N-VBXJ",
         "companyCode": "0001",
@@ -25884,7 +25884,7 @@
     },
     {
         "titleId": "00050000101ef500",
-        "name": "Emojikara\nA Clever Emoji Match Game",
+        "name": "Emojikara A Clever Emoji Match Game",
         "region": "USA",
         "productCode": "WUP-P-BMKE",
         "companyCode": "015U",
@@ -26247,7 +26247,7 @@
     },
     {
         "titleId": "00050000101f5500",
-        "name": "Letter Quest\nGrimm's Journey Remastered",
+        "name": "Letter Quest Grimm's Journey Remastered",
         "region": "USA",
         "productCode": "WUP-P-AG8E",
         "companyCode": "015J",
@@ -26324,7 +26324,7 @@
     },
     {
         "titleId": "00050000101f6000",
-        "name": "SURFIN' SAM\nATTACK OF THE AQUALITES",
+        "name": "SURFIN' SAM ATTACK OF THE AQUALITES",
         "region": "USA",
         "productCode": "WUP-P-AH3E",
         "companyCode": "019M",
@@ -26335,7 +26335,7 @@
     },
     {
         "titleId": "00050000101f6200",
-        "name": "Adventure Party\nCats and Caverns",
+        "name": "Adventure Party Cats and Caverns",
         "region": "USA",
         "productCode": "WUP-P-AH4E",
         "companyCode": "020P",
@@ -26357,7 +26357,7 @@
     },
     {
         "titleId": "00050000101f6400",
-        "name": "Letter Quest\nGrimm's Journey Remastered",
+        "name": "Letter Quest Grimm's Journey Remastered",
         "region": "EUR",
         "productCode": "WUP-P-AG8P",
         "companyCode": "015J",
@@ -26467,7 +26467,7 @@
     },
     {
         "titleId": "00050000101f7300",
-        "name": "Shantae: Risky's Revenge\nDirector's Cut",
+        "name": "Shantae: Risky's Revenge Director's Cut",
         "region": "JPN",
         "productCode": "WUP-P-BRYJ",
         "companyCode": "00R7",
@@ -27336,7 +27336,7 @@
     },
     {
         "titleId": "0005000010200100",
-        "name": "Grand Prix\nRock 'N Racing",
+        "name": "Grand Prix Rock 'N Racing",
         "region": "USA",
         "productCode": "WUP-P-BGNE",
         "companyCode": "00UP",
@@ -27523,7 +27523,7 @@
     },
     {
         "titleId": "0005000010201a00",
-        "name": "StarFox Zero:\nThe Battle Begins + Training",
+        "name": "StarFox Zero: The Battle Begins + Training",
         "region": "JPN",
         "productCode": "WUP-P-BAEJ",
         "companyCode": "0001",
@@ -27534,7 +27534,7 @@
     },
     {
         "titleId": "0005000010201b00",
-        "name": "Star Fox Zero:\nThe Battle Begins + Training",
+        "name": "Star Fox Zero: The Battle Begins + Training",
         "region": "USA",
         "productCode": "WUP-P-BAEE",
         "companyCode": "0001",
@@ -27545,7 +27545,7 @@
     },
     {
         "titleId": "0005000010201c00",
-        "name": "Star Fox Zero\nThe Battle Begins + Training",
+        "name": "Star Fox Zero The Battle Begins + Training",
         "region": "EUR",
         "productCode": "WUP-P-BAEP",
         "companyCode": "0001",
@@ -27567,7 +27567,7 @@
     },
     {
         "titleId": "0005000010201f00",
-        "name": "Grand Prix\nRock 'N Racing",
+        "name": "Grand Prix Rock 'N Racing",
         "region": "EUR",
         "productCode": "WUP-P-BGNP",
         "companyCode": "00UP",
@@ -27776,7 +27776,7 @@
     },
     {
         "titleId": "0005000010203d00",
-        "name": "Space Hunted:\nThe Lost Levels",
+        "name": "Space Hunted: The Lost Levels",
         "region": "USA",
         "productCode": "WUP-P-ANDE",
         "companyCode": "021F",
@@ -27842,7 +27842,7 @@
     },
     {
         "titleId": "0005000010204c00",
-        "name": "Chronicles of Teddy\nHarmony of Exidus",
+        "name": "Chronicles of Teddy Harmony of Exidus",
         "region": "JPN",
         "productCode": "WUP-P-AF2J",
         "companyCode": "00JF",
@@ -27875,7 +27875,7 @@
     },
     {
         "titleId": "0005000010205000",
-        "name": "Cubit\nThe Robot HD",
+        "name": "Cubit The Robot HD",
         "region": "USA",
         "productCode": "WUP-P-AK9E",
         "companyCode": "00AT",
@@ -28095,7 +28095,7 @@
     },
     {
         "titleId": "0005000010208500",
-        "name": "Octocopter\nSuper Sub Squid Escape",
+        "name": "Octocopter Super Sub Squid Escape",
         "region": "EUR",
         "productCode": "WUP-P-BE3P",
         "companyCode": "014P",
@@ -28106,7 +28106,7 @@
     },
     {
         "titleId": "0005000010208700",
-        "name": "Octocopter\nSuper Sub Squid Escape",
+        "name": "Octocopter Super Sub Squid Escape",
         "region": "USA",
         "productCode": "WUP-P-BE3E",
         "companyCode": "014P",
@@ -28447,7 +28447,7 @@
     },
     {
         "titleId": "000500001020c300",
-        "name": "RADIANTFLUX:\nHYPERFRACTAL",
+        "name": "RADIANTFLUX: HYPERFRACTAL",
         "region": "USA",
         "productCode": "WUP-P-AZKE",
         "companyCode": "014P",
@@ -28458,7 +28458,7 @@
     },
     {
         "titleId": "000500001020c400",
-        "name": "RADIANTFLUX:\nHYPERFRACTAL",
+        "name": "RADIANTFLUX: HYPERFRACTAL",
         "region": "EUR",
         "productCode": "WUP-P-AZKP",
         "companyCode": "014P",
@@ -28667,7 +28667,7 @@
     },
     {
         "titleId": "000500001020de00",
-        "name": "プランテラ\nガーデンライフ",
+        "name": "プランテラ ガーデンライフ",
         "region": "JPN",
         "productCode": "WUP-P-AL8J",
         "companyCode": "00TF",
@@ -28755,7 +28755,7 @@
     },
     {
         "titleId": "000500001020e900",
-        "name": "Grand Prix\nRock 'N Racing",
+        "name": "Grand Prix Rock 'N Racing",
         "region": "JPN",
         "productCode": "WUP-P-BGNJ",
         "companyCode": "00W4",
@@ -28821,7 +28821,7 @@
     },
     {
         "titleId": "000500001020f100",
-        "name": "Cubit\nThe Robot HD",
+        "name": "Cubit The Robot HD",
         "region": "EUR",
         "productCode": "WUP-P-AK9P",
         "companyCode": "00AT",
@@ -28931,7 +28931,7 @@
     },
     {
         "titleId": "0005000010210300",
-        "name": "Citadale\nThe Legends Trilogy",
+        "name": "Citadale The Legends Trilogy",
         "region": "EUR",
         "productCode": "WUP-P-BRKP",
         "companyCode": "00VA",
@@ -29206,7 +29206,7 @@
     },
     {
         "titleId": "0005000010212200",
-        "name": "Cube Life:\nPixel Action Heroes",
+        "name": "Cube Life: Pixel Action Heroes",
         "region": "JPN",
         "productCode": "WUP-P-BZPJ",
         "companyCode": "00S6",
@@ -29228,7 +29228,7 @@
     },
     {
         "titleId": "0005000010212500",
-        "name": "Armored ACORNs\nAction Squirrel Squad",
+        "name": "Armored ACORNs Action Squirrel Squad",
         "region": "EUR",
         "productCode": "WUP-P-BNBP",
         "companyCode": "019K",
@@ -29822,7 +29822,7 @@
     },
     {
         "titleId": "0005000010218100",
-        "name": "SCOOP! AROUND THE WORLD\nIN 80 SPACES",
+        "name": "SCOOP! AROUND THE WORLD IN 80 SPACES",
         "region": "USA",
         "productCode": "WUP-P-WSCE",
         "companyCode": "0113",
@@ -29899,7 +29899,7 @@
     },
     {
         "titleId": "0005000010218b00",
-        "name": "El Silla\nArcade Edition",
+        "name": "El Silla Arcade Edition",
         "region": "USA",
         "productCode": "WUP-P-WSEE",
         "companyCode": "0116",
@@ -29910,7 +29910,7 @@
     },
     {
         "titleId": "0005000010218c00",
-        "name": "El Silla\nArcade Edition",
+        "name": "El Silla Arcade Edition",
         "region": "EUR",
         "productCode": "WUP-P-WSEP",
         "companyCode": "0116",
@@ -29965,7 +29965,7 @@
     },
     {
         "titleId": "0005000010219c00",
-        "name": "Space Hunted: \nThe Lost Levels",
+        "name": "Space Hunted: The Lost Levels",
         "region": "EUR",
         "productCode": "WUP-P-ANDP",
         "companyCode": "021F",
@@ -30130,7 +30130,7 @@
     },
     {
         "titleId": "000500001021c300",
-        "name": "SturmFront - The Mutant War\nÜbel Edition",
+        "name": "SturmFront - The Mutant War Übel Edition",
         "region": "USA",
         "productCode": "WUP-P-AN5E",
         "companyCode": "0339",
@@ -30141,7 +30141,7 @@
     },
     {
         "titleId": "000500001021c500",
-        "name": "SturmFront - The Mutant War\nÜbel Edition",
+        "name": "SturmFront - The Mutant War Übel Edition",
         "region": "EUR",
         "productCode": "WUP-P-WT9P",
         "companyCode": "0339",
@@ -30185,7 +30185,7 @@
     },
     {
         "titleId": "000500001021d000",
-        "name": "Silver Falls\nUndertakers",
+        "name": "Silver Falls Undertakers",
         "region": "USA",
         "productCode": "WUP-P-AB1E",
         "companyCode": "030Q",
@@ -30196,7 +30196,7 @@
     },
     {
         "titleId": "000500001021d300",
-        "name": "Silver Falls\nWhite Inside Its Umbra",
+        "name": "Silver Falls White Inside Its Umbra",
         "region": "USA",
         "productCode": "WUP-P-AZ1E",
         "companyCode": "030Q",

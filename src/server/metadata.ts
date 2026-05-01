@@ -1065,7 +1065,10 @@ function parseCommonKeyByteLiterals(text: string): Uint8Array | null {
         .map((token) => token.trim())
         .filter((token) => token.length > 0);
 
-    if (tokens.length === 0 || !tokens.every((token) => /^0x[\da-fA-F]{1,2}$/.test(token))) {
+    if (
+        tokens.length === 0 ||
+        !tokens.every((token) => /^0x[\da-fA-F]{1,2}$/.test(token))
+    ) {
         return null;
     }
 

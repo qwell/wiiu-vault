@@ -6,10 +6,7 @@ import { parse as CsvParse } from 'csv-parse/sync';
 import { XMLParser } from 'fast-xml-parser';
 
 import { normalizeRegion } from '../src/shared/regions.js';
-import {
-    normalizeTitleName as normalizeSharedTitleName,
-    toArray,
-} from '../src/shared/shared.js';
+import { normalizeTitleName, toArray } from '../src/shared/shared.js';
 
 type Title = {
     titleId: string;
@@ -64,8 +61,11 @@ type SamuraiResponse = {
     };
 };
 
-const root = process.cwd();
-const titlesDir = path.join(root, 'titles');
+type WiiUTdbDatafile = {
+    datafile?: {
+        game?: unknown;
+    };
+};
 
 const ranges = [
     '0005000010100000:0005000010220000',
@@ -85,11 +85,21 @@ const samuraiContentsUrl =
 
 const parallel = Number.parseInt(process.env.parallel ?? '16', 10);
 
+const parser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: '@',
+});
+
+const root = process.cwd();
+const titlesDir = path.join(root, 'titles');
+
 const titlesFile = path.join(titlesDir, 'titles.json');
 const extraFile = path.join(titlesDir, 'extra.json');
 const iconsFile = path.join(titlesDir, 'icons.json');
 const excludeFile = path.join(titlesDir, 'exclude.json');
 const titledbFile = path.join(titlesDir, 'titledb.csv');
+const wiiUTdbInputFile = path.join(titlesDir, 'wiiutdb.xml');
+const wiiUTdbOutputFile = path.join(titlesDir, 'wiiutdb.json');
 
 function formatUrl(template: string, titleId: string): string {
     return template.replace('%s', titleId);
@@ -113,10 +123,6 @@ function normalizeTitleId(value: string): string | null {
     const titleId = value.toLowerCase();
 
     return titleIdPattern.test(titleId) ? titleId : null;
-}
-
-function normalizeTitleName(name: string | null | undefined): string | null {
-    return name == null ? null : normalizeSharedTitleName(name);
 }
 
 function titleIdSet(entries: unknown[]): Set<string> {
@@ -282,7 +288,7 @@ async function processTitle(
 
     const title: Title = {
         titleId,
-        name: normalizeTitleName(metadata.name),
+        name: metadata.name == null ? null : normalizeTitleName(metadata.name),
         region: normalizeRegion(metadata.region, metadata.productCode),
         productCode: metadata.productCode ?? null,
         companyCode: metadata.companyCode ?? null,
@@ -366,7 +372,7 @@ async function loadExtraTitles(
 
             return {
                 titleId: titleId,
-                name: normalizeTitleName(row.Description) ?? 'Unknown',
+                name: normalizeTitleName(row.Description),
                 region: normalizeRegion(row.Region, row['Product Code']),
                 productCode:
                     row['Product Code'] === ''
@@ -415,10 +421,6 @@ function parseCsvRows(text: string): CsvRow[] {
 async function loadSamuraiIcons(): Promise<Icon[] | null> {
     try {
         const xml = await fetchTextInsecure(samuraiContentsUrl);
-        const parser = new XMLParser({
-            ignoreAttributes: false,
-            attributeNamePrefix: '@',
-        });
         const parsed = parser.parse(xml) as SamuraiResponse;
         const contents = parsed.eshop?.contents?.content;
         const contentEntries = toArray(contents);
@@ -480,6 +482,17 @@ async function mergeSamuraiIcons(): Promise<void> {
     console.log(`Icon data saved to ${iconsFile}`);
 }
 
+async function convertWiiUTdb(): Promise<void> {
+    const xml = await fs.readFile(wiiUTdbInputFile, 'utf8');
+    const json = parser.parse(xml) as WiiUTdbDatafile;
+
+    const games = toArray(json?.datafile?.game);
+
+    await writeJson(wiiUTdbOutputFile, { games });
+
+    console.log(`Converted ${wiiUTdbInputFile} -> ${wiiUTdbOutputFile}`);
+}
+
 function isIcon(value: unknown): value is Icon {
     return stringFieldRecord(value, ['titleId', 'iconUrl']);
 }
@@ -528,6 +541,8 @@ async function main() {
     }
 
     await mergeSamuraiIcons();
+
+    await convertWiiUTdb();
 
     const icons = (await readJsonArray(iconsFile)).filter(isIcon);
     await applyIcons(titlesFile, icons);

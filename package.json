@@ -21,7 +21,6 @@
         "build": "tsx scripts/build.ts",
         "start": "tsx scripts/start.ts",
         "test": "vitest run",
-        "convert:wiiutdb": "tsx scripts/convert.ts",
         "generate:titles": "tsx scripts/generate-titles.ts"
     },
     "devDependencies": {
