@@ -6,7 +6,10 @@ import { parse as CsvParse } from 'csv-parse/sync';
 import { XMLParser } from 'fast-xml-parser';
 
 import { normalizeRegion } from '../src/shared/regions.js';
-import { toArray } from '../src/shared/shared.js';
+import {
+    normalizeTitleName as normalizeSharedTitleName,
+    toArray,
+} from '../src/shared/shared.js';
 
 type Title = {
     titleId: string;
@@ -110,6 +113,10 @@ function normalizeTitleId(value: string): string | null {
     const titleId = value.toLowerCase();
 
     return titleIdPattern.test(titleId) ? titleId : null;
+}
+
+function normalizeTitleName(name: string | null | undefined): string | null {
+    return name == null ? null : normalizeSharedTitleName(name);
 }
 
 function titleIdSet(entries: unknown[]): Set<string> {
@@ -275,7 +282,7 @@ async function processTitle(
 
     const title: Title = {
         titleId,
-        name: metadata.name ?? null,
+        name: normalizeTitleName(metadata.name),
         region: normalizeRegion(metadata.region, metadata.productCode),
         productCode: metadata.productCode ?? null,
         companyCode: metadata.companyCode ?? null,
@@ -359,7 +366,7 @@ async function loadExtraTitles(
 
             return {
                 titleId: titleId,
-                name: row.Description ?? 'Unknown',
+                name: normalizeTitleName(row.Description) ?? 'Unknown',
                 region: normalizeRegion(row.Region, row['Product Code']),
                 productCode:
                     row['Product Code'] === ''

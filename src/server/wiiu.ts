@@ -18,6 +18,7 @@ import {
     PARENT_KINDS,
     CHILD_KINDS,
     toArray,
+    normalizeTitleName,
     TitleKinds,
 } from '../shared/shared.js';
 import { readTmd } from './metadata.js';
@@ -83,16 +84,6 @@ type GameTdbFile = {
 type LocalTitleEntry = TitleEntry & {
     family: string;
 };
-
-function normalizeTitleName(name: string): string {
-    const normalized =
-        name
-            ?.replace(/([^\s])\s*\n\s*([^\s])/g, '$1 $2')
-            ?.replace(/\s*\n\s*/g, ' ')
-            ?.replace(/ {2,}/g, ' ')
-            ?.trim() ?? 'Unknown';
-    return normalized;
-}
 
 function cleanDirectoryName(dirname: string): string {
     // Clear [ and anything after it.

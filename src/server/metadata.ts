@@ -5,15 +5,16 @@ import { XMLParser } from 'fast-xml-parser';
 import {
     createContentIv,
     createTitleKeyIv,
+    decryptContentWithBigIntIv,
     decryptContentWithIndex,
     decryptContentWithIv,
-    decryptContentWithBigIntIv,
     decryptTitleKey,
     encryptTitleKey,
     findGeneratedTitleKey,
 } from './decryption.js';
 import { getAppRoot } from './paths.js';
 import { normalizeRegion } from '../shared/regions.js';
+import { normalizeTitleName } from '../shared/shared.js';
 
 export type Tmd = {
     header: TmdHeader;
@@ -128,6 +129,12 @@ type ContentTreeVerification = {
     error?: string;
 };
 
+type DownloadedContentFile = {
+    app: string | null;
+    h3: string | null;
+    verification: ContentTreeVerification;
+};
+
 class TitleMetadataError extends Error {
     stage: string;
 
@@ -189,6 +196,7 @@ const CERT_TITLE_FILE = 'title.cert';
 const NUS_BASE_URL = 'http://ccs.cdn.wup.shop.nintendo.net/ccs/download';
 // const NUS_BASE_URL = 'http://ccs.cdn.c.shop.nintendowifi.net/ccs/download/';
 const DEFAULT_CERT_TITLE_ID = '000500101000400a'; // OSv10
+const TITLE_DOWNLOAD_CONCURRENCY = 8;
 
 const COMMON_KEY_SIZE = 16;
 
@@ -594,49 +602,27 @@ export async function generateTitleInstallFiles(
         ),
     ]);
 
-    for (const content of tmd.contents) {
-        const contentId = formatContentId(content.id);
-        const appName = `${contentId}.app`;
-        const appFile = path.join(outputDir, appName);
-
-        if (!isHashedContent(content)) {
-            const result = await ensureContentHash({
-                appFile,
+    const downloadedContentFiles = await mapConcurrent(
+        tmd.contents,
+        TITLE_DOWNLOAD_CONCURRENCY,
+        async (content) =>
+            downloadTitleContentFile({
                 content,
+                outputDir,
                 titleKey,
-                contentId,
-                download: () =>
-                    downloadContent(baseUrl, normalizedTitleId, content.id),
-            });
+                baseUrl,
+                titleId: normalizedTitleId,
+            })
+    );
 
-            if (result.status === 'ok') {
-                files.app.push(appName);
-            }
-
-            verification.push(result);
-            continue;
+    for (const downloadedContentFile of downloadedContentFiles) {
+        if (downloadedContentFile.app) {
+            files.app.push(downloadedContentFile.app);
         }
-
-        const h3Name = `${contentId}.h3`;
-        const h3File = path.join(outputDir, h3Name);
-        const result = await ensureContentTree({
-            appFile,
-            h3File,
-            content,
-            titleKey,
-            contentId,
-            downloadApp: () =>
-                downloadContent(baseUrl, normalizedTitleId, content.id),
-            downloadH3: () =>
-                downloadContentH3(baseUrl, normalizedTitleId, content.id),
-        });
-
-        if (result.status === 'ok') {
-            files.app.push(appName);
-            files.h3.push(h3Name);
+        if (downloadedContentFile.h3) {
+            files.h3.push(downloadedContentFile.h3);
         }
-
-        verification.push(result);
+        verification.push(downloadedContentFile.verification);
     }
 
     return {
@@ -647,6 +633,58 @@ export async function generateTitleInstallFiles(
         titleKeyPassword,
         outputDir,
         files,
+        verification,
+    };
+}
+
+async function downloadTitleContentFile({
+    content,
+    outputDir,
+    titleKey,
+    baseUrl,
+    titleId,
+}: {
+    content: TmdContent;
+    outputDir: string;
+    titleKey: Uint8Array;
+    baseUrl: string;
+    titleId: string;
+}): Promise<DownloadedContentFile> {
+    const contentId = formatContentId(content.id);
+    const appName = `${contentId}.app`;
+    const appFile = path.join(outputDir, appName);
+
+    if (!isHashedContent(content)) {
+        const verification = await ensureContentHash({
+            appFile,
+            content,
+            titleKey,
+            contentId,
+            download: () => downloadContent(baseUrl, titleId, content.id),
+        });
+
+        return {
+            app: verification.status === 'ok' ? appName : null,
+            h3: null,
+            verification,
+        };
+    }
+
+    const h3Name = `${contentId}.h3`;
+    const h3File = path.join(outputDir, h3Name);
+    const verification = await ensureContentTree({
+        appFile,
+        h3File,
+        content,
+        titleKey,
+        contentId,
+        downloadApp: () => downloadContent(baseUrl, titleId, content.id),
+        downloadH3: () => downloadContentH3(baseUrl, titleId, content.id),
+    });
+
+    return {
+        app: verification.status === 'ok' ? appName : null,
+        h3: verification.status === 'ok' ? h3Name : null,
         verification,
     };
 }
@@ -1167,6 +1205,32 @@ function logExistingContentSkipped(contentId: string, size: bigint): void {
     console.log(
         `[metadata] existing content hash matches, skipping download: ${contentId} (${size.toString()} bytes)`
     );
+}
+
+async function mapConcurrent<T, U>(
+    items: T[],
+    concurrency: number,
+    mapper: (item: T, index: number) => Promise<U>
+): Promise<U[]> {
+    if (items.length === 0) {
+        return [];
+    }
+
+    const results = new Array<U>(items.length);
+    const workers = new Array(Math.min(concurrency, items.length))
+        .fill(null)
+        .map(async (_, workerIndex) => {
+            for (
+                let index = workerIndex;
+                index < items.length;
+                index += concurrency
+            ) {
+                results[index] = await mapper(items[index], index);
+            }
+        });
+
+    await Promise.all(workers);
+    return results;
 }
 
 function verifyEncryptedContentTree(
@@ -1788,8 +1852,9 @@ function parseMetaUnsignedInt(value: string | null): number | null {
 
 function safeDirectoryName(value: string): string {
     const invalid = new Set(['<', '>', ':', '"', '/', '\\', '|', '?', '*']);
+    const normalized = normalizeTitleName(value);
     return (
-        [...value]
+        [...normalized]
             .filter((char) => !invalid.has(char) && char.charCodeAt(0) >= 32)
             .join('')
             .replace(/\s+/g, ' ')

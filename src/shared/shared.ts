@@ -21,6 +21,10 @@ export function toArray<T>(value: T | readonly T[] | null | undefined): T[] {
         : [value as T];
 }
 
+export function normalizeTitleName(name: string): string {
+    return name.replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim() || 'Unknown';
+}
+
 export const PARENT_KINDS = [
     TitleKinds.vWii,
     TitleKinds.Base,
