@@ -10,6 +10,8 @@ import {
     PARENT_KINDS,
 } from '../shared/shared.js';
 
+declare const __APP_VERSION__: string;
+
 type SlotBadgeState = 'complete' | 'incomplete' | 'na' | 'unknown';
 type LibraryViewMode = 'table' | 'list';
 
@@ -912,8 +914,16 @@ function setupTheme(): void {
     });
 }
 
+function setupVersion(): void {
+    const version = document.querySelector<HTMLElement>('#app-version');
+    if (version) {
+        version.textContent = `v${__APP_VERSION__}`;
+    }
+}
+
 resetDetailSidebars();
 window.addEventListener('pageshow', resetDetailSidebars);
 
+setupVersion();
 void setupTheme();
 void refreshLibrary();
