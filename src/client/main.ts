@@ -8,6 +8,7 @@ import {
     TitleKinds,
     type ChildKind,
     PARENT_KINDS,
+    formatSize,
 } from '../shared/shared.js';
 
 declare const __APP_VERSION__: string;
@@ -84,24 +85,6 @@ function formatRegion(region: string | null): {
         default:
             return { text: region ?? '', flag: '' };
     }
-}
-
-function formatSize(sizeBytes: number | null): string {
-    if (sizeBytes === null) {
-        return '-';
-    }
-
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    let value = sizeBytes;
-    let unitIndex = 0;
-
-    while (value >= 1024 && unitIndex < units.length - 1) {
-        value /= 1024;
-        unitIndex += 1;
-    }
-
-    const digits = value >= 100 || unitIndex === 0 ? 0 : value >= 10 ? 1 : 2;
-    return `${value.toFixed(digits)} ${units[unitIndex]}`;
 }
 
 function formatCount(value: number, singular: string, plural: string): string {

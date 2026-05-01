@@ -124,7 +124,7 @@ type DownloadableTitle = {
     kind: 'Game' | 'Update' | 'DLC';
 };
 
-type ContentTreeVerification = {
+export type ContentTreeVerification = {
     contentId: string;
     status: 'ok' | 'missing-h3' | 'failed';
     error?: string;
@@ -134,6 +134,22 @@ type DownloadedContentFile = {
     app: string | null;
     h3: string | null;
     verification: ContentTreeVerification;
+};
+
+type ContentInstallFiles = {
+    contentId: string;
+    appName: string;
+    appFile: string;
+    h3Name: string | null;
+    h3File: string | null;
+};
+
+export type InstalledTitleValidation = {
+    titleId: string | null;
+    titleVersion: number | null;
+    status: 'ok' | 'failed';
+    error: string | null;
+    verification: ContentTreeVerification[];
 };
 
 class TitleMetadataError extends Error {
@@ -189,10 +205,10 @@ const SYSTEM_TYPE_WIIU = 'wiiu';
 const SYSTEM_TYPE_WII = 'wii';
 const SYSTEM_TYPE_UNKNOWN = 'unknown';
 
-const TIK_TITLE_FILE = 'title.tik';
+export const TIK_TITLE_FILE = 'title.tik';
 const TIK_TITLE_FILE_CDN = 'cetk';
 export const TMD_TITLE_FILE = 'title.tmd';
-const CERT_TITLE_FILE = 'title.cert';
+export const CERT_TITLE_FILE = 'title.cert';
 
 const NUS_BASE_URL = 'http://ccs.cdn.wup.shop.nintendo.net/ccs/download';
 // const NUS_BASE_URL = 'http://ccs.cdn.c.shop.nintendowifi.net/ccs/download/';
@@ -638,6 +654,96 @@ export async function generateTitleInstallFiles(
     };
 }
 
+export async function validateTitleInstallFiles(
+    dirPath: string
+): Promise<InstalledTitleValidation> {
+    const tmd = await readTmd(dirPath);
+    if (!tmd) {
+        return createFailedInstalledValidation(
+            null,
+            null,
+            `Missing or invalid ${TMD_TITLE_FILE}`
+        );
+    }
+
+    const titleId = getTitleIdHex(tmd.header.titleId);
+    const titleVersion = tmd.header.titleVersion;
+    const ticket = await readTikHeader(dirPath);
+    if (!ticket) {
+        return createFailedInstalledValidation(
+            titleId,
+            titleVersion,
+            `Missing or invalid ${TIK_TITLE_FILE}`
+        );
+    }
+
+    let titleKey: Uint8Array;
+    try {
+        titleKey = decryptTitleKey(
+            ticket.encryptedKey,
+            await readCommonKey(),
+            ticket.titleId
+        );
+    } catch (error) {
+        return createFailedInstalledValidation(
+            titleId,
+            titleVersion,
+            error instanceof Error ? error.message : String(error)
+        );
+    }
+
+    const verification: ContentTreeVerification[] = [];
+    for (const content of tmd.contents) {
+        verification.push(
+            await verifyInstalledContent({
+                dirPath,
+                content,
+                titleKey,
+            })
+        );
+    }
+
+    return {
+        titleId,
+        titleVersion,
+        status: verification.every((result) => result.status === 'ok')
+            ? 'ok'
+            : 'failed',
+        error: null,
+        verification,
+    };
+}
+
+function createFailedInstalledValidation(
+    titleId: string | null,
+    titleVersion: number | null,
+    error: string
+): InstalledTitleValidation {
+    return {
+        titleId,
+        titleVersion,
+        status: 'failed',
+        error,
+        verification: [],
+    };
+}
+
+function verifyInstalledContent({
+    dirPath,
+    content,
+    titleKey,
+}: {
+    dirPath: string;
+    content: TmdContent;
+    titleKey: Uint8Array;
+}): Promise<ContentTreeVerification> {
+    return verifyContentInstallFiles({
+        files: getContentInstallFiles(dirPath, content),
+        content,
+        titleKey,
+    });
+}
+
 async function downloadTitleContentFile({
     content,
     outputDir,
@@ -651,41 +757,34 @@ async function downloadTitleContentFile({
     baseUrl: string;
     titleId: string;
 }): Promise<DownloadedContentFile> {
-    const contentId = formatContentId(content.id);
-    const appName = `${contentId}.app`;
-    const appFile = path.join(outputDir, appName);
+    const files = getContentInstallFiles(outputDir, content);
 
     if (!isHashedContent(content)) {
-        const verification = await ensureContentHash({
-            appFile,
+        const verification = await ensureContentInstallFiles({
+            files,
             content,
             titleKey,
-            contentId,
             download: () => downloadContent(baseUrl, titleId, content.id),
         });
 
         return {
-            app: verification.status === 'ok' ? appName : null,
+            app: verification.status === 'ok' ? files.appName : null,
             h3: null,
             verification,
         };
     }
 
-    const h3Name = `${contentId}.h3`;
-    const h3File = path.join(outputDir, h3Name);
-    const verification = await ensureContentTree({
-        appFile,
-        h3File,
+    const verification = await ensureContentInstallFiles({
+        files,
         content,
         titleKey,
-        contentId,
         downloadApp: () => downloadContent(baseUrl, titleId, content.id),
         downloadH3: () => downloadContentH3(baseUrl, titleId, content.id),
     });
 
     return {
-        app: verification.status === 'ok' ? appName : null,
-        h3: verification.status === 'ok' ? h3Name : null,
+        app: verification.status === 'ok' ? files.appName : null,
+        h3: verification.status === 'ok' ? files.h3Name : null,
         verification,
     };
 }
@@ -1093,6 +1192,110 @@ function assertCommonKeyLength(
 
 function isNodeError(error: unknown): error is NodeJS.ErrnoException {
     return error instanceof Error && 'code' in error;
+}
+
+function getContentInstallFiles(
+    dirPath: string,
+    content: TmdContent
+): ContentInstallFiles {
+    const contentId = formatContentId(content.id);
+    const appName = `${contentId}.app`;
+    const h3Name = isHashedContent(content) ? `${contentId}.h3` : null;
+
+    return {
+        contentId,
+        appName,
+        appFile: path.join(dirPath, appName),
+        h3Name,
+        h3File: h3Name ? path.join(dirPath, h3Name) : null,
+    };
+}
+
+function verifyContentInstallFiles({
+    files,
+    content,
+    titleKey,
+}: {
+    files: ContentInstallFiles;
+    content: TmdContent;
+    titleKey: Uint8Array;
+}): Promise<ContentTreeVerification> {
+    if (isHashedContent(content)) {
+        if (!files.h3File) {
+            return Promise.resolve({
+                contentId: files.contentId,
+                status: 'failed',
+                error: 'Missing H3 file path for hashed content',
+            });
+        }
+
+        return verifyContentTree({
+            appFile: files.appFile,
+            h3File: files.h3File,
+            content,
+            titleKey,
+            contentId: files.contentId,
+        });
+    }
+
+    return verifyContentHash({
+        appFile: files.appFile,
+        content,
+        titleKey,
+        contentId: files.contentId,
+    });
+}
+
+async function ensureContentInstallFiles({
+    files,
+    content,
+    titleKey,
+    download,
+    downloadApp,
+    downloadH3,
+}: {
+    files: ContentInstallFiles;
+    content: TmdContent;
+    titleKey: Uint8Array;
+    download?: () => Promise<Uint8Array>;
+    downloadApp?: () => Promise<Uint8Array>;
+    downloadH3?: () => Promise<Uint8Array>;
+}): Promise<ContentTreeVerification> {
+    if (isHashedContent(content)) {
+        if (!files.h3File || !downloadApp || !downloadH3) {
+            return {
+                contentId: files.contentId,
+                status: 'failed',
+                error: 'Missing hashed content install inputs',
+            };
+        }
+
+        return ensureContentTree({
+            appFile: files.appFile,
+            h3File: files.h3File,
+            content,
+            titleKey,
+            contentId: files.contentId,
+            downloadApp,
+            downloadH3,
+        });
+    }
+
+    if (!download) {
+        return {
+            contentId: files.contentId,
+            status: 'failed',
+            error: 'Missing content download input',
+        };
+    }
+
+    return ensureContentHash({
+        appFile: files.appFile,
+        content,
+        titleKey,
+        contentId: files.contentId,
+        download,
+    });
 }
 
 async function ensureContentTree({

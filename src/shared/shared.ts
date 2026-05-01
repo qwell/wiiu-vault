@@ -25,6 +25,24 @@ export function normalizeTitleName(name: string): string {
     return name.replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim() || 'Unknown';
 }
 
+export function formatSize(sizeBytes: number | null): string {
+    if (sizeBytes === null) {
+        return '-';
+    }
+
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let value = sizeBytes;
+    let unitIndex = 0;
+
+    while (value >= 1024 && unitIndex < units.length - 1) {
+        value /= 1024;
+        unitIndex += 1;
+    }
+
+    const digits = value >= 100 || unitIndex === 0 ? 0 : value >= 10 ? 1 : 2;
+    return `${value.toFixed(digits)} ${units[unitIndex]}`;
+}
+
 export async function mapConcurrent<T, U>(
     items: T[],
     concurrency: number,

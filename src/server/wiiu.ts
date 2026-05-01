@@ -1,10 +1,13 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import type { Dirent } from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import { getAppRoot } from './paths.js';
 import { normalizeRegion } from '../shared/regions.js';
-import { TMD_TITLE_FILE } from './metadata.js';
+import {
+    type ContentTreeVerification,
+    TMD_TITLE_FILE,
+    validateTitleInstallFiles,
+} from './metadata.js';
 
 import {
     type AvailableTitleEntry,
@@ -20,9 +23,19 @@ import {
     toArray,
     normalizeTitleName,
     mapConcurrent,
+    formatSize,
     TitleKinds,
 } from '../shared/shared.js';
 import { readTmd } from './metadata.js';
+
+export type LibraryTitleValidation = {
+    directory: string;
+    titleId: string | null;
+    titleVersion: number | null;
+    status: 'ok' | 'failed';
+    error: string | null;
+    verification: ContentTreeVerification[];
+};
 
 type RawTitleDatabaseEntry = {
     titleId: string;
@@ -87,6 +100,8 @@ type LocalTitleEntry = TitleEntry & {
 };
 
 const LIBRARY_SCAN_CONCURRENCY = 8;
+const ANSI_RED = '\u001b[31m';
+const ANSI_RESET = '\u001b[0m';
 
 function cleanDirectoryName(dirname: string): string {
     // Clear [ and anything after it.
@@ -378,39 +393,20 @@ async function getDirectorySizeBytes(targetPath: string): Promise<number> {
     }
 
     const entries = await readdir(targetPath, { withFileTypes: true });
-    let total = 0;
-
-    const queue = [...entries];
-    const cpuCount = os.cpus()?.length ?? 4;
-    const concurrency = Math.min(cpuCount * 2, queue.length);
-
-    const workers = new Array(concurrency).fill(null).map(async () => {
-        while (queue.length > 0) {
-            const entry = queue.shift();
-            if (!entry) break;
-
-            const childPath = path.join(targetPath, entry.name);
-
+    const sizes = await mapConcurrent(
+        entries.filter((entry) => entry.isFile()),
+        LIBRARY_SCAN_CONCURRENCY,
+        async (entry) => {
             try {
-                if (entry.isDirectory()) {
-                    const size = await getDirectorySizeBytes(childPath);
-                    total += size;
-                    continue;
-                }
-
-                if (entry.isFile()) {
-                    const childInfo = await stat(childPath);
-                    total += childInfo.size;
-                }
+                const childInfo = await stat(path.join(targetPath, entry.name));
+                return childInfo.size;
             } catch {
-                // ignore individual errors while scanning
+                return 0;
             }
         }
-    });
+    );
 
-    await Promise.all(workers);
-
-    return total;
+    return sizes.reduce((total, size) => total + size, 0);
 }
 
 async function readTitleEntry(
@@ -442,6 +438,46 @@ async function readTitleEntry(
         family,
         sizeBytes: await getDirectorySizeBytes(dirPath),
     };
+}
+
+async function findTitleDirs(root: string): Promise<string[]> {
+    async function findTitleDirsInPath(
+        currentPath: string,
+        relative = ''
+    ): Promise<string[]> {
+        const found: string[] = [];
+        let entries: Dirent[];
+        try {
+            entries = await readdir(currentPath, { withFileTypes: true });
+        } catch {
+            return found;
+        }
+
+        const hasTmd = entries.some(
+            (entry) => entry.isFile() && entry.name === TMD_TITLE_FILE
+        );
+        if (hasTmd) {
+            found.push(relative || '.');
+        }
+
+        const childDirectories = entries.filter((entry) => entry.isDirectory());
+        const childResults = await mapConcurrent(
+            childDirectories,
+            LIBRARY_SCAN_CONCURRENCY,
+            async (entry) => {
+                const subRel = relative
+                    ? `${relative}/${entry.name}`
+                    : entry.name;
+                const childPath = path.join(currentPath, entry.name);
+                return findTitleDirsInPath(childPath, subRel);
+            }
+        );
+        found.push(...childResults.flat());
+
+        return found;
+    }
+
+    return (await findTitleDirsInPath(root)).sort((a, b) => a.localeCompare(b));
 }
 
 function createEmptyGroup(family: string): TitleGroup {
@@ -500,46 +536,7 @@ export async function scanWiiUTitles(
         readGameTdb(),
     ]);
 
-    // Recursively find directories that contain a title.tmd file.
-    async function findTitleDirs(
-        currentPath: string,
-        relative = ''
-    ): Promise<string[]> {
-        const found: string[] = [];
-        let entries: Dirent[];
-        try {
-            entries = await readdir(currentPath, { withFileTypes: true });
-        } catch {
-            return found;
-        }
-
-        const hasTmd = entries.some(
-            (e) => e.isFile() && e.name === TMD_TITLE_FILE
-        );
-        if (hasTmd) {
-            found.push(relative || '.');
-        }
-
-        const childDirectories = entries.filter((entry) => entry.isDirectory());
-        const childResults = await mapConcurrent(
-            childDirectories,
-            LIBRARY_SCAN_CONCURRENCY,
-            async (entry) => {
-                const subRel = relative
-                    ? `${relative}/${entry.name}`
-                    : entry.name;
-                const childPath = path.join(currentPath, entry.name);
-                return findTitleDirs(childPath, subRel);
-            }
-        );
-        found.push(...childResults.flat());
-
-        return found;
-    }
-
-    const directories = (await findTitleDirs(root)).sort((a, b) =>
-        a.localeCompare(b)
-    );
+    const directories = await findTitleDirs(root);
 
     const scanned = (
         await mapConcurrent(
@@ -625,4 +622,36 @@ export async function scanWiiUTitles(
     return [...groups.values()]
         .filter((group) => options.includeAll || group.entries.length > 0)
         .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function validateWiiUTitles(
+    root: string
+): Promise<LibraryTitleValidation[]> {
+    const directories = await findTitleDirs(root);
+    const validations: LibraryTitleValidation[] = [];
+
+    for (const directory of directories) {
+        const dirPath = path.join(root, directory);
+        const sizeBytes = await getDirectorySizeBytes(dirPath);
+        console.log(
+            `[wiiu] validating title: ${directory} (${formatSize(sizeBytes)})`
+        );
+        const validation = await validateTitleInstallFiles(dirPath);
+        const status =
+            validation.status === 'failed'
+                ? `${ANSI_RED}failed${ANSI_RESET}`
+                : validation.status;
+        console.log(`[wiiu] validated title: ${directory} (${status})`);
+
+        validations.push({
+            directory,
+            titleId: validation.titleId,
+            titleVersion: validation.titleVersion,
+            status: validation.status,
+            error: validation.error,
+            verification: validation.verification,
+        });
+    }
+
+    return validations;
 }

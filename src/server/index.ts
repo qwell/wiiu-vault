@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
@@ -10,7 +10,7 @@ import {
     getUpdateMetadata,
 } from './metadata.js';
 import { getCachedImage } from './image-cache.js';
-import { getTitleIconUrl, scanWiiUTitles } from './wiiu.js';
+import { getTitleIconUrl, scanWiiUTitles, validateWiiUTitles } from './wiiu.js';
 
 const config = loadConfig();
 
@@ -20,6 +20,82 @@ const port = config.server.port;
 const romRoot = config.roms.wiiuRoot;
 
 const clientDir = path.join(getAppRoot(), 'client');
+
+type TitleIdQueryResult =
+    | {
+          ok: true;
+          titleId: string;
+      }
+    | {
+          ok: false;
+          error: string;
+      };
+
+function getTitleIdQuery(req: Request): TitleIdQueryResult {
+    const { titleId } = req.query;
+
+    if (typeof titleId !== 'string' || titleId.length === 0) {
+        return {
+            ok: false,
+            error: 'Missing titleId query parameter',
+        };
+    }
+
+    if (!/^[0-9a-f]{16}$/i.test(titleId)) {
+        return {
+            ok: false,
+            error: 'titleId query parameter must be 16 hexadecimal characters',
+        };
+    }
+
+    return {
+        ok: true,
+        titleId: titleId.toLowerCase(),
+    };
+}
+
+function requireTitleIdQuery(req: Request, res: Response): string | null {
+    const result = getTitleIdQuery(req);
+    if (result.ok) {
+        return result.titleId;
+    }
+
+    res.status(400).json({
+        error: result.error,
+    });
+    return null;
+}
+
+function getErrorStage(error: unknown): string | null {
+    return typeof error === 'object' &&
+        error !== null &&
+        'stage' in error &&
+        typeof error.stage === 'string'
+        ? error.stage
+        : null;
+}
+
+function sendServerError(
+    res: Response,
+    publicError: string,
+    error: unknown,
+    options: { includeDetails?: boolean } = {}
+): void {
+    const body: {
+        error: string;
+        message?: string;
+        stage?: string | null;
+    } = {
+        error: publicError,
+    };
+
+    if (options.includeDetails) {
+        body.message = error instanceof Error ? error.message : String(error);
+        body.stage = getErrorStage(error);
+    }
+
+    res.status(500).json(body);
+}
 
 app.use((req, _res, next) => {
     console.log(`[server] ${req.method} ${req.url}`);
@@ -39,9 +115,25 @@ app.get('/api/library', async (req, res) => {
         });
     } catch (error) {
         console.error('[server] Failed to scan library:', error);
+        sendServerError(res, 'Failed to scan library', error);
+    }
+});
 
-        res.status(500).json({
-            error: 'Failed to scan library',
+app.get('/api/library/validate', async (_req, res) => {
+    try {
+        const titles = await validateWiiUTitles(romRoot);
+        const failed = titles.filter((title) => title.status !== 'ok').length;
+
+        res.json({
+            status: failed === 0 ? 'ok' : 'failed',
+            total: titles.length,
+            failed,
+            titles,
+        });
+    } catch (error) {
+        console.error('[server] Failed to validate library:', error);
+        sendServerError(res, 'Failed to validate library', error, {
+            includeDetails: true,
         });
     }
 });
@@ -62,20 +154,13 @@ app.get('/api/title-icon/:family', async (req, res) => {
         res.send(image.body);
     } catch (error) {
         console.error('[server] Failed to load title icon:', error);
-
-        res.status(500).json({
-            error: 'Failed to load title icon',
-        });
+        sendServerError(res, 'Failed to load title icon', error);
     }
 });
 
 app.get('/api/title-metadata', async (req, res) => {
-    const titleId = req.query.titleId as string;
-
+    const titleId = requireTitleIdQuery(req, res);
     if (!titleId) {
-        res.status(400).json({
-            error: 'Missing titleId query parameter',
-        });
         return;
     }
 
@@ -105,28 +190,15 @@ app.get('/api/title-metadata', async (req, res) => {
         });
     } catch (error) {
         console.error('[server] Failed to download title metadata:', error);
-
-        res.status(500).json({
-            error: 'Failed to download title metadata',
-            message: error instanceof Error ? error.message : String(error),
-            stage:
-                typeof error === 'object' &&
-                error !== null &&
-                'stage' in error &&
-                typeof error.stage === 'string'
-                    ? error.stage
-                    : null,
+        sendServerError(res, 'Failed to download title metadata', error, {
+            includeDetails: true,
         });
     }
 });
 
 app.get('/api/title-all', async (req, res) => {
-    const titleId = req.query.titleId as string;
-
+    const titleId = requireTitleIdQuery(req, res);
     if (!titleId) {
-        res.status(400).json({
-            error: 'Missing titleId query parameter',
-        });
         return;
     }
 
@@ -167,28 +239,15 @@ app.get('/api/title-all', async (req, res) => {
         });
     } catch (error) {
         console.error('[server] Failed to load full title metadata:', error);
-
-        res.status(500).json({
-            error: 'Failed to load full title metadata',
-            message: error instanceof Error ? error.message : String(error),
-            stage:
-                typeof error === 'object' &&
-                error !== null &&
-                'stage' in error &&
-                typeof error.stage === 'string'
-                    ? error.stage
-                    : null,
+        sendServerError(res, 'Failed to load full title metadata', error, {
+            includeDetails: true,
         });
     }
 });
 
 app.get('/api/title-download', async (req, res) => {
-    const titleId = req.query.titleId as string;
-
+    const titleId = requireTitleIdQuery(req, res);
     if (!titleId) {
-        res.status(400).json({
-            error: 'Missing titleId query parameter',
-        });
         return;
     }
 
@@ -196,28 +255,15 @@ app.get('/api/title-download', async (req, res) => {
         res.json(await generateTitleInstallFiles(titleId, romRoot));
     } catch (error) {
         console.error('[server] Failed to download title:', error);
-
-        res.status(500).json({
-            error: 'Failed to download title',
-            message: error instanceof Error ? error.message : String(error),
-            stage:
-                typeof error === 'object' &&
-                error !== null &&
-                'stage' in error &&
-                typeof error.stage === 'string'
-                    ? error.stage
-                    : null,
+        sendServerError(res, 'Failed to download title', error, {
+            includeDetails: true,
         });
     }
 });
 
 app.get('/api/title-update', async (req, res) => {
-    const titleId = req.query.titleId as string;
-
+    const titleId = requireTitleIdQuery(req, res);
     if (!titleId) {
-        res.status(400).json({
-            error: 'Missing titleId query parameter',
-        });
         return;
     }
 
@@ -231,21 +277,15 @@ app.get('/api/title-update', async (req, res) => {
         });
     } catch (error) {
         console.error('[server] Failed to load title update metadata:', error);
-
-        res.status(500).json({
-            error: 'Failed to load title update metadata',
-            message: error instanceof Error ? error.message : String(error),
+        sendServerError(res, 'Failed to load title update metadata', error, {
+            includeDetails: true,
         });
     }
 });
 
 app.get('/api/title-dlc', async (req, res) => {
-    const titleId = req.query.titleId as string;
-
+    const titleId = requireTitleIdQuery(req, res);
     if (!titleId) {
-        res.status(400).json({
-            error: 'Missing titleId query parameter',
-        });
         return;
     }
 
@@ -259,10 +299,8 @@ app.get('/api/title-dlc', async (req, res) => {
         });
     } catch (error) {
         console.error('[server] Failed to load title DLC metadata:', error);
-
-        res.status(500).json({
-            error: 'Failed to load title DLC metadata',
-            message: error instanceof Error ? error.message : String(error),
+        sendServerError(res, 'Failed to load title DLC metadata', error, {
+            includeDetails: true,
         });
     }
 });
