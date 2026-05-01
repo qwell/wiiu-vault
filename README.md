@@ -1,6 +1,6 @@
-# Wii U Vault
+# WiiU Vault
 
-Wii U Vault is a web-based application that allows users to manage and organize their Wii U game library. It provides features such as game categorization, search and filter functionality, and the ability to track game statuses (e.g., complete, incomplete, etc.). The application is built using TypeScript and Node.js. The aim is to be cross-platform.
+WiiU Vault is a web-based application that allows users to manage and organize their Wii U game library. It provides features such as game categorization, search and filter functionality, and the ability to track game statuses (e.g., complete, incomplete, etc.). The application is built using TypeScript and Node.js. The aim is to be cross-platform.
 
 Work in Progress
 
@@ -97,7 +97,7 @@ yarn test
 yarn generate:titles
 ```
 
-`yarn generate:titles` only needs to be run when refreshing the checked-in title databases, updating `titles/titledb.csv`, rebuilding WiiUTDB data, or supplementing icons, and is only necessary in very specific cases. The Wii U Vault server must already be running because the generator calls the local metadata endpoints.
+`yarn generate:titles` only needs to be run when refreshing the checked-in title databases, updating `titles/titledb.csv`, rebuilding WiiUTDB data, or supplementing icons, and is only necessary in very specific cases. The WiiU Vault server must already be running because the generator calls the local metadata endpoints.
 
 ## API
 

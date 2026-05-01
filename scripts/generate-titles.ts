@@ -84,7 +84,7 @@ const dlcMetadataUrl = 'http://localhost:3000/api/title-dlc?titleId=%s';
 const samuraiContentsUrl =
     'https://samurai.wup.shop.nintendo.net/samurai/ws/US/contents/?shop_id=2&limit=10000';
 const wiiUTdbZipUrl = 'https://www.gametdb.com/wiiutdb.zip';
-const userAgent = 'Wii U Vault';
+const userAgent = 'WiiU Vault';
 
 const parallel = Number.parseInt(process.env.parallel ?? '16', 10);
 
