@@ -94,6 +94,8 @@ app.get('/api/title-metadata', async (req, res) => {
             region: metadata.region,
             productCode: metadata.productCode,
             companyCode: metadata.companyCode,
+            baseVersions:
+                metadata.titleVersion === null ? [] : [metadata.titleVersion],
             metaJson: metadata.metaJson,
             titleKey: metadata.titleKey
                 ? Buffer.from(metadata.titleKey).toString('hex')
@@ -147,6 +149,8 @@ app.get('/api/title-all', async (req, res) => {
             region: metadata.region,
             productCode: metadata.productCode,
             companyCode: metadata.companyCode,
+            baseVersions:
+                metadata.titleVersion === null ? [] : [metadata.titleVersion],
             titleKey: metadata.titleKey
                 ? Buffer.from(metadata.titleKey).toString('hex')
                 : null,

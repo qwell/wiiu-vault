@@ -29,6 +29,7 @@ type RawTitleDatabaseEntry = {
     companyCode?: string | null;
     iconUrl: string | null;
     productCode: string | null;
+    baseVersions: number[];
     updates: number[];
     dlc: number[];
 };
@@ -40,6 +41,7 @@ type TitleDatabaseEntry = {
     companyCode: string | null;
     iconUrl: string | null;
     productCode: string | null;
+    baseVersions: number[];
     updates: number[];
     dlc: number[];
 
@@ -164,13 +166,13 @@ function classifyTitleId(titleId: string): {
 }
 
 function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
-    const json = JSON.parse(jsonText) as unknown;
+    const json = JSON.parse(jsonText) as RawTitleDatabaseEntry[];
 
     if (!Array.isArray(json)) {
         throw new Error('titles.json must contain an array');
     }
 
-    return (json as RawTitleDatabaseEntry[]).map((entry) => {
+    const entries: TitleDatabaseEntry[] = json.map((entry) => {
         if (typeof entry.titleId !== 'string' || entry.titleId.length !== 16) {
             throw new Error(
                 `invalid titleId in titles.json: ${JSON.stringify(entry)}`
@@ -186,12 +188,19 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
             companyCode: entry.companyCode?.length ? entry.companyCode : null,
             productCode: entry.productCode?.length ? entry.productCode : null,
             iconUrl: entry.iconUrl,
+
+            baseVersions:
+                entry.baseVersions?.filter((version) =>
+                    Number.isFinite(version)
+                ) ?? [],
             updates: entry.updates,
             dlc: entry.dlc,
 
             family,
         };
     });
+
+    return entries;
 }
 
 function splitList(value: string | null | undefined): string[] {
@@ -228,6 +237,10 @@ function getGameTdbDetails(
     return id ? (gameTdb.get(id) ?? null) : null;
 }
 
+function latestVersion(versions: number[]): number[] {
+    return versions.length === 0 ? [] : [versions[versions.length - 1]];
+}
+
 function replaceTitleKind(titleId: string, kind: TitleKinds): string {
     switch (kind) {
         case TitleKinds.Update:
@@ -250,7 +263,7 @@ function getAvailableEntries(
         {
             kind: TitleKinds.Base,
             titleId: entry.titleId,
-            versions: [],
+            versions: latestVersion(entry.baseVersions),
         },
     ];
 
@@ -258,7 +271,7 @@ function getAvailableEntries(
         available.push({
             kind: TitleKinds.Update,
             titleId: replaceTitleKind(entry.titleId, TitleKinds.Update),
-            versions: entry.updates,
+            versions: latestVersion(entry.updates),
         });
     }
 
@@ -266,7 +279,7 @@ function getAvailableEntries(
         available.push({
             kind: TitleKinds.DLC,
             titleId: replaceTitleKind(entry.titleId, TitleKinds.DLC),
-            versions: entry.dlc,
+            versions: latestVersion(entry.dlc),
         });
     }
 
