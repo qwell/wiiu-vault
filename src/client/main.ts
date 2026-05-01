@@ -3,6 +3,8 @@ import {
     type TitleGroup,
     type TitleEntry,
     type TitleGroupStatus,
+    type TitleDetails,
+    type TitleInputControl,
     TitleKinds,
     type ChildKind,
     PARENT_KINDS,
@@ -13,6 +15,7 @@ type LibraryViewMode = 'table' | 'list';
 
 let refreshLibrary: (() => Promise<void>) | null = null;
 let showAllTitles = false;
+let selectedFamily: string | null = null;
 let iconObserver: IntersectionObserver | null = null;
 
 iconObserver = new IntersectionObserver(
@@ -37,7 +40,7 @@ iconObserver = new IntersectionObserver(
         }
     },
     {
-        root: document.querySelector('library-grid'),
+        root: document.querySelector('.library-grid'),
         rootMargin: '256px',
     }
 );
@@ -99,6 +102,105 @@ function formatSize(sizeBytes: number | null): string {
     return `${value.toFixed(digits)} ${units[unitIndex]}`;
 }
 
+function formatCount(value: number, singular: string, plural: string): string {
+    return `${value} ${value === 1 ? singular : plural}`;
+}
+
+function formatControlType(type: string): string {
+    const labels: Record<string, string> = {
+        balanceboard: 'Balance Board',
+        classiccontroller: 'Classic Controller',
+        gamecube: 'GameCube Controller',
+        motionplus: 'MotionPlus',
+        nunchuk: 'Nunchuk',
+        pad: 'GamePad',
+        procontroller: 'Pro Controller',
+        wiimote: 'Wii Remote',
+    };
+
+    return labels[type] ?? type;
+}
+
+function formatInputControl(control: TitleInputControl): string {
+    return `${formatControlType(control.type)} ${control.required ? 'required' : 'optional'}`;
+}
+
+function formatInput(details: TitleDetails): string {
+    const parts: string[] = [];
+
+    if (details.inputPlayers !== null) {
+        parts.push(formatCount(details.inputPlayers, 'player', 'players'));
+    }
+
+    parts.push(...details.inputControls.map(formatInputControl));
+
+    return parts.join('; ') || '-';
+}
+
+function hasLocalEntry(group: TitleGroup, kind: TitleKinds): boolean {
+    return group.entries.some((entry) => entry.kind === kind);
+}
+
+function renderDetailRow(label: string, value: string | null): HTMLElement {
+    const row = document.createElement('div');
+    row.className = 'title-detail-row';
+
+    const labelElement = document.createElement('dt');
+    labelElement.textContent = label;
+
+    const valueElement = document.createElement('dd');
+    valueElement.textContent = value && value.length > 0 ? value : '-';
+
+    row.append(labelElement, valueElement);
+    return row;
+}
+
+function renderAvailabilityRow(
+    label: string,
+    titleId: string,
+    size: string | null = null
+): HTMLElement {
+    const row = document.createElement('div');
+    row.className = 'title-availability-row';
+
+    const labelElement = document.createElement('div');
+    labelElement.className = 'title-availability-label';
+    labelElement.textContent = label;
+
+    const titleIdElement = document.createElement('div');
+    titleIdElement.className = 'title-availability-title-id';
+    titleIdElement.textContent = size ? `${titleId} (${size})` : titleId;
+
+    row.append(labelElement, titleIdElement);
+    return row;
+}
+
+function getKindSortValue(kind: TitleKinds): number {
+    switch (kind) {
+        case TitleKinds.Base:
+            return 0;
+        case TitleKinds.Update:
+            return 1;
+        case TitleKinds.DLC:
+            return 2;
+        default:
+            return 3;
+    }
+}
+
+function renderDetailSection(title: string): HTMLElement {
+    const heading = document.createElement('div');
+    heading.className = 'title-detail-section';
+    heading.textContent = title;
+    return heading;
+}
+
+function formatVersions(versions: number[]): string {
+    return versions.length > 0
+        ? versions.map((version) => `v${version}`).join(', ')
+        : '';
+}
+
 function getEntry(
     group: TitleGroup,
     kinds: TitleKinds | readonly TitleKinds[]
@@ -155,7 +257,187 @@ function renderSlotBadge(label: string, state: SlotBadgeState): HTMLElement {
     return badge;
 }
 
-function renderGroup(group: TitleGroup): HTMLElement | null {
+function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
+    const fragment = document.createDocumentFragment();
+    const summary = document.createElement('div');
+    summary.className = 'title-detail-summary';
+
+    const list = document.createElement('dl');
+    list.className = 'title-detail-list';
+
+    const metadata = group.details;
+    list.append(
+        renderDetailRow('TV Format', metadata?.tvFormat ?? null),
+        renderDetailRow('Languages', metadata?.languages.join(', ') ?? null),
+        renderDetailRow('Developer', metadata?.developer ?? null),
+        renderDetailRow('Genre', metadata?.genre.join(', ') ?? null),
+        renderDetailRow('Input', metadata ? formatInput(metadata) : null)
+    );
+
+    summary.append(list);
+    fragment.append(summary);
+
+    const synopsis = document.createElement('p');
+    synopsis.className = 'title-detail-synopsis';
+    synopsis.textContent = metadata?.synopsis?.replace(/\n+/g, '\n\n') ?? '';
+    fragment.append(synopsis);
+
+    const availability = document.createElement('div');
+    availability.className = 'title-detail-availability';
+
+    if (group.entries.length > 0) {
+        const localList = document.createElement('div');
+        localList.className = 'title-availability-list';
+
+        const localEntries = [...group.entries].sort(
+            (a, b) => getKindSortValue(a.kind) - getKindSortValue(b.kind)
+        );
+
+        for (const entry of localEntries) {
+            localList.append(
+                renderAvailabilityRow(
+                    `${entry.kind} v${entry.version}`,
+                    entry.titleId,
+                    formatSize(entry.sizeBytes)
+                )
+            );
+        }
+
+        availability.append(renderDetailSection('Downloaded'), localList);
+    }
+
+    const availableEntries = group.availableEntries
+        .filter((entry) => !hasLocalEntry(group, entry.kind))
+        .sort((a, b) => getKindSortValue(a.kind) - getKindSortValue(b.kind));
+
+    if (availableEntries.length > 0) {
+        const availableList = document.createElement('div');
+        availableList.className = 'title-availability-list';
+
+        for (const entry of availableEntries) {
+            const versions = formatVersions(entry.versions);
+            const label = versions ? `${entry.kind} ${versions}` : entry.kind;
+
+            availableList.append(renderAvailabilityRow(label, entry.titleId));
+        }
+
+        availability.append(renderDetailSection('Available'), availableList);
+    }
+
+    fragment.append(availability);
+
+    return fragment;
+}
+
+function closeDetailSidebar(sidebar: HTMLElement): void {
+    selectedFamily = null;
+    sidebar.hidden = true;
+    document.body.removeAttribute('data-detail-open');
+    sidebar.querySelector('.title-detail-body')?.replaceChildren();
+
+    for (const group of document.querySelectorAll('.title-group')) {
+        group.removeAttribute('data-selected');
+    }
+}
+
+function resetDetailSidebars(): void {
+    selectedFamily = null;
+    document.body.removeAttribute('data-detail-open');
+
+    for (const sidebar of document.querySelectorAll<HTMLElement>(
+        '.title-detail-sidebar'
+    )) {
+        sidebar.hidden = true;
+        sidebar.querySelector('.title-detail-body')?.replaceChildren();
+    }
+
+    for (const group of document.querySelectorAll('.title-group')) {
+        group.removeAttribute('data-selected');
+    }
+}
+
+function showDetailSidebar(sidebar: HTMLElement, group: TitleGroup): void {
+    selectedFamily = group.family;
+    sidebar.hidden = false;
+    document.body.setAttribute('data-detail-open', '');
+
+    const title = sidebar.querySelector('.title-detail-title');
+    if (title) {
+        title.textContent = group.name;
+    }
+
+    const thumbnail = sidebar.querySelector<HTMLElement>(
+        '.title-detail-thumbnail'
+    );
+    if (thumbnail) {
+        thumbnail.replaceChildren();
+
+        if (group.iconUrl) {
+            const image = document.createElement('img');
+            image.src = group.iconUrl;
+            image.alt = '';
+            image.width = 32;
+            image.height = 32;
+            thumbnail.append(image);
+        }
+    }
+
+    const body = sidebar.querySelector('.title-detail-body');
+    body?.replaceChildren(renderGroupDetailContent(group));
+
+    for (const groupElement of document.querySelectorAll('.title-group')) {
+        groupElement.toggleAttribute(
+            'data-selected',
+            groupElement.getAttribute('data-family') === group.family
+        );
+    }
+}
+
+function toggleDetailSidebar(sidebar: HTMLElement, group: TitleGroup): void {
+    if (selectedFamily === group.family) {
+        closeDetailSidebar(sidebar);
+        return;
+    }
+
+    showDetailSidebar(sidebar, group);
+}
+
+function buildDetailSidebar(): HTMLElement {
+    const sidebar = document.createElement('aside');
+    sidebar.className = 'title-detail-sidebar';
+    sidebar.hidden = true;
+    sidebar.setAttribute('aria-label', 'Title details');
+
+    const header = document.createElement('div');
+    header.className = 'title-detail-sidebar-header';
+
+    const thumbnail = document.createElement('div');
+    thumbnail.className = 'title-detail-thumbnail';
+
+    const title = document.createElement('h2');
+    title.className = 'title-detail-title';
+    title.textContent = 'Title details';
+
+    const closeButton = document.createElement('button');
+    closeButton.className = 'title-detail-close';
+    closeButton.type = 'button';
+    closeButton.setAttribute('aria-label', 'Close title details');
+    closeButton.textContent = '×';
+    closeButton.addEventListener('click', () => closeDetailSidebar(sidebar));
+
+    const body = document.createElement('div');
+    body.className = 'title-detail-body';
+
+    header.append(thumbnail, title, closeButton);
+    sidebar.append(header, body);
+
+    return sidebar;
+}
+
+function renderGroup(
+    group: TitleGroup,
+    onSelect: (group: TitleGroup) => void
+): HTMLElement | null {
     if (!group.name) {
         return null;
     }
@@ -164,7 +446,15 @@ function renderGroup(group: TitleGroup): HTMLElement | null {
 
     const root = document.createElement('div');
     root.className = `title-group title-group-${status}`;
+    root.dataset.family = group.family;
     root.title = formatTooltip(group);
+    root.tabIndex = 0;
+    root.setAttribute('role', 'button');
+    root.setAttribute('aria-label', `Show details for ${group.name}`);
+
+    if (group.family === selectedFamily) {
+        root.setAttribute('data-selected', '');
+    }
 
     if (group.iconUrl) {
         const image = document.createElement('img');
@@ -228,6 +518,14 @@ function renderGroup(group: TitleGroup): HTMLElement | null {
 
     root.append(badges);
 
+    root.addEventListener('click', () => onSelect(group));
+    root.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onSelect(group);
+        }
+    });
+
     return root;
 }
 
@@ -282,6 +580,7 @@ function collectRegions(groups: TitleGroup[]): string[] {
 function renderGroups(
     allGroups: TitleGroup[],
     grid: HTMLDivElement,
+    sidebar: HTMLElement,
     statusValue: string,
     regionValue: string,
     searchValue: string
@@ -303,7 +602,9 @@ function renderGroups(
     grid.replaceChildren();
 
     for (const group of filteredGroups) {
-        const render = renderGroup(group);
+        const render = renderGroup(group, (selectedGroup) =>
+            toggleDetailSidebar(sidebar, selectedGroup)
+        );
         if (!render) {
             continue;
         }
@@ -315,6 +616,7 @@ function renderGroups(
 function buildControls(
     groups: TitleGroup[],
     grid: HTMLDivElement,
+    sidebar: HTMLElement,
     loading = false
 ): HTMLElement {
     const controls = document.createElement('div');
@@ -423,6 +725,7 @@ function buildControls(
         renderGroups(
             groups,
             grid,
+            sidebar,
             statusSelect.value,
             regionSelect.value,
             searchInput.value
@@ -519,8 +822,9 @@ function buildLibraryContent(
     const grid = document.createElement('div');
     grid.className = 'library-grid';
 
-    const controls = buildControls(groups, grid, loading);
-    fragment.append(controls, grid);
+    const sidebar = buildDetailSidebar();
+    const controls = buildControls(groups, grid, sidebar, loading);
+    fragment.append(controls, grid, sidebar);
 
     const loadingLine = document.createElement('div');
     loadingLine.className = 'library-loading';
@@ -528,13 +832,14 @@ function buildLibraryContent(
     fragment.append(loadingLine);
 
     if (!loading && groups.length > 0) {
-        renderGroups(groups, grid, 'all', 'all', '');
+        renderGroups(groups, grid, sidebar, 'all', 'all', '');
     }
 
     return fragment;
 }
 
 async function loadLibrary(output: HTMLElement): Promise<void> {
+    resetDetailSidebars();
     output.replaceChildren(buildLibraryContent([], true));
 
     try {
@@ -592,8 +897,9 @@ function setTheme(darkMode: boolean, save = false): void {
 
 function setupTheme(): void {
     const prefers = window.matchMedia('(prefers-color-scheme: dark)');
+    const savedTheme = localStorage.getItem('theme');
 
-    setTheme(localStorage.getItem('theme') === 'dark' || prefers.matches);
+    setTheme(savedTheme ? savedTheme === 'dark' : prefers.matches);
 
     prefers.addEventListener('change', (e) => {
         if (!localStorage.getItem('theme')) {
@@ -605,6 +911,9 @@ function setupTheme(): void {
         setTheme(document.documentElement.dataset.theme !== 'dark', true);
     });
 }
+
+resetDetailSidebars();
+window.addEventListener('pageshow', resetDetailSidebars);
 
 void setupTheme();
 void refreshLibrary();

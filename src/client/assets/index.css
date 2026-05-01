@@ -1,6 +1,7 @@
 :root {
     color-scheme: light dark;
     --bg: #ffffff;
+    --panel-bg: #f4f4f4;
     --fg: #111111;
     --border: #444444;
     --border-muted: #777777;
@@ -14,6 +15,7 @@
 
 :root[data-theme='dark'] {
     --bg: #111111;
+    --panel-bg: #181818;
     --fg: #f3f3f3;
     --border: #666666;
     --border-muted: #999999;
@@ -27,9 +29,14 @@
 
 body {
     margin: 16px;
+    padding-bottom: 24px;
     font-family: sans-serif;
     background: var(--bg);
     color: var(--fg);
+}
+
+body[data-detail-open] {
+    margin-right: 436px;
 }
 
 header {
@@ -137,6 +144,7 @@ select {
     border: 1px solid var(--border-muted);
     border-radius: 100%;
     background: transparent;
+    color: var(--fg);
     cursor: pointer;
     font-size: 12px;
 }
@@ -212,6 +220,7 @@ select {
     border-radius: 6px;
     background-color: var(--bg);
     min-height: 24px;
+    cursor: pointer;
 
     grid-template-columns: 64px minmax(0, 1fr);
     grid-template-rows: auto auto;
@@ -228,6 +237,11 @@ select {
     grid-template-areas: 'icon header badges';
     align-items: center;
     padding: 2px 6px 2px 2px;
+}
+
+.title-group[data-selected] {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
 }
 
 .title-group-incomplete {
@@ -353,6 +367,141 @@ select {
     transform: rotate(180deg);
 }
 
+.title-detail-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1002;
+    width: 420px;
+    box-sizing: border-box;
+    border-left: 1px solid var(--border);
+    background: var(--panel-bg);
+    color: var(--fg);
+    padding: 16px;
+    box-shadow: -4px 0 16px rgb(0 0 0 / 0.2);
+    font-size: 12px;
+    line-height: 1.35;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.title-detail-sidebar[hidden] {
+    display: none;
+}
+
+.title-detail-sidebar-header {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.title-detail-thumbnail {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    background: var(--placeholder-bg);
+}
+
+.title-detail-thumbnail img {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+}
+
+.title-detail-title {
+    margin: 0;
+    font-size: 20px;
+    overflow-wrap: anywhere;
+}
+
+.title-detail-close {
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid var(--border-muted);
+    background: transparent;
+    color: var(--fg);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.title-detail-section {
+    margin: 12px 0 4px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-muted);
+    color: var(--fg);
+    font-size: 14px;
+}
+
+.title-detail-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.title-detail-list {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 2px 8px;
+    margin: 0;
+}
+
+.title-detail-row {
+    display: contents;
+}
+
+.title-detail-row dt {
+    color: var(--border-muted);
+    font-weight: 700;
+}
+
+.title-detail-row dd {
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.title-availability-list {
+    display: grid;
+    grid-template-columns: 10ch minmax(0, 1fr);
+    gap: 2px 8px;
+    margin: 0;
+}
+
+.title-availability-row {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+}
+
+.title-availability-label {
+    color: var(--border-muted);
+    font-weight: 700;
+}
+
+.title-availability-title-id {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.title-detail-synopsis {
+    margin: 12px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-muted);
+    min-height: min(5.4em, 30vh);
+    max-height: 50vh;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
 footer {
     position: fixed;
     display: flex;
@@ -360,7 +509,7 @@ footer {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: 1003;
     background-color: var(--footer);
     color: var(--fg);
     font-size: 10px;

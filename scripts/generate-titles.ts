@@ -6,6 +6,7 @@ import { parse as CsvParse } from 'csv-parse/sync';
 import { XMLParser } from 'fast-xml-parser';
 
 import { normalizeRegion } from '../src/shared/regions.js';
+import { toArray } from '../src/shared/shared.js';
 
 type Title = {
     titleId: string;
@@ -100,18 +101,6 @@ function stringFieldRecord<K extends string>(
             (key) => typeof (value as Record<string, unknown>)[key] === 'string'
         )
     );
-}
-
-function toArray<T>(value: T | readonly T[] | null | undefined): T[] {
-    if (value == null) {
-        return [];
-    }
-
-    if (Array.isArray(value)) {
-        return Array.from(value as readonly T[]);
-    }
-
-    return [value as T];
 }
 
 function normalizeTitleId(value: string): string | null {

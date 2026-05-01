@@ -47,6 +47,7 @@ async function main() {
     await copyFileIntoDist('config.json');
     await copyTitlesFileIntoDist('titles.json');
     await copyTitlesFileIntoDist('extra.json');
+    await copyTitlesFileIntoDist('wiiutdb.json');
 }
 
 main().catch((error) => {

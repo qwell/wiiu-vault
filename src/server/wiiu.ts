@@ -7,14 +7,18 @@ import { normalizeRegion } from '../shared/regions.js';
 import { TITLE_TMD } from './metadata.js';
 
 import {
+    type AvailableTitleEntry,
     type TitleEntry,
     type TitleGroup,
     type TitleGroupStatus,
-    TitleKinds,
+    type TitleDetails,
+    type TitleInputControl,
     type ChildKind,
     type ParentKind,
     PARENT_KINDS,
     CHILD_KINDS,
+    toArray,
+    TitleKinds,
 } from '../shared/shared.js';
 import { readTmd } from './metadata.js';
 
@@ -40,6 +44,38 @@ type TitleDatabaseEntry = {
     dlc: number[];
 
     family: string;
+};
+
+type GameTdbLocale = {
+    '@lang'?: string;
+    synopsis?: string;
+};
+
+type GameTdbControl = {
+    '@type'?: string;
+    '@required'?: string;
+};
+
+type GameTdbGameImage = {
+    '@size'?: string;
+};
+
+type GameTdbGame = {
+    id?: string;
+    region?: string;
+    languages?: string;
+    locale?: GameTdbLocale | GameTdbLocale[];
+    developer?: string;
+    genre?: string;
+    input?: {
+        control?: GameTdbControl | GameTdbControl[];
+        '@players'?: string;
+    };
+    rom?: GameTdbGameImage;
+};
+
+type GameTdbFile = {
+    games?: GameTdbGame[];
 };
 
 type LocalTitleEntry = TitleEntry & {
@@ -156,6 +192,131 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
             family,
         };
     });
+}
+
+function splitList(value: string | null | undefined): string[] {
+    return (value ?? '')
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+}
+
+function parseNumber(value: string | null | undefined): number | null {
+    if (!value) {
+        return null;
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getGameTdbId(entry: TitleDatabaseEntry): string | null {
+    const productCode = entry.productCode?.match(/WUP-[PN]-([A-Z0-9]{4})/i);
+
+    if (!productCode) {
+        return null;
+    }
+
+    return productCode[1].toUpperCase();
+}
+
+function getGameTdbDetails(
+    gameTdb: Map<string, TitleDetails>,
+    entry: TitleDatabaseEntry
+): TitleDetails | null {
+    const id = getGameTdbId(entry);
+    return id ? (gameTdb.get(id) ?? null) : null;
+}
+
+function replaceTitleKind(titleId: string, kind: TitleKinds): string {
+    switch (kind) {
+        case TitleKinds.Update:
+            return `0005000e${titleId.slice(8)}`;
+        case TitleKinds.DLC:
+            return `0005000c${titleId.slice(8)}`;
+        default:
+            return titleId;
+    }
+}
+
+function getAvailableEntries(
+    entry: TitleDatabaseEntry | null
+): AvailableTitleEntry[] {
+    if (!entry) {
+        return [];
+    }
+
+    const available: AvailableTitleEntry[] = [
+        {
+            kind: TitleKinds.Base,
+            titleId: entry.titleId,
+            versions: [],
+        },
+    ];
+
+    if (entry.updates.length > 0) {
+        available.push({
+            kind: TitleKinds.Update,
+            titleId: replaceTitleKind(entry.titleId, TitleKinds.Update),
+            versions: entry.updates,
+        });
+    }
+
+    if (entry.dlc.length > 0) {
+        available.push({
+            kind: TitleKinds.DLC,
+            titleId: replaceTitleKind(entry.titleId, TitleKinds.DLC),
+            versions: entry.dlc,
+        });
+    }
+
+    return available;
+}
+
+function parseGameTdbDetails(game: GameTdbGame): TitleDetails {
+    const { rom: gameImage } = game;
+    const englishLocale =
+        toArray(game.locale).find((locale) => locale['@lang'] === 'EN') ?? null;
+    const synopsis = englishLocale?.synopsis?.trim() || null;
+    const controls: TitleInputControl[] = toArray(game.input?.control)
+        .filter((control) => control['@type'])
+        .map((control) => ({
+            type: control['@type'] ?? '',
+            required: control['@required'] === 'true',
+        }));
+
+    return {
+        tvFormat: game.region ?? null,
+        languages: splitList(game.languages),
+        synopsis,
+        developer: game.developer?.trim() || null,
+        genre: splitList(game.genre),
+        inputPlayers: parseNumber(game.input?.['@players']),
+        inputControls: controls,
+        sizeBytes: parseNumber(gameImage?.['@size']),
+    };
+}
+
+async function readGameTdb(): Promise<Map<string, TitleDetails>> {
+    const filePath = path.join(getAppRoot(), 'titles', 'wiiutdb.json');
+
+    try {
+        const text = await readFile(filePath, 'utf8');
+        const parsed = JSON.parse(text) as GameTdbFile;
+        const games = Array.isArray(parsed.games) ? parsed.games : [];
+
+        return new Map(
+            games
+                .filter((game) => game.id)
+                .map((game) => [
+                    (game.id ?? '').slice(0, 4).toUpperCase(),
+                    parseGameTdbDetails(game),
+                ])
+        );
+    } catch (error) {
+        console.warn(`[wiiu] failed to read GameTdb at ${filePath}:`, error);
+        return new Map();
+    }
 }
 
 async function readTitleDatabaseFile(
@@ -280,6 +441,8 @@ function createEmptyGroup(family: string): TitleGroup {
         name: 'Unknown',
         region: null,
         iconUrl: null,
+        details: null,
+        availableEntries: [],
         titleInDatabase: false,
         expectedChildren: [],
         status: 'unknown',
@@ -324,6 +487,7 @@ export async function scanWiiUTitles(
     options: { includeAll?: boolean } = {}
 ): Promise<TitleGroup[]> {
     const titleDatabase = await readTitleDatabase();
+    const gameTdb = await readGameTdb();
 
     // Recursively find directories that contain a title.tmd file.
     async function findTitleDirs(
@@ -402,6 +566,10 @@ export async function scanWiiUTitles(
         const databaseEntry = titleDatabase.get(group.family) ?? null;
         const parentEntry = getParentByKind(group.entries);
         group.titleInDatabase = databaseEntry !== null;
+        group.details = databaseEntry
+            ? getGameTdbDetails(gameTdb, databaseEntry)
+            : null;
+        group.availableEntries = getAvailableEntries(databaseEntry);
         group.expectedChildren = CHILD_KINDS.filter((kind) => {
             if (!databaseEntry) {
                 return false;
