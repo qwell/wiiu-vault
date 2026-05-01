@@ -29,8 +29,8 @@ import {
 import { readTmd } from './metadata.js';
 
 export type LibraryTitleValidation = {
-    root: string;
-    directory: string;
+    root: string | null;
+    directory: string | null;
     titleId: string | null;
     titleVersion: number | null;
     status: 'ok' | 'failed';
@@ -102,6 +102,7 @@ type LocalTitleEntry = TitleEntry & {
 
 const LIBRARY_SCAN_CONCURRENCY = 8;
 const ANSI_RED = '\u001b[31m';
+const ANSI_GREEN = '\u001b[32m';
 const ANSI_RESET = '\u001b[0m';
 
 async function assertReadableDirectory(root: string): Promise<void> {
@@ -720,18 +721,30 @@ export async function validateWiiUTitles(
 
     for (const directory of directories) {
         const dirPath = path.join(root, directory);
-        const sizeBytes = await getDirectorySizeBytes(dirPath);
+        const titleEntry = await readTitleEntry(
+            root,
+            directory,
+            await readTitleDatabase()
+        );
+        const sizeBytes =
+            titleEntry?.sizeBytes ?? (await getDirectorySizeBytes(dirPath));
+        const titleId = titleEntry?.titleId ?? 'unknown';
+        const titleName = titleEntry?.titleName ?? directory;
+        const titleKind = titleEntry?.kind ?? TitleKinds.Unknown;
+
         console.log(
-            `[wiiu] validating title: ${directory} (${formatSize(sizeBytes)})`
+            `[wiiu] validating title: [${titleId}] ${titleName} [${titleKind}] (${formatSize(sizeBytes)})`
         );
         const validation = await validateTitleInstallFiles(dirPath);
         const status =
             validation.status === 'failed'
                 ? `${ANSI_RED}failed${ANSI_RESET}`
-                : validation.status;
+                : `${ANSI_GREEN}${validation.status}${ANSI_RESET}`;
 
         // Keep the extra space, for alignment purposes
-        console.log(`[wiiu] validated title:  ${directory} (${status})`);
+        console.log(
+            `[wiiu] validated title:  [${titleId}] ${titleName} [${titleKind}] (${status})`
+        );
 
         validations.push({
             root,
@@ -761,5 +774,55 @@ export async function validateWiiUTitleRoots(
         }
     }
 
+    validations.push(
+        ...createMissingExpectedChildValidations(
+            await scanWiiUTitleRoots(roots),
+            validations
+        )
+    );
+
     return validations;
+}
+
+function createMissingExpectedChildValidations(
+    groups: TitleGroup[],
+    existingValidations: LibraryTitleValidation[]
+): LibraryTitleValidation[] {
+    const installedTitleIds = new Set(
+        existingValidations
+            .map((validation) => validation.titleId)
+            .filter((titleId): titleId is string => titleId !== null)
+    );
+    const missing: LibraryTitleValidation[] = [];
+
+    for (const group of groups) {
+        if (group.entries.length === 0) {
+            continue;
+        }
+
+        for (const expectedKind of group.expectedChildren) {
+            const expectedEntry = group.availableEntries.find(
+                (entry) => entry.kind === expectedKind
+            );
+
+            if (
+                !expectedEntry ||
+                installedTitleIds.has(expectedEntry.titleId)
+            ) {
+                continue;
+            }
+
+            missing.push({
+                root: null,
+                directory: null,
+                titleId: expectedEntry.titleId,
+                titleVersion: expectedEntry.versions[0] ?? null,
+                status: 'failed',
+                error: `Missing expected ${expectedKind}`,
+                verification: [],
+            });
+        }
+    }
+
+    return missing;
 }

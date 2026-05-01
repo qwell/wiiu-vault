@@ -642,6 +642,10 @@ export async function generateTitleInstallFiles(
         verification.push(downloadedContentFile.verification);
     }
 
+    console.log(
+        `[metadata] finished downloading: [${normalizedTitleId}] ${meta?.name ?? normalizedTitleId}`
+    );
+
     return {
         titleId: normalizedTitleId,
         kind,
