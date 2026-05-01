@@ -9,6 +9,7 @@ Work in Progress
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
 - [Configuration](#configuration)
+- [Running](#running)
 - [Available Scripts](#available-scripts)
 - [API](#api)
 - [Title Data](#title-data)
@@ -49,9 +50,27 @@ cp config.sample.json config.json
 
 ## Configuration
 
-`config.json` is required. Copy it from `config.sample.json`, then set `roms.wiiuRoot` to your Wii U title directory.
+`config.json` is required. Copy it from `config.sample.json`, then set `roms.wiiuRoots` to one or more Wii U title directories.
 
-For title metadata generation or title downloads, put `common.key` in either `~/.wiiu/common.key` or the app root. The key may be raw 16-byte binary, hex text, or comma-separated byte literals.
+For title metadata generation or title downloads, put `common.key` in either `~/.wiiu/common.key` or the app root. If no key is found, WiiU Vault will try to download one and save it to `~/.wiiu/common.key`. The key may be raw 16-byte binary, hex text, or comma-separated byte literals.
+
+## Running
+
+By default, the server listens on the host and port configured in `config.json`, then opens the app in your browser when `server.openBrowser` is `true`.
+
+From a packaged release:
+
+1. Extract the release zip.
+2. Edit `app/config.json` if needed.
+3. Run `start.bat` on Windows or `./start.sh` on macOS/Linux.
+
+The packaged launch scripts download and verify a Node.js runtime on first run.
+
+From source:
+
+```bash
+yarn start
+```
 
 ## Available Scripts
 
@@ -67,7 +86,7 @@ yarn lint
 yarn format
 ```
 
-- `clean`: Clean up generated artifacts (like the `dist/` directory).
+- `clean`: Clean up generated artifacts.
 
 ```bash
 yarn clean
@@ -91,6 +110,12 @@ yarn start
 yarn test
 ```
 
+- `release`: Build a versioned release zip in `release/`.
+
+```bash
+yarn release
+```
+
 - `generate:titles`: Regenerate title data.
 
 ```bash
@@ -107,7 +132,7 @@ yarn generate:titles
 - `GET /api/title-update?titleId=...`: Check the update title ID and latest update version for a base title.
 - `GET /api/title-dlc?titleId=...`: Check the DLC title ID and latest DLC version for a base title.
 - `GET /api/title-all?titleId=...`: Fetch base metadata plus update and DLC availability.
-- `GET /api/title-download?titleId=...`: Download a base, update, or DLC title into `roms.wiiuRoot`, generate install files, and verify content hashes.
+- `GET /api/title-download?titleId=...`: Download a base, update, or DLC title into the first readable `roms.wiiuRoots` directory, generate install files, and verify content hashes.
 
 ## Title Data
 
