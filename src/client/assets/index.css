@@ -376,14 +376,14 @@ select {
     position: fixed;
     top: 0;
     right: 0;
-    bottom: 0;
+    bottom: 24px;
     z-index: 1002;
     width: 420px;
     box-sizing: border-box;
     border-left: 1px solid var(--border);
     background: var(--panel-bg);
     color: var(--fg);
-    padding: 16px;
+    padding: 8px 8px 4px 8px;
     box-shadow: -4px 0 16px rgb(0 0 0 / 0.2);
     font-size: 12px;
     line-height: 1.35;
@@ -405,8 +405,8 @@ select {
 
 .title-detail-thumbnail {
     flex: 0 0 auto;
-    width: 32px;
-    height: 32px;
+    width: 48px;
+    height: 48px;
     border-radius: 4px;
     background: var(--placeholder-bg);
 }
@@ -421,7 +421,8 @@ select {
 .title-detail-title {
     margin: 0;
     font-size: 20px;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    align-self: end;
 }
 
 .title-detail-close {
@@ -450,6 +451,7 @@ select {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: auto;
 }
 
 .title-detail-list {
@@ -510,7 +512,8 @@ select {
 footer {
     position: fixed;
     display: flex;
-    padding: 2px 4px 0px 2px;
+    padding: 4px 6px 0px 6px;
+    border-top: 1px solid var(--border-muted);
     left: 0;
     right: 0;
     bottom: 0;
