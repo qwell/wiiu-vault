@@ -69,6 +69,7 @@ The packaged launch scripts download and verify a Node.js runtime on first run.
 From source:
 
 ```bash
+yarn build
 yarn start
 ```
 

@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import open from 'open';
+import { createServer } from 'node:http';
 import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
@@ -334,7 +335,16 @@ app.get('/api/title-dlc', async (req, res) => {
     }
 });
 
-app.listen(port, host, () => {
+const server = createServer(app);
+
+server.on('error', (error: NodeJS.ErrnoException) => {
+    console.error(
+        `[server] Failed to listen at ${getListenUrl(host, port)}: ${error.message}`
+    );
+    process.exit(1);
+});
+
+server.on('listening', () => {
     console.log(`[server] Listening at ${getListenUrl(host, port)}`);
 
     if (config.server.openBrowser) {
@@ -345,3 +355,5 @@ app.listen(port, host, () => {
         });
     }
 });
+
+server.listen(port, host);

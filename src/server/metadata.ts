@@ -316,6 +316,7 @@ const HASH_H0_START = 0x000;
 const HASH_H1_START = 0x140;
 const HASH_H2_START = 0x280;
 const HASH_H2_END = 0x3c0;
+const AES_BLOCK_SIZE = 0x10;
 
 const META_XML_PARSER = new XMLParser({
     ignoreAttributes: true,
@@ -1449,7 +1450,11 @@ async function verifyContentTree({
     contentId: string;
 }): Promise<ContentTreeVerification> {
     try {
-        await assertExistingContentFileSize(appFile, content.size, contentId);
+        await assertExistingContentFileSize(
+            appFile,
+            getEncryptedContentFileSize(content),
+            contentId
+        );
         await verifyEncryptedContentTreeFile({
             appFile,
             h3File,
@@ -1529,11 +1534,16 @@ async function verifyContentHash({
     contentId: string;
 }): Promise<ContentTreeVerification> {
     try {
-        await assertExistingContentFileSize(appFile, content.size, contentId);
+        await assertExistingContentFileSize(
+            appFile,
+            getEncryptedContentFileSize(content),
+            contentId
+        );
         const actualHash = await hashDecryptedContentFile(
             appFile,
             titleKey,
-            content.index
+            content.index,
+            content.size
         );
 
         assertHashEquals(
@@ -1568,6 +1578,15 @@ async function assertExistingContentFileSize(
     }
 }
 
+function getEncryptedContentFileSize(content: TmdContent): bigint {
+    if (isHashedContent(content)) {
+        return content.size;
+    }
+
+    const blockSize = BigInt(AES_BLOCK_SIZE);
+    return ((content.size + blockSize - 1n) / blockSize) * blockSize;
+}
+
 function logExistingContentSkipped(contentId: string, size: bigint): void {
     console.log(
         `[metadata] content ${contentId} (${size.toString()} bytes, cached)`
@@ -1586,7 +1605,8 @@ function logExistingContentInvalid(
 async function hashDecryptedContentFile(
     appFile: string,
     titleKey: Uint8Array,
-    contentIndex: number
+    contentIndex: number,
+    contentSize: bigint
 ): Promise<Uint8Array> {
     const decipher = createDecipheriv(
         'aes-128-cbc',
@@ -1596,10 +1616,36 @@ async function hashDecryptedContentFile(
     decipher.setAutoPadding(false);
 
     const hash = createHash('sha1');
+    let remaining = contentSize;
+
     for await (const chunk of readFileChunks(appFile)) {
-        hash.update(decipher.update(chunk));
+        const decrypted = decipher.update(chunk);
+        const hashLength = Number(
+            remaining < BigInt(decrypted.length)
+                ? remaining
+                : BigInt(decrypted.length)
+        );
+
+        if (hashLength > 0) {
+            hash.update(decrypted.subarray(0, hashLength));
+            remaining -= BigInt(hashLength);
+        }
     }
-    hash.update(decipher.final());
+
+    const final = decipher.final();
+    const finalHashLength = Number(
+        remaining < BigInt(final.length) ? remaining : BigInt(final.length)
+    );
+    if (finalHashLength > 0) {
+        hash.update(final.subarray(0, finalHashLength));
+        remaining -= BigInt(finalHashLength);
+    }
+
+    if (remaining !== 0n) {
+        throw new Error(
+            `Decrypted content was shorter than expected: missing ${remaining.toString()} bytes`
+        );
+    }
 
     return new Uint8Array(hash.digest());
 }
