@@ -1,4 +1,5 @@
 import express, { type Request, type Response } from 'express';
+import open from 'open';
 import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
@@ -95,6 +96,20 @@ function sendServerError(
     }
 
     res.status(500).json(body);
+}
+
+function formatUrlHost(host: string): string {
+    return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
+}
+
+function getBrowserUrl(host: string, port: number): string {
+    const browserHost =
+        host === '0.0.0.0' || host === '::' ? '127.0.0.1' : host;
+    return `http://${formatUrlHost(browserHost)}:${port}`;
+}
+
+function getListenUrl(host: string, port: number): string {
+    return `http://${formatUrlHost(host)}:${port}`;
 }
 
 app.use((req, _res, next) => {
@@ -306,5 +321,13 @@ app.get('/api/title-dlc', async (req, res) => {
 });
 
 app.listen(port, host, () => {
-    console.log(`[server] Listening at http://${host}:${port}`);
+    console.log(`[server] Listening at ${getListenUrl(host, port)}`);
+
+    if (config.server.openBrowser) {
+        const url = getBrowserUrl(host, port);
+        console.log(`[server] Opening browser at ${url}`);
+        void open(url).catch((error: unknown) => {
+            console.warn('[server] Failed to open browser:', error);
+        });
+    }
 });

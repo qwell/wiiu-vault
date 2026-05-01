@@ -3,10 +3,14 @@ import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
 
+const DEFAULT_SERVER_HOST = '127.0.0.1';
+const DEFAULT_SERVER_PORT = 3000;
+
 type ServerConfig = {
     server: {
         host: string;
         port: number;
+        openBrowser: boolean;
     };
     roms: {
         wiiuRoot: string;
@@ -33,12 +37,22 @@ function assertConfig(value: unknown): asserts value is ServerConfig {
         throw new Error('Config.roms must be an object.');
     }
 
-    if (typeof server.host !== 'string' || server.host.length === 0) {
+    if (
+        'host' in server &&
+        (typeof server.host !== 'string' || server.host.length === 0)
+    ) {
         throw new Error('Config.server.host must be a non-empty string.');
     }
 
-    if (typeof server.port !== 'number' || !Number.isInteger(server.port)) {
+    if (
+        'port' in server &&
+        (typeof server.port !== 'number' || !Number.isInteger(server.port))
+    ) {
         throw new Error('Config.server.port must be an integer.');
+    }
+
+    if ('openBrowser' in server && typeof server.openBrowser !== 'boolean') {
+        throw new Error('Config.server.openBrowser must be a boolean.');
     }
 
     if (typeof roms.wiiuRoot !== 'string' || roms.wiiuRoot.length === 0) {
@@ -53,5 +67,13 @@ export function loadConfig(): ServerConfig {
 
     assertConfig(parsed);
 
-    return parsed;
+    return {
+        ...parsed,
+        server: {
+            ...parsed.server,
+            host: parsed.server.host ?? DEFAULT_SERVER_HOST,
+            port: parsed.server.port ?? DEFAULT_SERVER_PORT,
+            openBrowser: parsed.server.openBrowser ?? true,
+        },
+    };
 }

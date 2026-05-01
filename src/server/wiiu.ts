@@ -641,7 +641,7 @@ export async function validateWiiUTitles(
             validation.status === 'failed'
                 ? `${ANSI_RED}failed${ANSI_RESET}`
                 : validation.status;
-        console.log(`[wiiu] validated title: ${directory} (${status})`);
+        console.log(`[wiiu] validated title:  ${directory} (${status})`);
 
         validations.push({
             directory,
