@@ -377,9 +377,7 @@ function showDetailSidebar(sidebar: HTMLElement, group: TitleGroup): void {
         if (group.iconUrl) {
             const image = document.createElement('img');
             image.src = group.iconUrl;
-            image.alt = '';
-            image.width = 32;
-            image.height = 32;
+            image.alt = group.name;
             thumbnail.append(image);
         }
     }
