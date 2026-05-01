@@ -7,10 +7,9 @@ Work in Progress
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Setup](#setup)
+- [Release](#release)
 - [Configuration](#configuration)
-- [Running](#running)
-- [Available Scripts](#available-scripts)
+- [Development](#development)
 - [API](#api)
 - [Title Data](#title-data)
 - [Contributing](#contributing)
@@ -19,10 +18,28 @@ Work in Progress
 
 ## Prerequisites
 
-- [Node 24](https://nodejs.org/)
-- [Yarn](https://yarnpkg.com/)
+For packaged releases, no system Node.js or Yarn installation is required. The packaged launch scripts download and verify a Node.js runtime on first run.
 
-## Setup
+Development from source requires [Node 24](https://nodejs.org/) and [Yarn](https://yarnpkg.com/).
+
+## Configuration
+
+`config.json` is required. Packaged releases already include one. When running from source, copy it from `config.sample.json`. Set `roms.wiiuRoots` to one or more Wii U title directories.
+
+For title metadata generation or title downloads, put `common.key` in either `~/.wiiu/common.key` or the app root. If no key is found, WiiU Vault will try to download one and save it to `~/.wiiu/common.key`. The key may be raw 16-byte binary, hex text, or comma-separated byte literals.
+
+## Release
+
+From a packaged release:
+
+1. Download the latest release zip from GitHub.
+2. Extract the release zip.
+3. Edit `app/config.json` if needed.
+4. Run `start.bat` on Windows or `./start.sh` on macOS/Linux.
+
+By default, the server listens on the host and port configured in `config.json`, then opens the app in your browser when `server.openBrowser` is `true`.
+
+## Development
 
 Clone the repository.
 
@@ -48,25 +65,7 @@ Copy the sample config.
 cp config.sample.json config.json
 ```
 
-## Configuration
-
-`config.json` is required. Copy it from `config.sample.json`, then set `roms.wiiuRoots` to one or more Wii U title directories.
-
-For title metadata generation or title downloads, put `common.key` in either `~/.wiiu/common.key` or the app root. If no key is found, WiiU Vault will try to download one and save it to `~/.wiiu/common.key`. The key may be raw 16-byte binary, hex text, or comma-separated byte literals.
-
-## Running
-
-By default, the server listens on the host and port configured in `config.json`, then opens the app in your browser when `server.openBrowser` is `true`.
-
-From a packaged release:
-
-1. Extract the release zip.
-2. Edit `app/config.json` if needed.
-3. Run `start.bat` on Windows or `./start.sh` on macOS/Linux.
-
-The packaged launch scripts download and verify a Node.js runtime on first run.
-
-From source:
+Build and run from source.
 
 ```bash
 yarn build
