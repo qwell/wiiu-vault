@@ -21,7 +21,9 @@
         "build": "tsx scripts/build.ts",
         "start": "tsx scripts/start.ts",
         "test": "vitest run",
-        "release": "yarn clean && yarn build && tsx scripts/release.ts",
+        "release": "yarn clean && yarn build && tsx scripts/release.ts all",
+        "release:stage": "yarn clean && yarn build && tsx scripts/release.ts stage",
+        "release:zip": "tsx scripts/release.ts zip",
         "generate:titles": "tsx scripts/generate-titles.ts"
     },
     "devDependencies": {

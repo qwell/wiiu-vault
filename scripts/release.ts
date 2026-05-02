@@ -13,6 +13,8 @@ const ROOT_DIR = process.cwd();
 const RELEASE_ROOT = path.join(ROOT_DIR, 'release');
 const LAUNCHER_DIR = path.join(ROOT_DIR, 'scripts', 'launcher');
 
+type ReleaseMode = 'all' | 'stage' | 'zip';
+
 type ReleaseTarget = {
     name: string;
     goos: string;
@@ -58,6 +60,29 @@ const RELEASE_TARGETS: ReleaseTarget[] = [
         launcherFileName: RELEASE_NAME,
     },
 ];
+
+function readReleaseMode(): ReleaseMode {
+    const mode = process.argv[2] ?? 'all';
+
+    if (mode === 'all' || mode === 'stage' || mode === 'zip') {
+        return mode;
+    }
+
+    throw new Error(
+        `Unknown release mode: ${mode}. Expected all, stage, or zip.`
+    );
+}
+
+function getTargetOutputDir(target: ReleaseTarget): string {
+    return path.join(RELEASE_ROOT, `${RELEASE_NAME}-${target.name}`);
+}
+
+function getTargetZipPath(version: string, target: ReleaseTarget): string {
+    return path.join(
+        RELEASE_ROOT,
+        `${RELEASE_NAME}-${version}-${target.name}.zip`
+    );
+}
 
 async function copyAppFiles(outputDir: string): Promise<void> {
     const appDir = path.join(outputDir, 'app');
@@ -128,15 +153,8 @@ async function createReleaseZip(
     console.log(`[release] wrote ${zipPath}`);
 }
 
-async function createTargetRelease(
-    version: string,
-    target: ReleaseTarget
-): Promise<void> {
-    const outputDir = path.join(RELEASE_ROOT, `${RELEASE_NAME}-${target.name}`);
-    const zipPath = path.join(
-        RELEASE_ROOT,
-        `${RELEASE_NAME}-${version}-${target.name}.zip`
-    );
+async function stageTargetRelease(target: ReleaseTarget): Promise<void> {
+    const outputDir = getTargetOutputDir(target);
 
     await fs.rm(outputDir, { recursive: true, force: true });
     await fs.mkdir(outputDir, { recursive: true });
@@ -147,18 +165,60 @@ async function createTargetRelease(
     await buildLauncher(target, outputDir);
 
     console.log(`[release] staged ${outputDir}`);
+}
+
+async function zipTargetRelease(
+    version: string,
+    target: ReleaseTarget
+): Promise<void> {
+    const outputDir = getTargetOutputDir(target);
+    const zipPath = getTargetZipPath(version, target);
+
+    const launcherPath = path.join(outputDir, target.launcherFileName);
+
+    try {
+        await fs.access(launcherPath);
+    } catch {
+        throw new Error(
+            `Cannot zip ${target.name}. Missing staged launcher: ${launcherPath}`
+        );
+    }
 
     await createReleaseZip(outputDir, zipPath);
 }
 
-async function main(): Promise<void> {
-    const version = await readAppVersion(ROOT_DIR);
-
+async function stageRelease(): Promise<void> {
     await fs.mkdir(RELEASE_ROOT, { recursive: true });
 
     for (const target of RELEASE_TARGETS) {
-        await createTargetRelease(version, target);
+        await stageTargetRelease(target);
     }
+}
+
+async function zipRelease(version: string): Promise<void> {
+    await fs.mkdir(RELEASE_ROOT, { recursive: true });
+
+    for (const target of RELEASE_TARGETS) {
+        await zipTargetRelease(version, target);
+    }
+}
+
+async function main(): Promise<void> {
+    const mode = readReleaseMode();
+    const version = await readAppVersion(ROOT_DIR);
+
+    if (mode === 'stage') {
+        await stageRelease();
+        return;
+    }
+
+    if (mode === 'zip') {
+        await zipRelease(version);
+        return;
+    }
+
+    await stageRelease();
+    await zipRelease(version);
 }
 
 main().catch((error) => {
