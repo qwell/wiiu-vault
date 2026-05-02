@@ -26,7 +26,7 @@ jobs:
               uses: actions/setup-go@v5
               with:
                   go-version: stable
-                  cache-dependency-path: scripts/launcher/go.sum
+                  cache: false
 
             - name: Install dependencies
               run: yarn install --immutable
