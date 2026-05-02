@@ -5,7 +5,6 @@ titles/wiiutdb.xml
 # Transient node files
 **/node_modules/
 package-lock.json
-yarn.lock
 
 .yarn/*
 !.yarn/patches
