@@ -39,4 +39,4 @@ Please report security issues privately:
 
 ## License
 
-[GPLv3](https://github.com/qwell/wiiu-vault/blob/main/LICENSE)
+WiiU Vault is licensed under the [GNU General Public License v3.0](https://github.com/qwell/wiiu-vault/blob/main/LICENSE) or later.
