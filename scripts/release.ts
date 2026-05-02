@@ -36,18 +36,6 @@ const RELEASE_TARGETS: ReleaseTarget[] = [
         launcherFileName: `${RELEASE_NAME}.exe`,
     },
     {
-        name: 'macos-x64',
-        goos: 'darwin',
-        goarch: 'amd64',
-        launcherFileName: RELEASE_NAME,
-    },
-    {
-        name: 'macos-arm64',
-        goos: 'darwin',
-        goarch: 'arm64',
-        launcherFileName: RELEASE_NAME,
-    },
-    {
         name: 'linux-x64',
         goos: 'linux',
         goarch: 'amd64',
@@ -59,6 +47,26 @@ const RELEASE_TARGETS: ReleaseTarget[] = [
         goarch: 'arm64',
         launcherFileName: RELEASE_NAME,
     },
+    {
+        name: 'macos-x64',
+        goos: 'darwin',
+        goarch: 'amd64',
+        launcherFileName: RELEASE_NAME,
+    },
+    {
+        name: 'macos-arm64',
+        goos: 'darwin',
+        goarch: 'arm64',
+        launcherFileName: RELEASE_NAME,
+    },
+];
+
+const ROOT_RELEASE_FILES = [
+    'CHANGELOG.md',
+    'CODE_OF_CONDUCT.md',
+    'CONTRIBUTING.md',
+    'README.md',
+    'SECURITY.md',
 ];
 
 function readReleaseMode(): ReleaseMode {
@@ -100,10 +108,12 @@ async function copyAppFiles(outputDir: string): Promise<void> {
 }
 
 async function copyRootFiles(outputDir: string): Promise<void> {
-    await fs.cp(
-        path.join(ROOT_DIR, 'README.md'),
-        path.join(outputDir, 'README.md')
-    );
+    for (const fileName of ROOT_RELEASE_FILES) {
+        await fs.cp(
+            path.join(ROOT_DIR, fileName),
+            path.join(outputDir, fileName)
+        );
+    }
 }
 
 async function buildLauncher(
