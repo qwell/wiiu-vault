@@ -20,7 +20,11 @@ function fetchImage(url: string): Promise<CachedImage> {
     return new Promise((resolve, reject) => {
         const parsed = new URL(url);
         const client = parsed.protocol === 'https:' ? https : http;
-        const request = client.get(parsed, (response) => {
+        const requestOptions =
+            parsed.protocol === 'https:'
+                ? { rejectUnauthorized: false }
+                : undefined;
+        const handleResponse = (response: http.IncomingMessage) => {
             const statusCode = response.statusCode ?? 0;
 
             if (statusCode < 200 || statusCode >= 300) {
@@ -38,7 +42,11 @@ function fetchImage(url: string): Promise<CachedImage> {
                     body: Buffer.concat(chunks),
                 });
             });
-        });
+        };
+        const request =
+            requestOptions === undefined
+                ? client.get(parsed, handleResponse)
+                : https.get(parsed, requestOptions, handleResponse);
 
         request.on('error', reject);
     });
