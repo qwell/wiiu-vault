@@ -18,21 +18,40 @@ export async function readPackageVersion(root: string): Promise<string> {
 
 async function readGitVersionSuffix(root: string): Promise<string> {
     try {
-        const { stdout } = await execFileAsync(
+        const { stdout: statusStdout } = await execFileAsync(
+            'git',
+            ['status', '--porcelain'],
+            { cwd: root }
+        );
+
+        const dirty = statusStdout.trim().length > 0;
+
+        let onExactTag = false;
+        try {
+            const { stdout } = await execFileAsync(
+                'git',
+                ['describe', '--tags', '--exact-match', 'HEAD'],
+                { cwd: root }
+            );
+
+            onExactTag = stdout.trim().length > 0;
+        } catch {
+            onExactTag = false;
+        }
+
+        if (onExactTag && !dirty) {
+            return '';
+        }
+
+        const { stdout: hashStdout } = await execFileAsync(
             'git',
             ['rev-parse', '--short', 'HEAD'],
             { cwd: root }
         );
-        const hash = stdout.trim();
+
+        const hash = hashStdout.trim();
         if (!hash) {
             return '';
-        }
-
-        let dirty = false;
-        try {
-            await execFileAsync('git', ['diff', '--quiet'], { cwd: root });
-        } catch {
-            dirty = true;
         }
 
         return `+${hash}${dirty ? '.dirty' : ''}`;
