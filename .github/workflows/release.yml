@@ -48,7 +48,7 @@ jobs:
               run: yarn release:zip
 
             - name: Upload ZIPs as workflow artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: wiiu-vault-release-zips
                   path: release/wiiu-vault-*.zip
