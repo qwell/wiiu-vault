@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache-dependency-path: scripts/launcher/go.sum
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build release ZIPs
+        run: yarn release
+
+      - name: Upload ZIPs as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wiiu-vault-release-zips
+          path: release/wiiu-vault-*.zip
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" ./release/wiiu-vault-*.zip \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            --verify-tag
