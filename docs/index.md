@@ -6,7 +6,7 @@ WiiU Vault is a multi-platform open source Wii U ROM manager.
 
 Download the latest release from GitHub Releases:
 
-https://github.com/qwell/wiiu-vault/releases
+[Download the latest release](https://github.com/qwell/wiiu-vault/releases)
 
 ## Features
 
@@ -27,13 +27,13 @@ The packaged launcher downloads and verifies a Node.js runtime on first run.
 
 ## Source Code
 
-https://github.com/qwell/wiiu-vault
+[Source code](https://github.com/qwell/wiiu-vault)
 
 ## Security
 
 Please report security issues privately:
 
-https://github.com/qwell/wiiu-vault/blob/main/SECURITY.md
+[Security policy](https://github.com/qwell/wiiu-vault/blob/main/SECURITY.md)
 
 ## License
 
