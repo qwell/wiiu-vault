@@ -46,6 +46,11 @@ header {
     margin-bottom: 16px;
 }
 
+header .logo {
+    width: 64px;
+    height: 64px;
+}
+
 h1 {
     margin: 0px;
 }
@@ -405,16 +410,16 @@ select {
 
 .title-detail-thumbnail {
     flex: 0 0 auto;
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     border-radius: 4px;
     background: var(--placeholder-bg);
 }
 
 .title-detail-thumbnail img {
     display: block;
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     border-radius: 4px;
 }
 
@@ -422,7 +427,7 @@ select {
     margin: 0;
     font-size: 20px;
     overflow-wrap: break-word;
-    align-self: end;
+    align-self: center;
 }
 
 .title-detail-close {
