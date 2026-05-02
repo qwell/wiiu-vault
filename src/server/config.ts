@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { getUserAppRoot } from './paths.js';
@@ -83,8 +83,8 @@ function getDefaultConfig(): ServerConfig {
 }
 
 function writeDefaultConfig(configPath: string): void {
-    mkdirSync(path.dirname(configPath), { recursive: true });
-    writeFileSync(
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(
         configPath,
         `${JSON.stringify(getDefaultConfig(), null, 4)}\n`
     );
@@ -94,13 +94,13 @@ function writeDefaultConfig(configPath: string): void {
 export function loadConfig(): ServerConfig {
     const configPath = path.join(getUserAppRoot(), 'config.json');
 
-    if (!existsSync(configPath)) {
+    if (!fs.existsSync(configPath)) {
         writeDefaultConfig(configPath);
     }
 
     console.log(`[server] Loaded config from ${configPath}`);
 
-    const raw = readFileSync(configPath, 'utf8');
+    const raw = fs.readFileSync(configPath, 'utf8');
     const parsed = JSON.parse(raw) as unknown;
 
     assertConfig(parsed);
