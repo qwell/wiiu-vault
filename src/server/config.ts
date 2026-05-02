@@ -1,20 +1,18 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { getAppRoot } from './paths.js';
+import { getUserAppRoot } from './paths.js';
 
 const DEFAULT_SERVER_HOST = '127.0.0.1';
 const DEFAULT_SERVER_PORT = 3000;
+const DEFAULT_BROWSER_OPEN = true;
+const DEFAULT_ROM_DIR = getUserAppRoot();
 
 type ServerConfig = {
-    server: {
-        host: string;
-        port: number;
-        openBrowser: boolean;
-    };
-    roms: {
-        wiiuRoots: string[];
-    };
+    host: string;
+    port: number;
+    openBrowser: boolean;
+    wiiuRoots: string[];
 };
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -26,79 +24,82 @@ function assertConfig(value: unknown): asserts value is ServerConfig {
         throw new Error('Config must be an object.');
     }
 
-    const server = value.server;
-    const roms = value.roms;
-
-    if (!isObject(server)) {
-        throw new Error('Config.server must be an object.');
-    }
-
-    if (!isObject(roms)) {
-        throw new Error('Config.roms must be an object.');
-    }
-
     if (
-        'host' in server &&
-        (typeof server.host !== 'string' || server.host.length === 0)
+        'host' in value &&
+        (typeof value.host !== 'string' || value.host.length === 0)
     ) {
-        throw new Error('Config.server.host must be a non-empty string.');
+        throw new Error('Config.host must be a non-empty string.');
     }
 
     if (
-        'port' in server &&
-        (typeof server.port !== 'number' || !Number.isInteger(server.port))
+        'port' in value &&
+        (typeof value.port !== 'number' || !Number.isInteger(value.port))
     ) {
-        throw new Error('Config.server.port must be an integer.');
+        throw new Error('Config.port must be an integer.');
     }
 
-    if ('openBrowser' in server && typeof server.openBrowser !== 'boolean') {
-        throw new Error('Config.server.openBrowser must be a boolean.');
-    }
-
-    if (
-        'wiiuRoot' in roms &&
-        (typeof roms.wiiuRoot !== 'string' || roms.wiiuRoot.length === 0)
-    ) {
-        throw new Error('Config.roms.wiiuRoot must be a non-empty string.');
+    if ('openBrowser' in value && typeof value.openBrowser !== 'boolean') {
+        throw new Error('Config.openBrowser must be a boolean.');
     }
 
     if (
-        'wiiuRoots' in roms &&
-        (!Array.isArray(roms.wiiuRoots) ||
-            !roms.wiiuRoots.every(
+        'wiiuRoots' in value &&
+        (!Array.isArray(value.wiiuRoots) ||
+            !value.wiiuRoots.every(
                 (root) => typeof root === 'string' && root.length > 0
             ))
     ) {
         throw new Error(
-            'Config.roms.wiiuRoots must be an array of non-empty strings.'
+            'Config.wiiuRoots must be an array of non-empty strings.'
         );
-    }
-
-    if (!('wiiuRoot' in roms) && !('wiiuRoots' in roms)) {
-        throw new Error('Config.roms.wiiuRoot or wiiuRoots must be set.');
     }
 }
 
-function readWiiURoots(roms: Record<string, unknown>): string[] {
+function readWiiURoots(config: Record<string, unknown>): string[] {
     const roots: string[] = [];
 
-    if (typeof roms.wiiuRoot === 'string') {
-        roots.push(roms.wiiuRoot);
-    }
-
-    if (Array.isArray(roms.wiiuRoots)) {
+    if (Array.isArray(config.wiiuRoots)) {
         roots.push(
-            ...roms.wiiuRoots.filter(
+            ...config.wiiuRoots.filter(
                 (root): root is string => typeof root === 'string'
             )
         );
     }
 
+    if (roots.length === 0) {
+        roots.push(DEFAULT_ROM_DIR);
+    }
+
     return [...new Set(roots)];
 }
 
+function getDefaultConfig(): ServerConfig {
+    return {
+        host: DEFAULT_SERVER_HOST,
+        port: DEFAULT_SERVER_PORT,
+        openBrowser: DEFAULT_BROWSER_OPEN,
+        wiiuRoots: [DEFAULT_ROM_DIR],
+    };
+}
+
+function writeDefaultConfig(configPath: string): void {
+    mkdirSync(path.dirname(configPath), { recursive: true });
+    writeFileSync(
+        configPath,
+        `${JSON.stringify(getDefaultConfig(), null, 4)}\n`
+    );
+    console.log(`[server] Created config at ${configPath}`);
+}
+
 export function loadConfig(): ServerConfig {
-    const configPath = path.join(getAppRoot(), 'config.json');
+    const configPath = path.join(getUserAppRoot(), 'config.json');
+
+    if (!existsSync(configPath)) {
+        writeDefaultConfig(configPath);
+    }
+
+    console.log(`[server] Loaded config from ${configPath}`);
+
     const raw = readFileSync(configPath, 'utf8');
     const parsed = JSON.parse(raw) as unknown;
 
@@ -106,15 +107,9 @@ export function loadConfig(): ServerConfig {
 
     return {
         ...parsed,
-        server: {
-            ...parsed.server,
-            host: parsed.server.host ?? DEFAULT_SERVER_HOST,
-            port: parsed.server.port ?? DEFAULT_SERVER_PORT,
-            openBrowser: parsed.server.openBrowser ?? true,
-        },
-        roms: {
-            ...parsed.roms,
-            wiiuRoots: readWiiURoots(parsed.roms),
-        },
+        host: parsed.host ?? DEFAULT_SERVER_HOST,
+        port: parsed.port ?? DEFAULT_SERVER_PORT,
+        openBrowser: parsed.openBrowser ?? DEFAULT_BROWSER_OPEN,
+        wiiuRoots: readWiiURoots(parsed),
     };
 }

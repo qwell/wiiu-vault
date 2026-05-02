@@ -1,5 +1,10 @@
+import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+
+export function getUserAppRoot(): string {
+    return path.join(os.homedir(), '.wiiu-vault');
+}
 
 export function getAppRoot(): string {
     const appRoot = process.env.APP_ROOT;

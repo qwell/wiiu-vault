@@ -2,7 +2,6 @@ import path from 'path';
 import { createDecipheriv, createHash } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
-import os from 'node:os';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { XMLParser } from 'fast-xml-parser';
@@ -16,7 +15,7 @@ import {
     encryptTitleKey,
     findGeneratedTitleKey,
 } from './decryption.js';
-import { getAppRoot } from './paths.js';
+import { getUserAppRoot } from './paths.js';
 import { normalizeRegion } from '../shared/regions.js';
 import { mapConcurrent, normalizeTitleName } from '../shared/shared.js';
 
@@ -1071,12 +1070,29 @@ export function getTitleIdNumber(value: Uint8Array): bigint {
 }
 
 export async function readCommonKey(): Promise<Uint8Array> {
-    const commonKeyPaths = [
-        path.join(os.homedir(), '.wiiu', 'common.key'),
-        path.join(getAppRoot(), 'common.key'),
-    ];
+    const commonKeyPath = path.join(getUserAppRoot(), 'common.key');
 
-    commonKeyPromise ??= readCommonKeyFromPaths(commonKeyPaths);
+    commonKeyPromise ??= (async () => {
+        try {
+            const commonKey = parseCommonKey(
+                await readFile(commonKeyPath),
+                commonKeyPath
+            );
+            console.log(`[metadata] Loaded common key from ${commonKeyPath}`);
+            return commonKey;
+        } catch (error) {
+            if (isNodeError(error) && error.code === 'ENOENT') {
+                return downloadCommonKey(commonKeyPath);
+            }
+
+            throw new Error(
+                `common key not found or invalid at ${commonKeyPath}. ${
+                    error instanceof Error ? error.message : String(error)
+                }`,
+                { cause: error }
+            );
+        }
+    })();
     return commonKeyPromise;
 }
 
@@ -1129,32 +1145,6 @@ async function readDefaultCert(): Promise<Uint8Array> {
     return defaultCertPromise;
 }
 
-async function readCommonKeyFromPaths(
-    filePaths: string[]
-): Promise<Uint8Array> {
-    const errors: string[] = [];
-
-    for (const filePath of filePaths) {
-        try {
-            return parseCommonKey(await readFile(filePath), filePath);
-        } catch (error) {
-            if (isNodeError(error) && error.code === 'ENOENT') {
-                continue;
-            }
-
-            errors.push(error instanceof Error ? error.message : String(error));
-        }
-    }
-
-    if (errors.length === 0 && filePaths.length > 0) {
-        return downloadCommonKey(filePaths[0]);
-    }
-
-    throw new Error(
-        `common key not found or invalid. Checked: ${filePaths.join(', ')}${errors.length > 0 ? `. ${errors.join('; ')}` : ''}`
-    );
-}
-
 async function downloadCommonKey(filePath: string): Promise<Uint8Array> {
     console.warn(
         [
@@ -1184,6 +1174,7 @@ async function downloadCommonKey(filePath: string): Promise<Uint8Array> {
 
             await mkdir(path.dirname(filePath), { recursive: true });
             await writeFile(filePath, body);
+            console.log(`[metadata] Saved common key to ${filePath}`);
 
             return commonKey;
         } catch (error) {

@@ -14,10 +14,6 @@ async function copyTitlesFileIntoDist(name: string) {
 }
 
 async function copyFilesIntoDist() {
-    await fs.copyFile(
-        path.join(root, 'config.sample.json'),
-        path.join(root, 'dist', 'config.json')
-    );
     await copyTitlesFileIntoDist('titles.json');
     await copyTitlesFileIntoDist('extra.json');
     await copyTitlesFileIntoDist('wiiutdb.json');

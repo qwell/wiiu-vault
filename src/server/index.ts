@@ -22,9 +22,9 @@ import {
 const config = loadConfig();
 
 const app = express();
-const host = config.server.host;
-const port = config.server.port;
-const romRoots = config.roms.wiiuRoots;
+const host = config.host;
+const port = config.port;
+const romRoots = config.wiiuRoots;
 
 const clientDir = path.join(getAppRoot(), 'client');
 
@@ -347,7 +347,7 @@ server.on('error', (error: NodeJS.ErrnoException) => {
 server.on('listening', () => {
     console.log(`[server] Listening at ${getListenUrl(host, port)}`);
 
-    if (config.server.openBrowser) {
+    if (config.openBrowser) {
         const url = getBrowserUrl(host, port);
         console.log(`[server] Opening browser at ${url}`);
         void open(url).catch((error: unknown) => {
