@@ -34,11 +34,6 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 		fmt.Fprintln(os.Stderr)
 
-		if runtime.GOOS == "windows" {
-			fmt.Println("Press Enter to exit...")
-			_, _ = fmt.Scanln()
-		}
-
 		os.Exit(1)
 	}
 }
