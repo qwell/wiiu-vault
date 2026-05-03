@@ -514,6 +514,42 @@ select {
     white-space: pre-wrap;
 }
 
+.server-status-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgb(0 0 0 / 0.55);
+}
+
+.server-status-modal[hidden] {
+    display: none;
+}
+
+.server-status-modal-card {
+    width: min(420px, 100%);
+    box-sizing: border-box;
+    border: 1px solid var(--border-muted);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    color: var(--fg);
+    padding: 16px;
+    box-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
+    text-align: center;
+}
+
+.server-status-modal-card h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.server-status-modal-card p {
+    margin: 0;
+    line-height: 1.4;
+}
+
 footer {
     position: fixed;
     display: flex;

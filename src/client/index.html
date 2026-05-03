@@ -57,6 +57,25 @@
 
         <div id="output">Waiting...</div>
 
+        <div
+            id="server-status-modal"
+            class="server-status-modal"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="server-status-title"
+            aria-describedby="server-status-message"
+            hidden
+        >
+            <div class="server-status-modal-card">
+                <h2 id="server-status-title">Server connection lost</h2>
+                <p id="server-status-message">
+                    WiiU Vault can no longer reach the local server. This
+                    message will close automatically if the server starts
+                    responding again.
+                </p>
+            </div>
+        </div>
+
         <script type="module" src="./main.ts"></script>
         <footer>
             <div>

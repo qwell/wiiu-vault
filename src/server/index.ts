@@ -28,6 +28,11 @@ const romRoots = config.wiiuRoots;
 
 const clientDir = path.join(getAppRoot(), 'client');
 
+let lastHeartbeatAt: number | null = null;
+
+const HEARTBEAT_TIMEOUT_MS = 30000;
+const HEARTBEAT_CHECK_MS = 5000;
+
 type TitleIdQueryResult =
     | {
           ok: true;
@@ -333,6 +338,30 @@ app.get('/api/title-dlc', async (req, res) => {
             includeDetails: true,
         });
     }
+});
+
+app.post('/api/session/heartbeat', (_req, res) => {
+    const isFirstHeartbeat = lastHeartbeatAt == null;
+
+    lastHeartbeatAt = Date.now();
+
+    if (isFirstHeartbeat) {
+        setInterval(() => {
+            if (lastHeartbeatAt === null) {
+                return;
+            }
+
+            if (Date.now() - lastHeartbeatAt > HEARTBEAT_TIMEOUT_MS) {
+                console.log('[server] Client heartbeat timeout, exiting.');
+                process.exit(0);
+            }
+        }, HEARTBEAT_CHECK_MS);
+    }
+
+    res.json({
+        status: 'ok',
+        lastHeartbeatAt,
+    });
 });
 
 const server = createServer(app);

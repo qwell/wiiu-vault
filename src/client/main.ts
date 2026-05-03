@@ -12,6 +12,7 @@ import {
 } from '../shared/shared.js';
 
 declare const __APP_VERSION__: string;
+const HEARTBEAT_MS = 15000;
 
 type SlotBadgeState = 'complete' | 'incomplete' | 'na' | 'unknown';
 type LibraryViewMode = 'table' | 'list';
@@ -19,7 +20,11 @@ type LibraryViewMode = 'table' | 'list';
 let refreshLibrary: (() => Promise<void>) | null = null;
 let showAllTitles = false;
 let selectedFamily: string | null = null;
+
 let iconObserver: IntersectionObserver | null = null;
+const serverStatusModal = document.querySelector<HTMLDivElement>(
+    '#server-status-modal'
+);
 
 iconObserver = new IntersectionObserver(
     (entries) => {
@@ -902,8 +907,28 @@ function setupVersion(): void {
     }
 }
 
-resetDetailSidebars();
+function showServerGoneModal(): void {
+    serverStatusModal?.removeAttribute('hidden');
+}
+
+function hideServerGoneModal(): void {
+    serverStatusModal?.setAttribute('hidden', '');
+}
+
+function sessionHeartbeat(): void {
+    fetch('/api/session/heartbeat', {
+        method: 'POST',
+    })
+        .then(hideServerGoneModal)
+        .catch(showServerGoneModal);
+}
+
 window.addEventListener('pageshow', resetDetailSidebars);
+
+setInterval(sessionHeartbeat, HEARTBEAT_MS);
+sessionHeartbeat();
+
+resetDetailSidebars();
 
 setupVersion();
 void setupTheme();
