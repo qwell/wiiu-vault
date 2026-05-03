@@ -36,7 +36,14 @@ body {
 }
 
 body[data-detail-open] {
-    margin-right: 436px;
+    height: calc(100vh - 32px);
+    margin-right: 420px;
+    overflow: hidden;
+}
+
+body[data-detail-open] #output {
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
 }
 
 header {
