@@ -341,26 +341,8 @@ app.get('/api/title-dlc', async (req, res) => {
 });
 
 app.post('/api/session/heartbeat', (_req, res) => {
-    const isFirstHeartbeat = lastHeartbeatAt == null;
-
-    lastHeartbeatAt = Date.now();
-
-    if (isFirstHeartbeat) {
-        setInterval(() => {
-            if (lastHeartbeatAt === null) {
-                return;
-            }
-
-            if (Date.now() - lastHeartbeatAt > HEARTBEAT_TIMEOUT_MS) {
-                console.log('[server] Client heartbeat timeout, exiting.');
-                process.exit(0);
-            }
-        }, HEARTBEAT_CHECK_MS);
-    }
-
     res.json({
         status: 'ok',
-        lastHeartbeatAt,
     });
 });
 
