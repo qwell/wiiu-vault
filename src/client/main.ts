@@ -29,11 +29,25 @@ type SlotBadgeState =
     | 'unavailable'
     | 'unknown';
 type LibraryViewMode = 'table' | 'list';
+type LibraryVcFilter = 'all' | 'vc' | 'non-vc' | VirtualConsolePlatform;
+type LibraryControlState = {
+    region: string;
+    status: TitleGroupStatus | 'all';
+    vc: LibraryVcFilter;
+    search: string;
+};
 
 let refreshLibrary: (() => Promise<void>) | null = null;
 let showAllTitles = false;
 let selectedFamily: string | null = null;
 let currentGroups: TitleGroup[] = [];
+let libraryControlState: LibraryControlState = {
+    region: 'all',
+    status: 'all',
+    vc: 'all',
+    search: '',
+};
+let activeLibraryRequestId = 0;
 
 let iconObserver: IntersectionObserver | null = null;
 
@@ -1312,13 +1326,60 @@ function collectRegions(groups: TitleGroup[]): string[] {
     );
 }
 
+function collectVirtualConsolePlatforms(
+    groups: TitleGroup[]
+): VirtualConsolePlatform[] {
+    const seen = new Set<VirtualConsolePlatform>();
+
+    for (const group of groups) {
+        if (!group.productCode) {
+            continue;
+        }
+
+        const platform = getVirtualConsolePlatform(group.productCode);
+        if (platform) {
+            seen.add(platform);
+        }
+    }
+
+    return [...seen].sort((a, b) =>
+        a.toString().localeCompare(b.toString(), undefined, {
+            sensitivity: 'base',
+        })
+    );
+}
+
+function normalizeLibraryControlState(
+    groups: TitleGroup[],
+    controlState: LibraryControlState
+): LibraryControlState {
+    const regions = collectRegions(groups);
+    const vcFilters: LibraryVcFilter[] = [
+        'all',
+        'vc',
+        'non-vc',
+        ...collectVirtualConsolePlatforms(groups),
+    ];
+    const region =
+        controlState.region === 'all' || regions.includes(controlState.region)
+            ? controlState.region
+            : 'all';
+    const vc = vcFilters.includes(controlState.vc) ? controlState.vc : 'all';
+
+    return {
+        ...controlState,
+        region,
+        vc,
+    };
+}
+
 function renderGroups(
     allGroups: TitleGroup[],
     grid: HTMLDivElement,
     sidebar: HTMLElement,
-    statusValue: string,
+    statusValue: TitleGroupStatus | 'all',
     regionValue: string,
-    vcValue: string,
+    vcValue: LibraryVcFilter,
     searchValue: string
 ): void {
     currentGroups = allGroups;
@@ -1373,8 +1434,13 @@ function buildControls(
     groups: TitleGroup[],
     grid: HTMLDivElement,
     sidebar: HTMLElement,
-    loading = false
+    loading = false,
+    initialControlState = libraryControlState
 ): HTMLElement {
+    const controlState = normalizeLibraryControlState(
+        groups,
+        initialControlState
+    );
     const controls = document.createElement('div');
     controls.className = 'library-controls';
 
@@ -1442,13 +1508,13 @@ function buildControls(
     vcSelect.disabled = loading || groups.length === 0;
 
     const vcOptions: Array<{
-        value: 'all' | 'vc' | 'non-vc' | VirtualConsolePlatform;
+        value: LibraryVcFilter;
         label: string;
     }> = [
         { value: 'all', label: 'All' },
         { value: 'vc', label: 'VC only' },
         { value: 'non-vc', label: 'Non-VC' },
-        ...Object.values(VirtualConsolePlatform).map((platform) => ({
+        ...collectVirtualConsolePlatforms(groups).map((platform) => ({
             value: platform,
             label: platform.toString(),
         })),
@@ -1466,6 +1532,7 @@ function buildControls(
     searchInput.placeholder = 'Name, title ID, or region';
     searchInput.className = 'library-search library-field-search';
     searchInput.disabled = loading || groups.length === 0;
+    searchInput.value = controlState.search;
 
     const titleLabel = document.createElement('label');
     titleLabel.className = 'library-checkbox library-field-title';
@@ -1508,15 +1575,26 @@ function buildControls(
         refreshButton
     );
 
+    regionSelect.value = controlState.region;
+    statusSelect.value = controlState.status;
+    vcSelect.value = controlState.vc;
+
     const update = (): void => {
+        libraryControlState = {
+            region: regionSelect.value,
+            status: statusSelect.value as TitleGroupStatus | 'all',
+            vc: vcSelect.value as LibraryVcFilter,
+            search: searchInput.value,
+        };
+
         renderGroups(
             groups,
             grid,
             sidebar,
-            statusSelect.value,
-            regionSelect.value,
-            vcSelect.value,
-            searchInput.value
+            libraryControlState.status,
+            libraryControlState.region,
+            libraryControlState.vc,
+            libraryControlState.search
         );
     };
 
@@ -1538,7 +1616,7 @@ function buildControls(
         }
     });
 
-    if (groups.length > 0) {
+    if (!loading && groups.length > 0) {
         update();
     }
 
@@ -1604,7 +1682,8 @@ function buildViewControl(grid: HTMLDivElement): HTMLDivElement {
 
 function buildLibraryContent(
     groups: TitleGroup[],
-    loading = false
+    loading = false,
+    controlState = libraryControlState
 ): DocumentFragment {
     const fragment = document.createDocumentFragment();
 
@@ -1612,7 +1691,13 @@ function buildLibraryContent(
     grid.className = 'library-grid';
 
     const sidebar = buildDetailSidebar();
-    const controls = buildControls(groups, grid, sidebar, loading);
+    const controls = buildControls(
+        groups,
+        grid,
+        sidebar,
+        loading,
+        controlState
+    );
     fragment.append(controls, grid, sidebar);
 
     const loadingLine = document.createElement('div');
@@ -1620,16 +1705,17 @@ function buildLibraryContent(
     loadingLine.textContent = loading ? 'Loading...' : '';
     fragment.append(loadingLine);
 
-    if (!loading && groups.length > 0) {
-        renderGroups(groups, grid, sidebar, 'all', 'all', 'all', '');
-    }
-
     return fragment;
 }
 
 async function loadLibrary(output: HTMLElement): Promise<void> {
+    const requestId = ++activeLibraryRequestId;
+    const nextControlState = { ...libraryControlState };
+    const loadingGroups = currentGroups.length > 0 ? currentGroups : [];
     resetDetailSidebars();
-    output.replaceChildren(buildLibraryContent([], true));
+    output.replaceChildren(
+        buildLibraryContent(loadingGroups, true, nextControlState)
+    );
 
     try {
         const response = await fetch(
@@ -1642,15 +1728,29 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
 
         const data = (await response.json()) as LibraryResponse;
 
+        if (requestId !== activeLibraryRequestId) {
+            return;
+        }
+
         for (const group of data.groups) {
             group.entries.sort((a, b) => b.version - a.version);
             updateGroupStatusFromSlots(group);
         }
 
         const groups = [...data.groups].sort(compareGroups);
+        libraryControlState = normalizeLibraryControlState(
+            groups,
+            nextControlState
+        );
 
-        output.replaceChildren(buildLibraryContent(groups, false));
+        output.replaceChildren(
+            buildLibraryContent(groups, false, libraryControlState)
+        );
     } catch (error) {
+        if (requestId !== activeLibraryRequestId) {
+            return;
+        }
+
         console.error(error);
 
         output.replaceChildren();
