@@ -5,7 +5,12 @@ import { WebSocket, WebSocketServer, type RawData } from 'ws';
 import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
-import { loadConfig } from './config.js';
+import {
+    getConfig,
+    loadConfig,
+    saveConfig,
+    validateWiiURoot,
+} from './config.js';
 import {
     downloadNusTitleMetadata,
     generateTitleInstallFiles,
@@ -27,6 +32,11 @@ import {
     DownloadQueueItem,
     ValidationStatusEvent,
 } from '../shared/socket.js';
+import {
+    type AppConfigResponse,
+    type AppConfigUpdate,
+    type AppConfigValidateRootResponse,
+} from '../shared/config.js';
 import logger from '../shared/logger.js';
 
 const config = loadConfig();
@@ -34,7 +44,6 @@ const config = loadConfig();
 const app = express();
 const host = config.host;
 const port = config.port;
-const romRoots = config.wiiuRoots;
 
 const clientDir = path.join(getAppRoot(), 'client');
 
@@ -184,7 +193,7 @@ async function downloadTitle(
     titleId: string,
     onProgress?: (progress: TitleDownloadProgress) => void
 ): Promise<DownloadTitleResult> {
-    const romRoot = await findFirstReadableWiiURoot(romRoots);
+    const romRoot = await findFirstReadableWiiURoot(getConfig().wiiuRoots);
 
     return generateTitleInstallFiles(titleId, romRoot, {
         onProgress,
@@ -354,10 +363,67 @@ app.use((req, _res, next) => {
 app.use(express.json());
 app.use(express.static(clientDir));
 
+function sendConfigResponse(res: Response, response: AppConfigResponse): void {
+    res.json(response);
+}
+
+function sendConfigValidateRootResponse(
+    res: Response,
+    response: AppConfigValidateRootResponse
+): void {
+    res.json(response);
+}
+
+app.get('/api/config', (_req, res) => {
+    sendConfigResponse(res, {
+        config: getConfig(),
+        restartRequired: false,
+    });
+});
+
+app.get('/api/config/all', (_req, res) => {
+    sendConfigResponse(res, {
+        config: getConfig(),
+        restartRequired: false,
+    });
+});
+
+app.post('/api/config/validate-root', async (req, res) => {
+    try {
+        const body = req.body as unknown;
+        const root =
+            typeof body === 'object' &&
+            body !== null &&
+            'root' in body &&
+            typeof body.root === 'string'
+                ? body.root
+                : '';
+        sendConfigValidateRootResponse(res, await validateWiiURoot(root));
+    } catch (error) {
+        logServerError('[server] Failed to validate Wii U root:', error);
+        sendServerError(res, 'Failed to validate Wii U root', error, {
+            includeDetails: true,
+        });
+    }
+});
+
+app.post('/api/config', (req, res) => {
+    try {
+        sendConfigResponse(res, saveConfig(req.body as AppConfigUpdate));
+    } catch (error) {
+        logServerError('[server] Failed to save config:', error);
+        sendServerError(res, 'Failed to save config', error, {
+            includeDetails: true,
+        });
+    }
+});
+
 app.get('/api/library', async (req, res) => {
     try {
         const includeAll = req.query.includeAll === 'true';
-        const groups = await scanWiiUTitleRoots(romRoots, { includeAll });
+        const groups = await scanWiiUTitleRoots(getConfig().wiiuRoots, {
+            includeAll,
+        });
 
         res.json({
             groups,
@@ -375,12 +441,15 @@ app.get('/api/library/validate', async (_req, res) => {
             status: 'started',
         });
 
-        const titles = await validateWiiUTitleRoots(romRoots, (progress) => {
-            broadcastLibraryValidationStatus({
-                type: 'library.validationStatus',
-                ...progress,
-            });
-        });
+        const titles = await validateWiiUTitleRoots(
+            getConfig().wiiuRoots,
+            (progress) => {
+                broadcastLibraryValidationStatus({
+                    type: 'library.validationStatus',
+                    ...progress,
+                });
+            }
+        );
         const failed = titles.filter((title) => title.status !== 'ok').length;
 
         broadcastLibraryValidationStatus({

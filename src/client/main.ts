@@ -18,6 +18,11 @@ import {
     DownloadQueueItem,
     DownloadQueueState,
 } from '../shared/socket.js';
+import {
+    type AppConfig,
+    type AppConfigResponse,
+    type AppConfigValidateRootResponse,
+} from '../shared/config.js';
 
 declare const __APP_VERSION__: string;
 const SOCKET_RECONNECT_MS = 2000;
@@ -52,12 +57,19 @@ let libraryStatusMessage = '';
 let libraryStatusTone: LibraryStatusTone = 'info';
 let validatingLibrary = false;
 let activeLibraryRequestId = 0;
+let settingsConfig: AppConfig | null = null;
+let settingsStatusMessage = '';
+let settingsStatusTone: LibraryStatusTone = 'info';
+let settingsLoading = false;
+let settingsSaving = false;
+let settingsCheckingRoot = false;
 
 let iconObserver: IntersectionObserver | null = null;
 
 const serverStatusModal = document.querySelector<HTMLDivElement>(
     '#server-status-modal'
 );
+const settingsRoot = document.querySelector<HTMLDivElement>('#settings-root');
 
 let downloadQueue: DownloadQueueItem[] = [];
 let downloadQueueRoot: HTMLElement | null = null;
@@ -99,6 +111,19 @@ function getViewMode(): LibraryViewMode {
 
 function saveViewMode(viewMode: LibraryViewMode): void {
     localStorage.setItem('libraryViewMode', viewMode);
+}
+
+function isSettingsOpen(): boolean {
+    return document.body.hasAttribute('data-settings-open');
+}
+
+function updateSettingsStatus(
+    message: string,
+    tone: LibraryStatusTone = 'info'
+): void {
+    settingsStatusMessage = message;
+    settingsStatusTone = tone;
+    renderSettingsSidebar();
 }
 
 function formatRegion(region: string | null): {
@@ -349,6 +374,9 @@ function handleAppSocketEvent(event: AppSocketEvent): void {
 
         case 'library.validationStatus': {
             hideServerGoneModal();
+            validatingLibrary =
+                event.status !== 'complete' && event.status !== 'failed';
+            updateValidationButtonState();
 
             const message = formatValidationStatus(event);
             if (!message) {
@@ -1636,6 +1664,16 @@ function buildControls(
         : 'fa-solid fa-check-double';
     validateButton.append(validateIcon);
 
+    const settingsButton = document.createElement('button');
+    settingsButton.className = 'library-field-settings';
+    settingsButton.type = 'button';
+    settingsButton.title = 'Open settings';
+    settingsButton.setAttribute('aria-label', 'Open settings');
+
+    const settingsIcon = document.createElement('i');
+    settingsIcon.className = 'fa-solid fa-gear';
+    settingsButton.append(settingsIcon);
+
     controls.append(
         regionText,
         statusText,
@@ -1649,7 +1687,8 @@ function buildControls(
         titleLabel,
         viewToggle,
         refreshButton,
-        validateButton
+        validateButton,
+        settingsButton
     );
 
     regionSelect.value = controlState.region;
@@ -1701,10 +1740,7 @@ function buildControls(
 
             validatingLibrary = true;
             validateButton.disabled = true;
-            validateButton.title = 'Validating library';
-            validateButton.setAttribute('aria-label', 'Validating library');
-            validateButton.setAttribute('aria-busy', 'true');
-            validateIcon.className = 'fa-solid fa-spinner fa-spin';
+            updateValidationButtonState();
 
             libraryStatusMessage = 'Validating library...';
             libraryStatusTone = 'info';
@@ -1738,13 +1774,14 @@ function buildControls(
             } finally {
                 validatingLibrary = false;
                 validateButton.disabled = loading || groups.length === 0;
-                validateButton.title = 'Validate library';
-                validateButton.setAttribute('aria-label', 'Validate library');
-                validateButton.setAttribute('aria-busy', 'false');
-                validateIcon.className = 'fa-solid fa-check-double';
+                updateValidationButtonState();
                 updateLibraryStatusLine();
             }
         })();
+    });
+
+    settingsButton.addEventListener('click', () => {
+        openSettingsSidebar();
     });
 
     if (!loading && groups.length > 0) {
@@ -1842,6 +1879,29 @@ function buildLibraryContent(
     return fragment;
 }
 
+function updateValidationButtonState(): void {
+    const validateButton = document.querySelector<HTMLButtonElement>(
+        '.library-field-validate'
+    );
+    const validateIcon = validateButton?.querySelector<HTMLElement>('i');
+
+    if (!validateButton || !validateIcon) {
+        return;
+    }
+
+    validateButton.title = validatingLibrary
+        ? 'Validating library'
+        : 'Validate library';
+    validateButton.setAttribute(
+        'aria-label',
+        validatingLibrary ? 'Validating library' : 'Validate library'
+    );
+    validateButton.setAttribute('aria-busy', String(validatingLibrary));
+    validateIcon.className = validatingLibrary
+        ? 'fa-solid fa-spinner fa-spin'
+        : 'fa-solid fa-check-double';
+}
+
 function updateLibraryStatusLine(): void {
     const loadingLine =
         document.querySelector<HTMLDivElement>('.library-loading');
@@ -1917,6 +1977,356 @@ refreshLibrary = async (): Promise<void> => {
     await loadLibrary(output);
 };
 
+function buildSettingsRootRow(value: string): HTMLDivElement {
+    const row = document.createElement('div');
+    row.className = 'settings-root-row';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'settings-input settings-root-input';
+    input.value = value;
+
+    const checkButton = document.createElement('button');
+    checkButton.type = 'button';
+    checkButton.className = 'settings-button settings-root-check';
+    checkButton.textContent = 'Check';
+    checkButton.disabled = settingsCheckingRoot;
+    checkButton.addEventListener('click', () => {
+        void (async () => {
+            if (settingsCheckingRoot) {
+                return;
+            }
+
+            const root = input.value.trim();
+            settingsCheckingRoot = true;
+            updateSettingsStatus(`Checking ${root || 'path'}...`);
+            renderSettingsSidebar();
+
+            try {
+                const response = await fetch('/api/config/validate-root', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ root }),
+                });
+                if (!response.ok) {
+                    throw new Error(
+                        `Request failed with status ${response.status}`
+                    );
+                }
+
+                const result =
+                    (await response.json()) as AppConfigValidateRootResponse;
+                updateSettingsStatus(
+                    result.message,
+                    result.readable ? 'success' : 'error'
+                );
+            } catch (error) {
+                console.error(error);
+                updateSettingsStatus('Failed to validate path.', 'error');
+            } finally {
+                settingsCheckingRoot = false;
+                renderSettingsSidebar();
+            }
+        })();
+    });
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'settings-icon-button';
+    removeButton.setAttribute('aria-label', 'Remove Wii U root');
+    removeButton.innerHTML = '<i class="fa-solid fa-minus"></i>';
+    removeButton.addEventListener('click', () => row.remove());
+
+    row.append(input, checkButton, removeButton);
+    return row;
+}
+
+function readSettingsForm(sidebar: HTMLElement): AppConfig {
+    const hostInput = sidebar.querySelector<HTMLInputElement>(
+        '.settings-input-host'
+    );
+    const portInput = sidebar.querySelector<HTMLInputElement>(
+        '.settings-input-port'
+    );
+    const openBrowserInput = sidebar.querySelector<HTMLInputElement>(
+        '.settings-input-open-browser'
+    );
+    const rootInputs = sidebar.querySelectorAll<HTMLInputElement>(
+        '.settings-root-input'
+    );
+
+    return {
+        host: hostInput?.value.trim() ?? '',
+        port: Number(portInput?.value ?? 0),
+        openBrowser: openBrowserInput?.checked ?? false,
+        wiiuRoots: [...rootInputs]
+            .map((input) => input.value.trim())
+            .filter((value) => value.length > 0),
+    };
+}
+
+async function loadSettingsConfig(): Promise<void> {
+    settingsLoading = true;
+    updateSettingsStatus('Loading settings...');
+
+    try {
+        const response = await fetch('/api/config/all');
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const result = (await response.json()) as AppConfigResponse;
+        settingsConfig = result.config;
+        settingsStatusMessage = '';
+        settingsStatusTone = 'info';
+    } catch (error) {
+        console.error(error);
+        settingsStatusMessage = 'Failed to load settings.';
+        settingsStatusTone = 'error';
+    } finally {
+        settingsLoading = false;
+        renderSettingsSidebar(false);
+    }
+}
+
+async function saveSettingsConfig(sidebar: HTMLElement): Promise<void> {
+    if (settingsSaving) {
+        return;
+    }
+
+    const nextConfig = readSettingsForm(sidebar);
+    const previousRoots = JSON.stringify(settingsConfig?.wiiuRoots ?? []);
+    const nextRoots = JSON.stringify(nextConfig.wiiuRoots);
+
+    settingsSaving = true;
+    updateSettingsStatus('Saving settings...');
+
+    try {
+        const response = await fetch('/api/config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(nextConfig),
+        });
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const result = (await response.json()) as AppConfigResponse;
+        settingsConfig = result.config;
+        settingsStatusMessage = result.restartRequired
+            ? 'Settings saved. Restart required for host/port changes.'
+            : 'Settings saved.';
+        settingsStatusTone = 'success';
+
+        if (previousRoots !== nextRoots && refreshLibrary) {
+            void refreshLibrary();
+        }
+    } catch (error) {
+        console.error(error);
+        settingsStatusMessage = 'Failed to save settings.';
+        settingsStatusTone = 'error';
+    } finally {
+        settingsSaving = false;
+        renderSettingsSidebar(false);
+    }
+}
+
+function closeSettingsSidebar(): void {
+    document.body.removeAttribute('data-settings-open');
+    renderSettingsSidebar();
+}
+
+function openSettingsSidebar(): void {
+    document.body.setAttribute('data-settings-open', '');
+    renderSettingsSidebar();
+
+    if (!settingsLoading) {
+        void loadSettingsConfig();
+    }
+}
+
+function renderSettingsSidebar(preserveDraft = true): void {
+    if (!settingsRoot) {
+        return;
+    }
+
+    const currentSidebar =
+        settingsRoot.querySelector<HTMLElement>('.settings-sidebar');
+    const hasSettingsInputs =
+        currentSidebar?.querySelector('.settings-input-host') !== null;
+    if (
+        preserveDraft &&
+        currentSidebar &&
+        settingsConfig &&
+        hasSettingsInputs
+    ) {
+        settingsConfig = readSettingsForm(currentSidebar);
+    }
+
+    settingsRoot.className = 'settings-root';
+    settingsRoot.hidden = false;
+    settingsRoot.dataset.open = String(isSettingsOpen());
+    settingsRoot.replaceChildren();
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'settings-backdrop';
+    backdrop.addEventListener('click', closeSettingsSidebar);
+
+    const sidebar = document.createElement('aside');
+    sidebar.className = 'settings-sidebar';
+
+    const header = document.createElement('div');
+    header.className = 'settings-header';
+
+    const title = document.createElement('h2');
+    title.className = 'settings-title';
+    title.textContent = 'Settings';
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'settings-close';
+    closeButton.setAttribute('aria-label', 'Close settings');
+    closeButton.textContent = '×';
+    closeButton.addEventListener('click', closeSettingsSidebar);
+
+    header.append(title, closeButton);
+
+    const status = document.createElement('div');
+    status.className = `settings-status settings-status-${settingsStatusTone}`;
+    status.textContent = settingsStatusMessage;
+
+    const form = document.createElement('div');
+    form.className = 'settings-form';
+
+    if (settingsConfig) {
+        const serverSection = document.createElement('section');
+        serverSection.className = 'settings-section';
+
+        const serverTitle = document.createElement('h3');
+        serverTitle.className = 'settings-section-title';
+        serverTitle.textContent = 'Server';
+
+        const hostField = document.createElement('label');
+        hostField.className = 'settings-field';
+        const hostLabel = document.createElement('span');
+        hostLabel.className = 'settings-label';
+        hostLabel.textContent = 'Host';
+        const hostInput = document.createElement('input');
+        hostInput.type = 'text';
+        hostInput.className = 'settings-input settings-input-host';
+        hostInput.value = settingsConfig.host;
+        hostField.append(hostLabel, hostInput);
+
+        const portField = document.createElement('label');
+        portField.className = 'settings-field';
+        const portLabel = document.createElement('span');
+        portLabel.className = 'settings-label';
+        portLabel.textContent = 'Port';
+        const portInput = document.createElement('input');
+        portInput.type = 'number';
+        portInput.className = 'settings-input settings-input-port';
+        portInput.value = String(settingsConfig.port);
+        portInput.min = '1';
+        portInput.step = '1';
+        portField.append(portLabel, portInput);
+
+        const openBrowserLabel = document.createElement('label');
+        openBrowserLabel.className = 'settings-checkbox';
+        const openBrowserInput = document.createElement('input');
+        openBrowserInput.type = 'checkbox';
+        openBrowserInput.className = 'settings-input-open-browser';
+        openBrowserInput.checked = settingsConfig.openBrowser;
+        const openBrowserText = document.createElement('span');
+        openBrowserText.textContent = 'Open browser on server start';
+        openBrowserLabel.append(openBrowserInput, openBrowserText);
+
+        const serverHelp = document.createElement('div');
+        serverHelp.className = 'settings-help';
+        serverHelp.textContent =
+            'Host and port changes are saved immediately but require a restart.';
+
+        serverSection.append(
+            serverTitle,
+            hostField,
+            portField,
+            openBrowserLabel,
+            serverHelp
+        );
+
+        const rootsSection = document.createElement('section');
+        rootsSection.className = 'settings-section';
+
+        const rootsTitle = document.createElement('h3');
+        rootsTitle.className = 'settings-section-title';
+        rootsTitle.textContent = 'Wii U Roots';
+
+        const rootsHelp = document.createElement('div');
+        rootsHelp.className = 'settings-help';
+        rootsHelp.textContent =
+            'Add one or more ROM roots. Check verifies that a path exists and is readable.';
+
+        const rootsList = document.createElement('div');
+        rootsList.className = 'settings-roots';
+
+        for (const root of settingsConfig.wiiuRoots) {
+            rootsList.append(buildSettingsRootRow(root));
+        }
+
+        if (settingsConfig.wiiuRoots.length === 0) {
+            rootsList.append(buildSettingsRootRow(''));
+        }
+
+        const addRootButton = document.createElement('button');
+        addRootButton.type = 'button';
+        addRootButton.className = 'settings-button';
+        addRootButton.textContent = 'Add root';
+        addRootButton.disabled = settingsCheckingRoot;
+        addRootButton.addEventListener('click', () => {
+            rootsList.append(buildSettingsRootRow(''));
+        });
+
+        rootsSection.append(rootsTitle, rootsHelp, rootsList, addRootButton);
+
+        const footer = document.createElement('div');
+        footer.className = 'settings-footer';
+
+        const cancelButton = document.createElement('button');
+        cancelButton.type = 'button';
+        cancelButton.className = 'settings-button';
+        cancelButton.textContent = 'Close';
+        cancelButton.addEventListener('click', closeSettingsSidebar);
+
+        const saveButton = document.createElement('button');
+        saveButton.type = 'button';
+        saveButton.className = 'settings-button';
+        saveButton.textContent = settingsSaving ? 'Saving...' : 'Save';
+        saveButton.disabled = settingsSaving || settingsCheckingRoot;
+        saveButton.addEventListener('click', () => {
+            void saveSettingsConfig(sidebar);
+        });
+
+        footer.append(cancelButton, saveButton);
+        form.append(serverSection, rootsSection, footer);
+    }
+
+    sidebar.append(header, status, form);
+    settingsRoot.append(backdrop, sidebar);
+}
+
+function setupSettingsSidebar(): void {
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && isSettingsOpen()) {
+            closeSettingsSidebar();
+        }
+    });
+
+    renderSettingsSidebar();
+}
+
 function setTheme(darkMode: boolean, save = false): void {
     const lightIcon = document.getElementById('theme-icon-light');
     const darkIcon = document.getElementById('theme-icon-dark');
@@ -1970,6 +2380,7 @@ mountDownloadQueueStrip();
 connectAppSocket();
 
 resetDetailSidebars();
+setupSettingsSidebar();
 
 setupVersion();
 void setupTheme();
