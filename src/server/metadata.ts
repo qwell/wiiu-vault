@@ -1,5 +1,5 @@
 import path from 'path';
-import { createDecipheriv, createHash } from 'node:crypto';
+import { createDecipheriv, createHash, randomUUID } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { Readable } from 'node:stream';
@@ -9,14 +9,13 @@ import {
     createContentIv,
     createTitleKeyIv,
     decryptContentWithBigIntIv,
-    decryptContentWithIndex,
     decryptContentWithIv,
     decryptTitleKey,
     encryptTitleKey,
     findGeneratedTitleKey,
 } from './decryption.js';
-import { getUserAppRoot } from './paths.js';
 import { normalizeRegion } from '../shared/regions.js';
+import { getUserAppRoot } from './paths.js';
 import { getImmediatePathSizeBytes } from '../shared/file.js';
 import { mapConcurrent, normalizeTitleName } from '../shared/shared.js';
 import logger from '../shared/logger.js';
@@ -143,6 +142,13 @@ type DownloadedContentFile = {
     verification: ContentTreeVerification;
 };
 
+type ResolvedTitleKey = {
+    titleKey: Uint8Array;
+    decryptedFst: Uint8Array;
+    encryptedTitleKey: Uint8Array | null;
+    titleKeyPassword: string | null;
+};
+
 type ContentInstallFiles = {
     contentId: string;
     appName: string;
@@ -173,6 +179,16 @@ class TitleMetadataError extends Error {
         super(message);
         this.name = 'TitleMetadataError';
         this.stage = stage;
+    }
+}
+
+class HttpError extends Error {
+    status: number;
+
+    constructor(url: string, status: number) {
+        super(`download failed for ${url}: HTTP ${status.toString()}`);
+        this.name = 'HttpError';
+        this.status = status;
     }
 }
 
@@ -393,57 +409,26 @@ export async function downloadNusTitleMetadata(
             `TMD has no first content entry for ${normalizedTitleId}`
         );
     }
-    const encryptedFst = fstContent
-        ? await downloadContent(
-              baseUrl,
-              normalizedTitleId,
-              fstContent.id
-          ).catch((error: unknown) => {
-              throw new TitleMetadataError(
-                  'download_fst_content',
-                  error instanceof Error
-                      ? error.message
-                      : `Failed to download FST content for ${normalizedTitleId}`
-              );
-          })
-        : null;
-
-    const ticketTitleKey =
-        ticket !== null
-            ? decryptTitleKey(ticket.encryptedKey, commonKey, ticket.titleId)
-            : null;
-    const ticketDecryptedFst =
-        encryptedFst && ticketTitleKey
-            ? decryptContentWithBigIntIv(encryptedFst, ticketTitleKey, 0)
-            : null;
-    const generatedMatch =
-        encryptedFst && !looksLikeFst(ticketDecryptedFst)
-            ? findGeneratedTitleKey(tmd.header.titleId, (candidate) =>
-                  looksLikeFst(
-                      decryptContentWithBigIntIv(
-                          encryptedFst,
-                          candidate.titleKey,
-                          0
-                      )
-                  )
-              )
-            : null;
-
-    const titleKey = generatedMatch?.titleKey ?? ticketTitleKey;
-    const decryptedFst =
-        generatedMatch && encryptedFst
-            ? decryptContentWithBigIntIv(
-                  encryptedFst,
-                  generatedMatch.titleKey,
-                  0
-              )
-            : ticketDecryptedFst;
-    if (!titleKey || !decryptedFst || !looksLikeFst(decryptedFst)) {
+    const encryptedFst = await downloadContent(
+        baseUrl,
+        normalizedTitleId,
+        fstContent.id
+    ).catch((error: unknown) => {
         throw new TitleMetadataError(
-            'decrypt_fst',
-            `No usable title key produced an FST for ${titleId}`
+            'download_fst_content',
+            error instanceof Error
+                ? error.message
+                : `Failed to download FST content for ${normalizedTitleId}`
         );
-    }
+    });
+
+    const { titleKey, decryptedFst, titleKeyPassword } = resolveTitleKey({
+        commonKey,
+        encryptedFst,
+        normalizedTitleId,
+        ticket,
+        tmd,
+    });
 
     const metaXml = await extractMetaXmlFromTitle(
         decryptedFst,
@@ -475,7 +460,7 @@ export async function downloadNusTitleMetadata(
         productCode: meta?.productCode ?? null,
         companyCode: meta?.companyCode ?? null,
         titleKey,
-        titleKeyPassword: generatedMatch?.password ?? null,
+        titleKeyPassword,
         metaJson,
     };
 }
@@ -544,53 +529,14 @@ export async function generateTitleInstallFiles(
     const ticket = ticketBytes
         ? readTikFromBuffer(Buffer.from(ticketBytes))
         : null;
-    const ticketTitleKey =
-        ticket !== null
-            ? decryptTitleKey(ticket.encryptedKey, commonKey, ticket.titleId)
-            : null;
-    const ticketDecryptedFst =
-        ticketTitleKey !== null
-            ? decryptContentWithBigIntIv(encryptedFst, ticketTitleKey, 0)
-            : null;
-
-    let encryptedTitleKey = ticket?.encryptedKey ?? null;
-    let titleKey = ticketTitleKey;
-    let decryptedFst = ticketDecryptedFst;
-    let titleKeyPassword: string | null = null;
-
-    if (!looksLikeFst(ticketDecryptedFst)) {
-        const generatedMatch = findGeneratedTitleKey(
-            tmd.header.titleId,
-            (candidate) =>
-                looksLikeFst(
-                    decryptContentWithBigIntIv(
-                        encryptedFst,
-                        candidate.titleKey,
-                        0
-                    )
-                )
-        );
-
-        if (!generatedMatch) {
-            throw new TitleMetadataError(
-                'resolve_title_key',
-                `No usable title key produced an FST for ${normalizedTitleId}`
-            );
-        }
-
-        encryptedTitleKey = encryptTitleKey(
-            generatedMatch.titleKey,
+    const { encryptedTitleKey, titleKey, decryptedFst, titleKeyPassword } =
+        resolveTitleKey({
             commonKey,
-            tmd.header.titleId
-        );
-        titleKey = generatedMatch.titleKey;
-        decryptedFst = decryptContentWithBigIntIv(
             encryptedFst,
-            generatedMatch.titleKey,
-            0
-        );
-        titleKeyPassword = generatedMatch.password;
-    }
+            normalizedTitleId,
+            ticket,
+            tmd,
+        });
 
     if (
         encryptedTitleKey === null ||
@@ -866,17 +812,22 @@ export function readMetaXml(buffer: Uint8Array): NUSTitleInformation | null {
 export function readMetaXmlJson(
     buffer: Uint8Array
 ): Record<string, unknown> | null {
-    const xml = Buffer.from(buffer)
-        .toString('utf8')
-        .replace(/^\uFEFF/, '');
-    const normalized = normalizeXmlText(xml);
-    if (!normalized) {
+    try {
+        const xml = Buffer.from(buffer)
+            .toString('utf8')
+            .replace(/^\uFEFF/, '');
+        const normalized = normalizeXmlText(xml);
+        if (!normalized) {
+            return null;
+        }
+        const parsed = META_XML_PARSER.parse(normalized) as {
+            menu?: Record<string, unknown>;
+        };
+        return parsed.menu ?? null;
+    } catch (error) {
+        logger.warn('metadata', 'failed to parse meta.xml:', error);
         return null;
     }
-    const parsed = META_XML_PARSER.parse(normalized) as {
-        menu?: Record<string, unknown>;
-    };
-    return parsed.menu ?? null;
 }
 
 export function readTikFromBuffer(buffer: Buffer): Tik | null {
@@ -922,7 +873,12 @@ export async function readTikHeader(dirPath: string): Promise<Tik | null> {
     try {
         const buffer = await readFile(path.join(dirPath, TIK_TITLE_FILE));
         return readTikFromBuffer(buffer);
-    } catch {
+    } catch (error) {
+        logger.warn(
+            'metadata',
+            `failed to read ${TIK_TITLE_FILE} from ${dirPath}:`,
+            error
+        );
         return null;
     }
 }
@@ -1013,7 +969,12 @@ export async function readTmd(dirPath: string): Promise<Tmd | null> {
     try {
         const buffer = await readFile(path.join(dirPath, TMD_TITLE_FILE));
         return readTmdFromBuffer(buffer);
-    } catch {
+    } catch (error) {
+        logger.warn(
+            'metadata',
+            `failed to read ${TMD_TITLE_FILE} from ${dirPath}:`,
+            error
+        );
         return null;
     }
 }
@@ -1103,27 +1064,38 @@ export function getTitleIdNumber(value: Uint8Array): bigint {
 export async function readCommonKey(): Promise<Uint8Array> {
     const commonKeyPath = path.join(getUserAppRoot(), 'common.key');
 
-    commonKeyPromise ??= (async () => {
-        try {
-            const commonKey = parseCommonKey(
-                await readFile(commonKeyPath),
-                commonKeyPath
-            );
-            logger.log('metadata', `Loaded common key from ${commonKeyPath}`);
-            return commonKey;
-        } catch (error) {
-            if (isNodeError(error) && error.code === 'ENOENT') {
-                return downloadCommonKey(commonKeyPath);
-            }
+    if (!commonKeyPromise) {
+        const pending = (async () => {
+            try {
+                const commonKey = parseCommonKey(
+                    await readFile(commonKeyPath),
+                    commonKeyPath
+                );
+                logger.log(
+                    'metadata',
+                    `Loaded common key from ${commonKeyPath}`
+                );
+                return commonKey;
+            } catch (error) {
+                if (isNodeError(error) && error.code === 'ENOENT') {
+                    return downloadCommonKey(commonKeyPath);
+                }
 
-            throw new Error(
-                `common key not found or invalid at ${commonKeyPath}. ${
-                    error instanceof Error ? error.message : String(error)
-                }`,
-                { cause: error }
-            );
-        }
-    })();
+                throw new Error(
+                    `common key not found or invalid at ${commonKeyPath}. ${
+                        error instanceof Error ? error.message : String(error)
+                    }`,
+                    { cause: error }
+                );
+            }
+        })();
+        pending.catch(() => {
+            if (commonKeyPromise === pending) {
+                commonKeyPromise = null;
+            }
+        });
+        commonKeyPromise = pending;
+    }
     return commonKeyPromise;
 }
 
@@ -1151,27 +1123,35 @@ async function resolveTitleCertAuthority(
 }
 
 async function readDefaultCert(): Promise<Uint8Array> {
-    defaultCertPromise ??= downloadTicket(
-        NUS_BASE_URL,
-        DEFAULT_CERT_TITLE_ID
-    ).then((ticket) => {
-        if (
-            ticket.length <
-            TITLE_CERT_AUTHORITY_OFFSET + TITLE_CERT_AUTHORITY_SIZE
-        ) {
-            throw new TitleMetadataError(
-                'download_default_cert',
-                `Default cetk too small: got ${ticket.length}`
-            );
-        }
-
-        return new Uint8Array(
-            ticket.subarray(
-                TITLE_CERT_AUTHORITY_OFFSET,
+    if (!defaultCertPromise) {
+        const pending = downloadTicket(
+            NUS_BASE_URL,
+            DEFAULT_CERT_TITLE_ID
+        ).then((ticket) => {
+            if (
+                ticket.length <
                 TITLE_CERT_AUTHORITY_OFFSET + TITLE_CERT_AUTHORITY_SIZE
-            )
-        );
-    });
+            ) {
+                throw new TitleMetadataError(
+                    'download_default_cert',
+                    `Default cetk too small: got ${ticket.length}`
+                );
+            }
+
+            return new Uint8Array(
+                ticket.subarray(
+                    TITLE_CERT_AUTHORITY_OFFSET,
+                    TITLE_CERT_AUTHORITY_OFFSET + TITLE_CERT_AUTHORITY_SIZE
+                )
+            );
+        });
+        pending.catch(() => {
+            if (defaultCertPromise === pending) {
+                defaultCertPromise = null;
+            }
+        });
+        defaultCertPromise = pending;
+    }
 
     return defaultCertPromise;
 }
@@ -1221,6 +1201,73 @@ async function downloadCommonKey(filePath: string): Promise<Uint8Array> {
             '; '
         )}`
     );
+}
+
+function resolveTitleKey({
+    commonKey,
+    encryptedFst,
+    normalizedTitleId,
+    ticket,
+    tmd,
+}: {
+    commonKey: Uint8Array;
+    encryptedFst: Uint8Array;
+    normalizedTitleId: string;
+    ticket: Tik | null;
+    tmd: Tmd;
+}): ResolvedTitleKey {
+    const ticketTitleKey =
+        ticket !== null
+            ? decryptTitleKey(ticket.encryptedKey, commonKey, ticket.titleId)
+            : null;
+    const ticketDecryptedFst =
+        ticketTitleKey !== null
+            ? decryptContentWithBigIntIv(encryptedFst, ticketTitleKey, 0)
+            : null;
+
+    if (
+        ticket !== null &&
+        ticketTitleKey !== null &&
+        ticketDecryptedFst !== null &&
+        looksLikeFst(ticketDecryptedFst)
+    ) {
+        return {
+            titleKey: ticketTitleKey,
+            decryptedFst: ticketDecryptedFst,
+            encryptedTitleKey: ticket.encryptedKey,
+            titleKeyPassword: null,
+        };
+    }
+
+    const generatedMatch = findGeneratedTitleKey(
+        tmd.header.titleId,
+        (candidate) =>
+            looksLikeFst(
+                decryptContentWithBigIntIv(encryptedFst, candidate.titleKey, 0)
+            )
+    );
+
+    if (!generatedMatch) {
+        throw new TitleMetadataError(
+            'resolve_title_key',
+            `No usable title key produced an FST for ${normalizedTitleId}`
+        );
+    }
+
+    return {
+        titleKey: generatedMatch.titleKey,
+        decryptedFst: decryptContentWithBigIntIv(
+            encryptedFst,
+            generatedMatch.titleKey,
+            0
+        ),
+        encryptedTitleKey: encryptTitleKey(
+            generatedMatch.titleKey,
+            commonKey,
+            tmd.header.titleId
+        ),
+        titleKeyPassword: generatedMatch.password,
+    };
 }
 
 function parseCommonKey(raw: Uint8Array, filePath: string): Uint8Array {
@@ -1958,11 +2005,18 @@ async function extractMetaXmlFromTitle(
         tmd.header.titleId,
         metaEntry
     );
+    if (!decryptedContent) {
+        return null;
+    }
     const extracted = extractFileFromContent(decryptedContent, metaEntry);
     if (!extracted) {
         return null;
     }
-    return extracted.slice(findXmlStartByte(extracted));
+    const xmlStart = findXmlStartByte(extracted);
+    if (xmlStart < 0) {
+        return null;
+    }
+    return extracted.slice(xmlStart);
 }
 
 function decryptTitleContent(
@@ -1972,7 +2026,7 @@ function decryptTitleContent(
     extractWithHash: boolean,
     titleId: Uint8Array,
     entry: FstEntry
-): Uint8Array {
+): Uint8Array | null {
     const decrypt = (iv: Uint8Array) =>
         extractWithHash
             ? decryptHashedContent(encryptedContent, titleKey, iv)
@@ -1991,14 +2045,7 @@ function decryptTitleContent(
         }
     }
 
-    // Fallback: use content index IV
-    return extractWithHash
-        ? decryptHashedContent(
-              encryptedContent,
-              titleKey,
-              createContentIv(contentIndex)
-          )
-        : decryptContentWithIndex(encryptedContent, titleKey, contentIndex);
+    return null;
 }
 
 function decryptHashedContent(
@@ -2322,7 +2369,7 @@ function findXmlStartByte(buffer: Uint8Array): number {
     const xmlIndex = source.indexOf(Buffer.from('<?xml'));
     if (xmlIndex >= 0) return xmlIndex;
     const menuIndex = source.indexOf(Buffer.from('<menu'));
-    return menuIndex >= 0 ? menuIndex : 0;
+    return menuIndex >= 0 ? menuIndex : -1;
 }
 
 function normalizeXmlText(xml: string): string | null {
@@ -2507,7 +2554,7 @@ async function downloadBinary(
     logger.log('metadata', `downloading ${label}: ${url}`);
     const response = await fetch(url);
     if (!response.ok) {
-        throw new Error(`download failed for ${url}: ${response.status}`);
+        throw new HttpError(url, response.status);
     }
     const bytes = new Uint8Array(await response.arrayBuffer());
     logger.log(
@@ -2525,13 +2572,13 @@ async function downloadBinaryToFile(
     logger.log('metadata', `downloading ${label}: ${url}`);
     const response = await fetch(url);
     if (!response.ok) {
-        throw new Error(`download failed for ${url}: ${response.status}`);
+        throw new HttpError(url, response.status);
     }
     if (!response.body) {
         throw new Error(`download failed for ${url}: empty response body`);
     }
 
-    const tempFile = `${targetFile}.download`;
+    const tempFile = `${targetFile}.${process.pid}.${randomUUID()}.download`;
 
     try {
         await pipeline(
@@ -2556,5 +2603,5 @@ function ensureTrailingSlash(value: string): string {
 }
 
 function isHttpErrorStatus(error: unknown, status: number): boolean {
-    return error instanceof Error && error.message.includes(`: ${status}`);
+    return error instanceof HttpError && error.status === status;
 }

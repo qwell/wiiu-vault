@@ -174,25 +174,63 @@ function broadcastLibraryValidationStatus(event: ValidationStatusEvent): void {
 }
 
 function parseSocketCommand(data: RawData): AppSocketCommand | null {
+    let parsed: unknown;
     try {
         const text = Buffer.isBuffer(data)
             ? data.toString('utf8')
             : Buffer.from(data as ArrayBuffer).toString('utf8');
-
-        const parsed = JSON.parse(text) as unknown;
-        if (!parsed || typeof parsed !== 'object') {
-            return null;
-        }
-
-        const command = parsed as { type?: unknown };
-
-        if (typeof command.type !== 'string') {
-            return null;
-        }
-
-        return parsed as AppSocketCommand;
+        parsed = JSON.parse(text) as unknown;
     } catch {
         return null;
+    }
+
+    if (!parsed || typeof parsed !== 'object') {
+        return null;
+    }
+
+    const command = parsed as { type?: unknown };
+
+    switch (command.type) {
+        case 'download.queue': {
+            const items = (command as { items?: unknown }).items;
+            if (!Array.isArray(items)) {
+                return null;
+            }
+            const isQueueItem = (
+                value: unknown
+            ): value is DownloadQueueItem => {
+                if (!value || typeof value !== 'object') {
+                    return false;
+                }
+                const item = value as Record<string, unknown>;
+                return (
+                    typeof item.id === 'string' &&
+                    typeof item.family === 'string' &&
+                    typeof item.groupName === 'string' &&
+                    typeof item.label === 'string' &&
+                    typeof item.titleId === 'string' &&
+                    typeof item.kind === 'string' &&
+                    (typeof item.sizeText === 'string' ||
+                        item.sizeText === null) &&
+                    (typeof item.totalBytes === 'number' ||
+                        item.totalBytes === null)
+                );
+            };
+            if (!items.every(isQueueItem)) {
+                return null;
+            }
+            return parsed as AppSocketCommand;
+        }
+        case 'download.retry':
+        case 'download.remove': {
+            const id = (command as { id?: unknown }).id;
+            if (typeof id !== 'string' || id.length === 0) {
+                return null;
+            }
+            return parsed as AppSocketCommand;
+        }
+        default:
+            return null;
     }
 }
 
@@ -272,7 +310,7 @@ async function processDownloadQueue(): Promise<void> {
 
 function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
     switch (command.type) {
-        case 'download.enqueue': {
+        case 'download.queue': {
             const newItems = command.items.filter(
                 (item) =>
                     !downloadQueue.some(
@@ -346,8 +384,21 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
     }
 }
 
+function getErrorCause(error: Error): unknown {
+    return 'cause' in error ? error.cause : undefined;
+}
+
 function formatLogError(error: unknown): string {
-    return error instanceof Error ? error.message : String(error);
+    if (!(error instanceof Error)) {
+        return String(error);
+    }
+
+    const cause = getErrorCause(error);
+    if (cause === undefined) {
+        return error.message;
+    }
+
+    return `${error.message}; cause: ${formatLogError(cause)}`;
 }
 
 function logServerError(message: string, error: unknown): void {
@@ -486,6 +537,7 @@ app.get('/api/title-icon/:family', async (req, res) => {
 
         const image = await getCachedImage(iconUrl);
         res.set('Cache-Control', 'public, max-age=31536000, immutable');
+        res.set('Content-Type', image.contentType);
         res.send(image.body);
     } catch (error) {
         logServerError('[server] Failed to load title icon:', error);

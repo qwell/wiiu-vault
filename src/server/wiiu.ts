@@ -1,7 +1,6 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import type { Dirent } from 'node:fs';
 import path from 'node:path';
-import { getAppRoot } from './paths.js';
 import { normalizeRegion } from '../shared/regions.js';
 import {
     type ContentTreeVerification,
@@ -28,9 +27,11 @@ import {
     TitleDatabaseEntry,
     RawTitleDatabaseEntry,
 } from '../shared/shared.js';
+import { getAppRoot } from './paths.js';
 import { getImmediatePathSizeBytes } from '../shared/file.js';
 import { readTmd } from './metadata.js';
 import logger from '../shared/logger.js';
+import { ansi } from '../shared/ansi.js';
 
 export type LibraryTitleValidation = {
     root: string | null;
@@ -80,10 +81,6 @@ type LocalTitleEntry = TitleEntry & {
 };
 
 const LIBRARY_SCAN_CONCURRENCY = 8;
-const ANSI_RED = '\u001b[31m';
-const ANSI_GREEN = '\u001b[32m';
-const ANSI_RESET = '\u001b[0m';
-
 const availableOnCdnByTitleId = new Map<string, boolean>();
 
 async function assertReadableDirectory(root: string): Promise<void> {
@@ -745,8 +742,8 @@ export async function validateWiiUTitles(
         const result = validation.status === 'ok' ? 'ok' : 'failed';
         const status =
             validation.status === 'failed'
-                ? `${ANSI_RED}failed${ANSI_RESET}`
-                : `${ANSI_GREEN}${validation.status}${ANSI_RESET}`;
+                ? `${ansi.red}failed${ansi.reset}`
+                : `${ansi.green}${validation.status}${ansi.reset}`;
 
         // Keep the extra space, for alignment purposes
         logger.log(

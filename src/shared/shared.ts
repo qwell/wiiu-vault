@@ -98,17 +98,19 @@ export async function mapConcurrent<T, U>(
     }
 
     const results = new Array<U>(items.length);
-    const workers = new Array(Math.min(concurrency, items.length))
-        .fill(null)
-        .map(async (_, workerIndex) => {
-            for (
-                let index = workerIndex;
-                index < items.length;
-                index += concurrency
-            ) {
-                results[index] = await mapper(items[index], index);
-            }
-        });
+    let cursor = 0;
+
+    const workerCount = Math.max(
+        1,
+        Math.min(Math.floor(concurrency) || 1, items.length)
+    );
+
+    const workers = Array.from({ length: workerCount }, async () => {
+        while (cursor < items.length) {
+            const index = cursor++;
+            results[index] = await mapper(items[index], index);
+        }
+    });
 
     await Promise.all(workers);
     return results;

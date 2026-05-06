@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 
 import { getAppRoot, getUserAppRoot } from './paths.js';
 import { type AppConfig, type AppConfigUpdate } from '../shared/config.js';
@@ -97,9 +98,12 @@ function assertConfig(value: unknown): asserts value is AppConfig {
 
     if (
         'port' in value &&
-        (typeof value.port !== 'number' || !Number.isInteger(value.port))
+        (typeof value.port !== 'number' ||
+            !Number.isInteger(value.port) ||
+            value.port < 1 ||
+            value.port > 65535)
     ) {
-        throw new Error('Config.port must be an integer.');
+        throw new Error('Config.port must be an integer between 1 and 65535.');
     }
 
     if ('openBrowser' in value && typeof value.openBrowser !== 'boolean') {
@@ -119,8 +123,12 @@ function assertConfig(value: unknown): asserts value is AppConfig {
     }
 }
 
-function readWiiURoots(config: Record<string, unknown>): string[] {
+function readWiiURoots(
+    config: Record<string, unknown>,
+    options: { useDefaultIfEmpty?: boolean } = {}
+): string[] {
     const roots: string[] = [];
+    const hasConfiguredRoots = 'wiiuRoots' in config;
 
     if (Array.isArray(config.wiiuRoots)) {
         for (const root of config.wiiuRoots) {
@@ -137,7 +145,11 @@ function readWiiURoots(config: Record<string, unknown>): string[] {
         }
     }
 
-    if (roots.length === 0) {
+    if (
+        roots.length === 0 &&
+        options.useDefaultIfEmpty &&
+        !hasConfiguredRoots
+    ) {
         roots.push(DEFAULT_ROM_DIR);
     }
 
@@ -178,10 +190,16 @@ function resolveConfigPath(): string {
     return currentConfigPath;
 }
 
+function writeConfigFile(configPath: string, contents: string): void {
+    const tempPath = `${configPath}.${process.pid}.${randomUUID()}.tmp`;
+    fs.writeFileSync(tempPath, contents);
+    fs.renameSync(tempPath, configPath);
+}
+
 function writeDefaultConfig(): void {
     const configPath = resolveConfigPath();
     fs.mkdirSync(path.dirname(configPath), { recursive: true });
-    fs.writeFileSync(
+    writeConfigFile(
         configPath,
         `${JSON.stringify(getDefaultConfig(), null, 4)}\n`
     );
@@ -190,7 +208,7 @@ function writeDefaultConfig(): void {
 
 function writeConfig(config: AppConfig): void {
     const configPath = resolveConfigPath();
-    fs.writeFileSync(configPath, `${JSON.stringify(config, null, 4)}\n`);
+    writeConfigFile(configPath, `${JSON.stringify(config, null, 4)}\n`);
     logger.log('server', `Saved config to ${configPath}`);
 }
 
@@ -217,7 +235,7 @@ export function loadConfig(): AppConfig {
         host: parsed.host ?? DEFAULT_SERVER_HOST,
         port: parsed.port ?? DEFAULT_SERVER_PORT,
         openBrowser: parsed.openBrowser ?? DEFAULT_BROWSER_OPEN,
-        wiiuRoots: readWiiURoots(parsed),
+        wiiuRoots: readWiiURoots(parsed, { useDefaultIfEmpty: true }),
     };
 
     return currentConfig;
@@ -280,8 +298,9 @@ export function saveConfig(update: AppConfigUpdate): {
 } {
     const previous = getConfig();
     const next: AppConfig = {
-        ...previous,
-        ...update,
+        host: update.host ?? previous.host,
+        port: update.port ?? previous.port,
+        openBrowser: update.openBrowser ?? previous.openBrowser,
         wiiuRoots:
             update.wiiuRoots === undefined
                 ? previous.wiiuRoots

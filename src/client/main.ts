@@ -56,6 +56,7 @@ let libraryControlState: LibraryControlState = {
 let libraryStatusMessage = '';
 let libraryStatusTone: LibraryStatusTone = 'info';
 let validatingLibrary = false;
+let libraryLoading = false;
 let activeLibraryRequestId = 0;
 let settingsConfig: AppConfig | null = null;
 let settingsStatusMessage = '';
@@ -76,32 +77,35 @@ let downloadQueueRoot: HTMLElement | null = null;
 let appSocket: WebSocket | null = null;
 let reconnectSocketTimer: number | null = null;
 
-iconObserver = new IntersectionObserver(
-    (entries) => {
-        for (const entry of entries) {
-            if (!entry.isIntersecting) {
-                continue;
-            }
+function resetIconObserver(): IntersectionObserver {
+    iconObserver?.disconnect();
+    iconObserver = new IntersectionObserver(
+        (entries) => {
+            for (const entry of entries) {
+                if (!entry.isIntersecting) {
+                    continue;
+                }
 
-            const image = entry.target;
-            if (!(image instanceof HTMLImageElement)) {
-                continue;
-            }
+                const image = entry.target;
+                if (!(image instanceof HTMLImageElement)) {
+                    continue;
+                }
 
-            const iconUrl = image.dataset.src;
-            if (iconUrl) {
-                image.src = iconUrl;
-                delete image.dataset.src;
-            }
+                const iconUrl = image.dataset.src;
+                if (iconUrl) {
+                    image.src = iconUrl;
+                    delete image.dataset.src;
+                }
 
-            iconObserver?.unobserve(image);
+                iconObserver?.unobserve(image);
+            }
+        },
+        {
+            rootMargin: '256px',
         }
-    },
-    {
-        root: document.querySelector('.library-grid'),
-        rootMargin: '256px',
-    }
-);
+    );
+    return iconObserver;
+}
 
 function getViewMode(): LibraryViewMode {
     return localStorage.getItem('libraryViewMode') === 'list'
@@ -618,7 +622,7 @@ function queueDownloads(items: DownloadQueueItem[]): void {
     }
 
     sendAppSocketCommand({
-        type: 'download.enqueue',
+        type: 'download.queue',
         items: addedItems,
     });
 }
@@ -725,6 +729,7 @@ function markDownloadComplete(item: DownloadQueueItem): void {
             kind: item.kind,
             sizeBytes: installedSizeBytes,
         });
+        groupSearchHaystacks.delete(group);
     } else {
         const existingEntry = group.entries.find(
             (entry) =>
@@ -732,9 +737,16 @@ function markDownloadComplete(item: DownloadQueueItem): void {
         );
 
         if (existingEntry) {
+            if (installedVersion < existingEntry.version) {
+                updateGroupStatusFromSlots(group);
+                updateRenderedTitleGroup(group);
+                refreshOpenDetailSidebarForGroup(group);
+                return;
+            }
             existingEntry.version = installedVersion;
             existingEntry.titleName = installedTitleName;
             existingEntry.sizeBytes = installedSizeBytes;
+            groupSearchHaystacks.delete(group);
         }
     }
 
@@ -1375,26 +1387,35 @@ function normalizeSearchText(value: string | null | undefined): string {
     return (value ?? '').toLocaleLowerCase();
 }
 
+const groupSearchHaystacks = new WeakMap<TitleGroup, string>();
+
+function getGroupSearchHaystack(group: TitleGroup): string {
+    let haystack = groupSearchHaystacks.get(group);
+    if (haystack === undefined) {
+        const parts: (string | null)[] = [
+            group.name,
+            group.family,
+            group.region,
+        ];
+        for (const entry of group.entries) {
+            parts.push(
+                entry.titleId,
+                entry.titleName,
+                entry.kind,
+                entry.region
+            );
+        }
+        haystack = parts.map(normalizeSearchText).join('\n');
+        groupSearchHaystacks.set(group, haystack);
+    }
+    return haystack;
+}
+
 function groupMatchesSearch(group: TitleGroup, search: string): boolean {
     if (!search) {
         return true;
     }
-
-    const haystacks = [
-        group.name,
-        group.family,
-        group.region,
-        ...group.entries.flatMap((entry) => [
-            entry.titleId,
-            entry.titleName,
-            entry.kind,
-            entry.region,
-        ]),
-    ];
-
-    return haystacks.some((value) =>
-        normalizeSearchText(value).includes(search)
-    );
+    return getGroupSearchHaystack(group).includes(search);
 }
 
 function compareGroups(a: TitleGroup, b: TitleGroup): number {
@@ -1508,6 +1529,7 @@ function renderGroups(
     });
 
     grid.replaceChildren();
+    resetIconObserver();
 
     for (const group of filteredGroups) {
         const render = renderGroup(group, (selectedGroup) =>
@@ -1656,21 +1678,8 @@ function buildControls(
     const validateButton = document.createElement('button');
     validateButton.className = 'library-field-validate';
     validateButton.type = 'button';
-    validateButton.title = validatingLibrary
-        ? 'Validating library'
-        : 'Validate library';
-    validateButton.setAttribute(
-        'aria-label',
-        validatingLibrary ? 'Validating library' : 'Validate library'
-    );
-    validateButton.setAttribute('aria-busy', String(validatingLibrary));
-    validateButton.disabled =
-        loading || validatingLibrary || groups.length === 0;
 
     const validateIcon = document.createElement('i');
-    validateIcon.className = validatingLibrary
-        ? 'fa-solid fa-spinner fa-spin'
-        : 'fa-solid fa-check-double';
     validateButton.append(validateIcon);
 
     const settingsButton = document.createElement('button');
@@ -1743,12 +1752,11 @@ function buildControls(
 
     validateButton.addEventListener('click', () => {
         void (async () => {
-            if (loading || validatingLibrary || groups.length === 0) {
+            if (libraryLoading || validatingLibrary || groups.length === 0) {
                 return;
             }
 
             validatingLibrary = true;
-            validateButton.disabled = true;
             updateValidationButtonState();
 
             libraryStatusMessage = 'Validating library...';
@@ -1774,7 +1782,6 @@ function buildControls(
                 libraryStatusTone = 'error';
             } finally {
                 validatingLibrary = false;
-                validateButton.disabled = loading || groups.length === 0;
                 updateValidationButtonState();
                 updateLibraryStatusLine();
             }
@@ -1898,6 +1905,8 @@ function updateValidationButtonState(): void {
         validatingLibrary ? 'Validating library' : 'Validate library'
     );
     validateButton.setAttribute('aria-busy', String(validatingLibrary));
+    validateButton.disabled =
+        libraryLoading || validatingLibrary || currentGroups.length === 0;
     validateIcon.className = validatingLibrary
         ? 'fa-solid fa-spinner fa-spin'
         : 'fa-solid fa-check-double';
@@ -1919,10 +1928,12 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
     const requestId = ++activeLibraryRequestId;
     const nextControlState = { ...libraryControlState };
     const loadingGroups = currentGroups.length > 0 ? currentGroups : [];
+    libraryLoading = true;
     resetDetailSidebars();
     output.replaceChildren(
         buildLibraryContent(loadingGroups, true, nextControlState)
     );
+    updateValidationButtonState();
 
     try {
         const data = await requestJson<LibraryResponse>(
@@ -1947,6 +1958,7 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
         output.replaceChildren(
             buildLibraryContent(groups, false, libraryControlState)
         );
+        updateValidationButtonState();
     } catch (error) {
         if (requestId !== activeLibraryRequestId) {
             return;
@@ -1959,6 +1971,11 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
         const message = document.createElement('div');
         message.textContent = 'Failed to load library.';
         output.append(message);
+    } finally {
+        if (requestId === activeLibraryRequestId) {
+            libraryLoading = false;
+            updateValidationButtonState();
+        }
     }
 }
 
@@ -2312,14 +2329,29 @@ function renderSettingsSidebar(preserveDraft = true): void {
     settingsRoot.append(backdrop, sidebar);
 }
 
-function setupSettingsSidebar(): void {
+function setupSidebars(): void {
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && isSettingsOpen()) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        if (isSettingsOpen()) {
             closeSettingsSidebar();
+            return;
+        }
+
+        if (selectedFamily !== null) {
+            const detailSidebar = document.querySelector<HTMLElement>(
+                '.title-detail-sidebar'
+            );
+            if (detailSidebar && !detailSidebar.hidden) {
+                closeDetailSidebar(detailSidebar);
+            }
         }
     });
 
     renderSettingsSidebar();
+    resetDetailSidebars();
 }
 
 function setTheme(darkMode: boolean, save = false): void {
@@ -2374,8 +2406,7 @@ mountDownloadQueueStrip();
 
 connectAppSocket();
 
-resetDetailSidebars();
-setupSettingsSidebar();
+setupSidebars();
 
 setupVersion();
 void setupTheme();

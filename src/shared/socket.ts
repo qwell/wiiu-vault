@@ -34,7 +34,7 @@ export type DownloadQueueItem = {
 
 export type DownloadSocketCommand =
     | {
-          type: 'download.enqueue';
+          type: 'download.queue';
           items: DownloadQueueItem[];
       }
     | {
