@@ -57,6 +57,19 @@ type TitleIdQueryResult =
           error: string;
       };
 
+function getConfigRootBodyValue(body: unknown): string {
+    if (
+        typeof body === 'object' &&
+        body !== null &&
+        'root' in body &&
+        typeof body.root === 'string'
+    ) {
+        return body.root;
+    }
+
+    return '';
+}
+
 function getTitleIdQuery(req: Request): TitleIdQueryResult {
     const { titleId } = req.query;
 
@@ -363,26 +376,8 @@ app.use((req, _res, next) => {
 app.use(express.json());
 app.use(express.static(clientDir));
 
-function sendConfigResponse(res: Response, response: AppConfigResponse): void {
-    res.json(response);
-}
-
-function sendConfigValidateRootResponse(
-    res: Response,
-    response: AppConfigValidateRootResponse
-): void {
-    res.json(response);
-}
-
 app.get('/api/config', (_req, res) => {
-    sendConfigResponse(res, {
-        config: getConfig(),
-        restartRequired: false,
-    });
-});
-
-app.get('/api/config/all', (_req, res) => {
-    sendConfigResponse(res, {
+    res.json({
         config: getConfig(),
         restartRequired: false,
     });
@@ -390,15 +385,10 @@ app.get('/api/config/all', (_req, res) => {
 
 app.post('/api/config/validate-root', async (req, res) => {
     try {
-        const body = req.body as unknown;
-        const root =
-            typeof body === 'object' &&
-            body !== null &&
-            'root' in body &&
-            typeof body.root === 'string'
-                ? body.root
-                : '';
-        sendConfigValidateRootResponse(res, await validateWiiURoot(root));
+        const root = getConfigRootBodyValue(req.body as unknown);
+        const response: AppConfigValidateRootResponse =
+            await validateWiiURoot(root);
+        res.json(response);
     } catch (error) {
         logServerError('[server] Failed to validate Wii U root:', error);
         sendServerError(res, 'Failed to validate Wii U root', error, {
@@ -409,7 +399,10 @@ app.post('/api/config/validate-root', async (req, res) => {
 
 app.post('/api/config', (req, res) => {
     try {
-        sendConfigResponse(res, saveConfig(req.body as AppConfigUpdate));
+        const response: AppConfigResponse = saveConfig(
+            req.body as AppConfigUpdate
+        );
+        res.json(response);
     } catch (error) {
         logServerError('[server] Failed to save config:', error);
         sendServerError(res, 'Failed to save config', error, {

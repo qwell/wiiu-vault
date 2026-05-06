@@ -126,6 +126,15 @@ function updateSettingsStatus(
     renderSettingsSidebar();
 }
 
+async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
+    const response = await fetch(url, init);
+    if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    return (await response.json()) as T;
+}
+
 function formatRegion(region: string | null): {
     text: string;
     flag: string;
@@ -1747,19 +1756,11 @@ function buildControls(
             updateLibraryStatusLine();
 
             try {
-                const response = await fetch('/api/library/validate');
-
-                if (!response.ok) {
-                    throw new Error(
-                        `Request failed with status ${response.status}`
-                    );
-                }
-
-                const result = (await response.json()) as {
+                const result = await requestJson<{
                     status: 'ok' | 'failed';
                     total: number;
                     failed: number;
-                };
+                }>('/api/library/validate');
 
                 libraryStatusMessage =
                     result.failed === 0
@@ -1924,15 +1925,9 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
     );
 
     try {
-        const response = await fetch(
+        const data = await requestJson<LibraryResponse>(
             showAllTitles ? '/api/library?includeAll=true' : '/api/library'
         );
-
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-        }
-
-        const data = (await response.json()) as LibraryResponse;
 
         if (requestId !== activeLibraryRequestId) {
             return;
@@ -2003,21 +1998,16 @@ function buildSettingsRootRow(value: string): HTMLDivElement {
             renderSettingsSidebar();
 
             try {
-                const response = await fetch('/api/config/validate-root', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ root }),
-                });
-                if (!response.ok) {
-                    throw new Error(
-                        `Request failed with status ${response.status}`
-                    );
-                }
-
-                const result =
-                    (await response.json()) as AppConfigValidateRootResponse;
+                const result = await requestJson<AppConfigValidateRootResponse>(
+                    '/api/config/validate-root',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ root }),
+                    }
+                );
                 updateSettingsStatus(
                     result.message,
                     result.readable ? 'success' : 'error'
@@ -2072,12 +2062,7 @@ async function loadSettingsConfig(): Promise<void> {
     updateSettingsStatus('Loading settings...');
 
     try {
-        const response = await fetch('/api/config/all');
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-        }
-
-        const result = (await response.json()) as AppConfigResponse;
+        const result = await requestJson<AppConfigResponse>('/api/config');
         settingsConfig = result.config;
         settingsStatusMessage = '';
         settingsStatusTone = 'info';
@@ -2104,18 +2089,13 @@ async function saveSettingsConfig(sidebar: HTMLElement): Promise<void> {
     updateSettingsStatus('Saving settings...');
 
     try {
-        const response = await fetch('/api/config', {
+        const result = await requestJson<AppConfigResponse>('/api/config', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(nextConfig),
         });
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-        }
-
-        const result = (await response.json()) as AppConfigResponse;
         settingsConfig = result.config;
         settingsStatusMessage = result.restartRequired
             ? 'Settings saved. Restart required for host/port changes.'
@@ -2147,6 +2127,124 @@ function openSettingsSidebar(): void {
     if (!settingsLoading) {
         void loadSettingsConfig();
     }
+}
+
+function buildSettingsServerSection(config: AppConfig): HTMLElement {
+    const serverSection = document.createElement('section');
+    serverSection.className = 'settings-section';
+
+    const serverTitle = document.createElement('h3');
+    serverTitle.className = 'settings-section-title';
+    serverTitle.textContent = 'Server';
+
+    const hostField = document.createElement('label');
+    hostField.className = 'settings-field';
+    const hostLabel = document.createElement('span');
+    hostLabel.className = 'settings-label';
+    hostLabel.textContent = 'Host';
+    const hostInput = document.createElement('input');
+    hostInput.type = 'text';
+    hostInput.className = 'settings-input settings-input-host';
+    hostInput.value = config.host;
+    hostField.append(hostLabel, hostInput);
+
+    const portField = document.createElement('label');
+    portField.className = 'settings-field';
+    const portLabel = document.createElement('span');
+    portLabel.className = 'settings-label';
+    portLabel.textContent = 'Port';
+    const portInput = document.createElement('input');
+    portInput.type = 'number';
+    portInput.className = 'settings-input settings-input-port';
+    portInput.value = String(config.port);
+    portInput.min = '1';
+    portInput.step = '1';
+    portField.append(portLabel, portInput);
+
+    const openBrowserLabel = document.createElement('label');
+    openBrowserLabel.className = 'settings-checkbox';
+    const openBrowserInput = document.createElement('input');
+    openBrowserInput.type = 'checkbox';
+    openBrowserInput.className = 'settings-input-open-browser';
+    openBrowserInput.checked = config.openBrowser;
+    const openBrowserText = document.createElement('span');
+    openBrowserText.textContent = 'Open browser on server start';
+    openBrowserLabel.append(openBrowserInput, openBrowserText);
+
+    const serverHelp = document.createElement('div');
+    serverHelp.className = 'settings-help';
+    serverHelp.textContent =
+        'Host and port changes are saved immediately but require a restart.';
+
+    serverSection.append(
+        serverTitle,
+        hostField,
+        portField,
+        openBrowserLabel,
+        serverHelp
+    );
+
+    return serverSection;
+}
+
+function buildSettingsRootsSection(config: AppConfig): HTMLElement {
+    const rootsSection = document.createElement('section');
+    rootsSection.className = 'settings-section';
+
+    const rootsTitle = document.createElement('h3');
+    rootsTitle.className = 'settings-section-title';
+    rootsTitle.textContent = 'Wii U Roots';
+
+    const rootsHelp = document.createElement('div');
+    rootsHelp.className = 'settings-help';
+    rootsHelp.textContent =
+        'Add one or more ROM roots. Check verifies that a path exists and is readable.';
+
+    const rootsList = document.createElement('div');
+    rootsList.className = 'settings-roots';
+
+    for (const root of config.wiiuRoots) {
+        rootsList.append(buildSettingsRootRow(root));
+    }
+
+    if (config.wiiuRoots.length === 0) {
+        rootsList.append(buildSettingsRootRow(''));
+    }
+
+    const addRootButton = document.createElement('button');
+    addRootButton.type = 'button';
+    addRootButton.className = 'settings-button';
+    addRootButton.textContent = 'Add root';
+    addRootButton.disabled = settingsCheckingRoot;
+    addRootButton.addEventListener('click', () => {
+        rootsList.append(buildSettingsRootRow(''));
+    });
+
+    rootsSection.append(rootsTitle, rootsHelp, rootsList, addRootButton);
+    return rootsSection;
+}
+
+function buildSettingsFooter(sidebar: HTMLElement): HTMLElement {
+    const footer = document.createElement('div');
+    footer.className = 'settings-footer';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.type = 'button';
+    cancelButton.className = 'settings-button';
+    cancelButton.textContent = 'Close';
+    cancelButton.addEventListener('click', closeSettingsSidebar);
+
+    const saveButton = document.createElement('button');
+    saveButton.type = 'button';
+    saveButton.className = 'settings-button';
+    saveButton.textContent = settingsSaving ? 'Saving...' : 'Save';
+    saveButton.disabled = settingsSaving || settingsCheckingRoot;
+    saveButton.addEventListener('click', () => {
+        void saveSettingsConfig(sidebar);
+    });
+
+    footer.append(cancelButton, saveButton);
+    return footer;
 }
 
 function renderSettingsSidebar(preserveDraft = true): void {
@@ -2203,114 +2301,11 @@ function renderSettingsSidebar(preserveDraft = true): void {
     form.className = 'settings-form';
 
     if (settingsConfig) {
-        const serverSection = document.createElement('section');
-        serverSection.className = 'settings-section';
-
-        const serverTitle = document.createElement('h3');
-        serverTitle.className = 'settings-section-title';
-        serverTitle.textContent = 'Server';
-
-        const hostField = document.createElement('label');
-        hostField.className = 'settings-field';
-        const hostLabel = document.createElement('span');
-        hostLabel.className = 'settings-label';
-        hostLabel.textContent = 'Host';
-        const hostInput = document.createElement('input');
-        hostInput.type = 'text';
-        hostInput.className = 'settings-input settings-input-host';
-        hostInput.value = settingsConfig.host;
-        hostField.append(hostLabel, hostInput);
-
-        const portField = document.createElement('label');
-        portField.className = 'settings-field';
-        const portLabel = document.createElement('span');
-        portLabel.className = 'settings-label';
-        portLabel.textContent = 'Port';
-        const portInput = document.createElement('input');
-        portInput.type = 'number';
-        portInput.className = 'settings-input settings-input-port';
-        portInput.value = String(settingsConfig.port);
-        portInput.min = '1';
-        portInput.step = '1';
-        portField.append(portLabel, portInput);
-
-        const openBrowserLabel = document.createElement('label');
-        openBrowserLabel.className = 'settings-checkbox';
-        const openBrowserInput = document.createElement('input');
-        openBrowserInput.type = 'checkbox';
-        openBrowserInput.className = 'settings-input-open-browser';
-        openBrowserInput.checked = settingsConfig.openBrowser;
-        const openBrowserText = document.createElement('span');
-        openBrowserText.textContent = 'Open browser on server start';
-        openBrowserLabel.append(openBrowserInput, openBrowserText);
-
-        const serverHelp = document.createElement('div');
-        serverHelp.className = 'settings-help';
-        serverHelp.textContent =
-            'Host and port changes are saved immediately but require a restart.';
-
-        serverSection.append(
-            serverTitle,
-            hostField,
-            portField,
-            openBrowserLabel,
-            serverHelp
+        form.append(
+            buildSettingsServerSection(settingsConfig),
+            buildSettingsRootsSection(settingsConfig),
+            buildSettingsFooter(sidebar)
         );
-
-        const rootsSection = document.createElement('section');
-        rootsSection.className = 'settings-section';
-
-        const rootsTitle = document.createElement('h3');
-        rootsTitle.className = 'settings-section-title';
-        rootsTitle.textContent = 'Wii U Roots';
-
-        const rootsHelp = document.createElement('div');
-        rootsHelp.className = 'settings-help';
-        rootsHelp.textContent =
-            'Add one or more ROM roots. Check verifies that a path exists and is readable.';
-
-        const rootsList = document.createElement('div');
-        rootsList.className = 'settings-roots';
-
-        for (const root of settingsConfig.wiiuRoots) {
-            rootsList.append(buildSettingsRootRow(root));
-        }
-
-        if (settingsConfig.wiiuRoots.length === 0) {
-            rootsList.append(buildSettingsRootRow(''));
-        }
-
-        const addRootButton = document.createElement('button');
-        addRootButton.type = 'button';
-        addRootButton.className = 'settings-button';
-        addRootButton.textContent = 'Add root';
-        addRootButton.disabled = settingsCheckingRoot;
-        addRootButton.addEventListener('click', () => {
-            rootsList.append(buildSettingsRootRow(''));
-        });
-
-        rootsSection.append(rootsTitle, rootsHelp, rootsList, addRootButton);
-
-        const footer = document.createElement('div');
-        footer.className = 'settings-footer';
-
-        const cancelButton = document.createElement('button');
-        cancelButton.type = 'button';
-        cancelButton.className = 'settings-button';
-        cancelButton.textContent = 'Close';
-        cancelButton.addEventListener('click', closeSettingsSidebar);
-
-        const saveButton = document.createElement('button');
-        saveButton.type = 'button';
-        saveButton.className = 'settings-button';
-        saveButton.textContent = settingsSaving ? 'Saving...' : 'Save';
-        saveButton.disabled = settingsSaving || settingsCheckingRoot;
-        saveButton.addEventListener('click', () => {
-            void saveSettingsConfig(sidebar);
-        });
-
-        footer.append(cancelButton, saveButton);
-        form.append(serverSection, rootsSection, footer);
     }
 
     sidebar.append(header, status, form);

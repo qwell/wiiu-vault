@@ -13,6 +13,13 @@ const DEFAULT_ROM_DIR = getUserAppRoot();
 let currentConfig: AppConfig | null = null;
 let currentConfigPath: string | null = null;
 
+type WiiURootInspection = {
+    normalizedRoot: string;
+    exists: boolean;
+    isDirectory: boolean;
+    readable: boolean;
+};
+
 function isObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null;
 }
@@ -24,6 +31,55 @@ function normalizeWiiURoot(root: string): string {
         return fs.realpathSync.native(resolvedRoot);
     } catch {
         return resolvedRoot;
+    }
+}
+
+async function inspectWiiURoot(root: string): Promise<WiiURootInspection> {
+    const normalizedRoot = normalizeWiiURoot(root);
+
+    try {
+        const stats = await fs.promises.stat(normalizedRoot);
+        if (!stats.isDirectory()) {
+            return {
+                normalizedRoot,
+                exists: true,
+                isDirectory: false,
+                readable: false,
+            };
+        }
+
+        try {
+            await fs.promises.access(normalizedRoot, fs.constants.R_OK);
+            return {
+                normalizedRoot,
+                exists: true,
+                isDirectory: true,
+                readable: true,
+            };
+        } catch {
+            return {
+                normalizedRoot,
+                exists: true,
+                isDirectory: true,
+                readable: false,
+            };
+        }
+    } catch (error) {
+        if (
+            error &&
+            typeof error === 'object' &&
+            'code' in error &&
+            error.code === 'ENOENT'
+        ) {
+            return {
+                normalizedRoot,
+                exists: false,
+                isDirectory: false,
+                readable: false,
+            };
+        }
+
+        throw error;
     }
 }
 
@@ -188,50 +244,34 @@ export async function validateWiiURoot(root: string): Promise<{
         };
     }
 
-    try {
-        const stats = await fs.promises.stat(normalizedRoot);
-        if (!stats.isDirectory()) {
-            return {
-                exists: true,
-                isDirectory: false,
-                readable: false,
-                message: 'Path exists but is not a directory.',
-            };
-        }
+    const inspection = await inspectWiiURoot(normalizedRoot);
 
-        try {
-            await fs.promises.access(normalizedRoot, fs.constants.R_OK);
-            return {
-                exists: true,
-                isDirectory: true,
-                readable: true,
-                message: 'Path exists and is readable.',
-            };
-        } catch {
-            return {
-                exists: true,
-                isDirectory: true,
-                readable: false,
-                message: 'Directory exists but is not readable.',
-            };
-        }
-    } catch (error) {
-        if (
-            error &&
-            typeof error === 'object' &&
-            'code' in error &&
-            error.code === 'ENOENT'
-        ) {
-            return {
-                exists: false,
-                isDirectory: false,
-                readable: false,
-                message: 'Path does not exist.',
-            };
-        }
-
-        throw error;
+    if (!inspection.exists) {
+        return {
+            exists: false,
+            isDirectory: false,
+            readable: false,
+            message: 'Path does not exist.',
+        };
     }
+
+    if (!inspection.isDirectory) {
+        return {
+            exists: true,
+            isDirectory: false,
+            readable: false,
+            message: 'Path exists but is not a directory.',
+        };
+    }
+
+    return {
+        exists: true,
+        isDirectory: true,
+        readable: inspection.readable,
+        message: inspection.readable
+            ? 'Path exists and is readable.'
+            : 'Directory exists but is not readable.',
+    };
 }
 
 export function saveConfig(update: AppConfigUpdate): {
