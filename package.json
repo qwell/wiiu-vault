@@ -13,7 +13,7 @@
     "engines": {
         "node": ">=24.0.0"
     },
-    "packageManager": "yarn@4.13.0",
+    "packageManager": "yarn@4.14.1",
     "scripts": {
         "lint": "eslint --cache --cache-strategy metadata --cache-location ./.cache/eslint src/ tests/",
         "format": "prettier --write --cache --cache-strategy metadata --cache-location ./.cache/prettier .",
