@@ -19,14 +19,12 @@ import {
     type ParentKind,
     PARENT_KINDS,
     CHILD_KINDS,
-    toArray,
     normalizeTitleName,
-    mapConcurrent,
-    formatSize,
     TitleKinds,
     TitleDatabaseEntry,
     RawTitleDatabaseEntry,
-} from '../shared/shared.js';
+} from '../shared/titles.js';
+import { toArray, mapConcurrent, formatSize } from '../shared/shared.js';
 import { getAppRoot } from './paths.js';
 import { getImmediatePathSizeBytes } from '../shared/file.js';
 import { readTmd } from './metadata.js';

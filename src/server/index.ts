@@ -1,5 +1,7 @@
 import express, { type Request, type Response } from 'express';
 import open from 'open';
+import { spawn } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
 import { WebSocket, WebSocketServer, type RawData } from 'ws';
 import path from 'node:path';
@@ -29,7 +31,7 @@ import {
     AppSocketCommand,
     AppSocketEvent,
     DownloadSocketCommand,
-    DownloadQueueItem,
+    StorageCopySocketCommand,
     ValidationStatusEvent,
 } from '../shared/socket.js';
 import {
@@ -37,7 +39,19 @@ import {
     type AppConfigUpdate,
     type AppConfigValidateRootResponse,
 } from '../shared/config.js';
+import {
+    copyPath,
+    cancelCopy,
+    type CopyPathCommand,
+    type CancelCopyCommand,
+    getRuntimeOs,
+    listFat32Volumes,
+    resolveReadablePath,
+    resolveFat32Destination,
+} from '../shared/os.js';
+import { getPathStats } from '../shared/file.js';
 import logger from '../shared/logger.js';
+import { DownloadQueueItem, StorageCopyItem } from '../shared/shared.js';
 
 const config = loadConfig();
 
@@ -46,6 +60,8 @@ const host = config.host;
 const port = config.port;
 
 const clientDir = path.join(getAppRoot(), 'client');
+
+let activeStorageCopyPid: number | null = null;
 
 type TitleIdQueryResult =
     | {
@@ -105,6 +121,14 @@ function requireTitleIdQuery(req: Request, res: Response): string | null {
     return null;
 }
 
+function toError(error: unknown): Error {
+    if (error instanceof Error) {
+        return error;
+    }
+
+    return new Error(String(error));
+}
+
 function getErrorStage(error: unknown): string | null {
     return typeof error === 'object' &&
         error !== null &&
@@ -136,16 +160,214 @@ function sendServerError(
     res.status(500).json(body);
 }
 
+function getStringQuery(req: Request, name: string): string | null {
+    const value = req.query[name];
+    if (typeof value !== 'string') {
+        return null;
+    }
+
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}
+
+function executeCancelCopyCommand(command: CancelCopyCommand): Promise<void> {
+    logger.log(
+        'server',
+        `storage cancel command: ${command.command} ${command.args
+            .map((arg) => JSON.stringify(arg))
+            .join(' ')}`
+    );
+
+    return new Promise((resolve, reject) => {
+        const child = spawn(command.command, command.args, {
+            stdio: 'ignore',
+            windowsHide: true,
+        });
+
+        child.once('error', reject);
+
+        child.once('close', (exitCode, signal) => {
+            const successExitCodes = command.successExitCodes ?? [0];
+            logger.log(
+                'server',
+                `storage cancel command exited: ${command.command} exit=${exitCode ?? 'null'} signal=${signal ?? 'null'}`
+            );
+
+            if (exitCode !== null && successExitCodes.includes(exitCode)) {
+                resolve();
+                return;
+            }
+
+            reject(
+                new Error(
+                    `${command.command} failed with exit code ${exitCode ?? signal}`
+                )
+            );
+        });
+    });
+}
+
+function createStorageCopyCancelledError(): Error {
+    const error = new Error('Storage copy cancelled');
+    error.name = 'AbortError';
+    return error;
+}
+
+function executeCopyCommand(
+    command: CopyPathCommand,
+    onOutput: (text: string) => void,
+    onPid?: (pid: number) => void,
+    signal?: AbortSignal
+): Promise<{
+    exitCode: number | null;
+    signal: NodeJS.Signals | null;
+    stdout: string;
+    stderr: string;
+}> {
+    return new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+            reject(createStorageCopyCancelledError());
+            return;
+        }
+
+        const child = spawn(command.command, command.args, {
+            stdio: ['ignore', 'pipe', 'pipe'],
+            windowsHide: true,
+            detached: command.detached ?? false,
+        });
+
+        const pid = child.pid;
+        if (!pid) {
+            reject(new Error(`Failed to start ${command.command}`));
+            return;
+        }
+
+        onPid?.(pid);
+
+        const stdout: Buffer[] = [];
+        const stderr: Buffer[] = [];
+        let settled = false;
+
+        const fail = (error: unknown): void => {
+            if (settled) {
+                return;
+            }
+
+            settled = true;
+            reject(toError(error));
+        };
+
+        const succeed = (value: {
+            exitCode: number | null;
+            signal: NodeJS.Signals | null;
+            stdout: string;
+            stderr: string;
+        }): void => {
+            if (settled) {
+                return;
+            }
+
+            settled = true;
+            resolve(value);
+        };
+
+        const handleOutput = (target: Buffer[], chunk: Buffer): void => {
+            if (signal?.aborted) {
+                return;
+            }
+
+            target.push(chunk);
+            onOutput(chunk.toString('utf8'));
+        };
+
+        child.stdout.on('data', (chunk: Buffer) => {
+            handleOutput(stdout, chunk);
+        });
+
+        child.stderr.on('data', (chunk: Buffer) => {
+            handleOutput(stderr, chunk);
+        });
+
+        child.on('error', (error: Error) => {
+            if (signal?.aborted) {
+                fail(createStorageCopyCancelledError());
+                return;
+            }
+
+            fail(error);
+        });
+
+        child.on('close', (exitCode, exitSignal) => {
+            if (signal?.aborted) {
+                fail(createStorageCopyCancelledError());
+                return;
+            }
+
+            const output = {
+                exitCode,
+                signal: exitSignal,
+                stdout: Buffer.concat(stdout).toString('utf8'),
+                stderr: Buffer.concat(stderr).toString('utf8'),
+            };
+
+            const successExitCodes = command.successExitCodes ?? [0];
+
+            if (exitCode !== null && successExitCodes.includes(exitCode)) {
+                succeed(output);
+                return;
+            }
+
+            fail(
+                new Error(
+                    `${command.command} failed with exit code ${exitCode ?? exitSignal}`
+                )
+            );
+        });
+    });
+}
+
 function handleAppSocketCommand(command: AppSocketCommand): void {
-    if (command.type.startsWith('download.')) {
-        handleDownloadSocketCommand(command);
-        return;
+    logger.log('server', `socket command dispatch: ${command.type}`);
+
+    switch (command.type) {
+        case 'download.queue':
+        case 'download.retry':
+        case 'download.remove':
+        case 'download.cancel':
+            handleDownloadSocketCommand(command);
+            return;
+
+        case 'storage.copy.queue':
+        case 'storage.copy.retry':
+        case 'storage.copy.remove':
+        case 'storage.copy.cancel':
+            handleStorageCopySocketCommand(command);
+            return;
     }
 }
 
 let downloadQueue: DownloadQueueItem[] = [];
+let storageCopies: StorageCopyItem[] = [];
+
 let activeDownloadItemId: string | null = null;
+const activeDownloadAbortControllers = new Map<string, AbortController>();
+
+let activeStorageCopyId: string | null = null;
+let activeStorageCopyAbortController: AbortController | null = null;
+
+const cancelledDownloadIds = new Set<string>();
+const cancelledDownloadKeys = new Set<string>();
+const cancelledStorageCopyIds = new Set<string>();
+
 let latestLibraryValidationStatus: ValidationStatusEvent | null = null;
+
+type StorageCopyQueueItem = StorageCopyItem & {
+    requestedSourcePath: string;
+    requestedDestination: string | null;
+    command: CopyPathCommand | null;
+};
+
+let storageCopyQueue: StorageCopyQueueItem[] = [];
 
 function sendAppSocketEvent(socket: WebSocket, event: AppSocketEvent): void {
     if (socket.readyState !== WebSocket.OPEN) {
@@ -168,9 +390,217 @@ function broadcastDownloadQueue(): void {
     });
 }
 
+function getDownloadQueueKey(item: {
+    family: string;
+    kind: string;
+    titleId: string;
+}): string {
+    return `${item.family}\0${item.kind}\0${item.titleId}`;
+}
+
+function hasDownloadQueueItem(id: string): boolean {
+    return downloadQueue.some((item) => item.id === id);
+}
+
+function broadcastStorageCopies(): void {
+    broadcastAppSocketEvent({
+        type: 'storage.copyChanged',
+        items: storageCopies,
+    });
+}
+
+function updateStorageCopy(
+    id: string,
+    update: Partial<Omit<StorageCopyItem, 'id'>>
+): void {
+    storageCopies = storageCopies.map((item) =>
+        item.id === id ? { ...item, ...update } : item
+    );
+    broadcastStorageCopies();
+}
+
+function hasStorageCopyItem(id: string): boolean {
+    return storageCopies.some((item) => item.id === id);
+}
+
+function retryStorageCopy(id: string): void {
+    const item = storageCopyQueue.find((candidate) => candidate.id === id);
+    if (!item || item.state !== 'failed') {
+        return;
+    }
+
+    logger.log(
+        'server',
+        `storage ${item.operation} retry queued: ${item.sourcePath} -> ${item.destinationPath}`
+    );
+
+    item.state = 'queued';
+    item.error = null;
+    item.progress = null;
+    item.message = 'Queued';
+    item.completedFiles = 0;
+    item.currentSizeBytes = null;
+    item.currentFilePath = null;
+    updateStorageCopy(id, {
+        state: item.state,
+        error: item.error,
+        progress: item.progress,
+        message: item.message,
+        completedFiles: item.completedFiles,
+        currentSizeBytes: item.currentSizeBytes,
+        currentFilePath: item.currentFilePath,
+    });
+    void processStorageCopyQueue();
+}
+
+function removeStorageCopyFromState(id: string): StorageCopyItem | null {
+    const item = storageCopies.find((candidate) => candidate.id === id) ?? null;
+
+    storageCopies = storageCopies.filter((candidate) => candidate.id !== id);
+    storageCopyQueue = storageCopyQueue.filter(
+        (candidate) => candidate.id !== id
+    );
+
+    return item;
+}
+
+function removeStorageCopy(id: string): void {
+    const item = storageCopies.find((candidate) => candidate.id === id);
+
+    if (!item) {
+        logger.log('server', `storage copy remove ignored: missing id=${id}`);
+        broadcastStorageCopies();
+        return;
+    }
+
+    logger.log(
+        'server',
+        `storage ${item.operation} removed: ${item.sourcePath} -> ${item.destinationPath}`
+    );
+
+    if (activeStorageCopyId === id) {
+        cancelledStorageCopyIds.add(id);
+        activeStorageCopyAbortController?.abort();
+
+        void cancelStorageCopyProcess(id, item).catch((error: unknown) => {
+            logServerError(
+                'Failed to cancel active storage copy during remove:',
+                error
+            );
+        });
+    }
+
+    removeStorageCopyFromState(id);
+    broadcastStorageCopies();
+
+    if (activeStorageCopyId !== id) {
+        void processStorageCopyQueue();
+    }
+}
+
+function removeStorageCopyLater(id: string): void {
+    setTimeout(() => {
+        removeStorageCopyFromState(id);
+        broadcastStorageCopies();
+    }, 5000);
+}
+
+async function cancelStorageCopyProcess(
+    id: string,
+    item: StorageCopyItem
+): Promise<void> {
+    const pid = activeStorageCopyId === id ? activeStorageCopyPid : null;
+
+    if (pid === null) {
+        logger.log(
+            'server',
+            `storage copy cancel marked before process start: id=${id}`
+        );
+        return;
+    }
+
+    const cancelCommand = await cancelCopy({
+        pid,
+        context: item.cancelContext,
+    });
+
+    await executeCancelCopyCommand(cancelCommand);
+
+    logger.log(
+        'server',
+        `storage ${item.operation} cancel completed: ${item.sourcePath} -> ${item.destinationPath}`
+    );
+}
+
+async function cancelStorageCopy(id: string): Promise<void> {
+    const item = storageCopies.find((candidate) => candidate.id === id);
+
+    if (!item) {
+        logger.log('server', `storage copy cancel ignored: missing id=${id}`);
+        broadcastStorageCopies();
+        return;
+    }
+
+    const wasActive = activeStorageCopyId === id;
+
+    logger.log(
+        'server',
+        `storage ${item.operation} cancel requested: ${item.sourcePath} -> ${item.destinationPath}`
+    );
+
+    cancelledStorageCopyIds.add(id);
+    removeStorageCopyFromState(id);
+    broadcastStorageCopies();
+
+    try {
+        if (wasActive) {
+            activeStorageCopyAbortController?.abort();
+            await cancelStorageCopyProcess(id, item);
+        }
+    } catch (error) {
+        logServerError('Failed to cancel storage copy:', error);
+    } finally {
+        broadcastStorageCopies();
+
+        if (!wasActive) {
+            void processStorageCopyQueue();
+        }
+    }
+}
+
 function broadcastLibraryValidationStatus(event: ValidationStatusEvent): void {
     latestLibraryValidationStatus = event;
     broadcastAppSocketEvent(event);
+}
+
+function handleStorageCopySocketCommand(
+    command: StorageCopySocketCommand
+): void {
+    switch (command.type) {
+        case 'storage.copy.queue':
+            try {
+                queueStorageTransfer({
+                    sourcePath: command.sourcePath ?? null,
+                    requestedDestination: command.destinationPath ?? null,
+                    move: command.move ?? false,
+                });
+            } catch (error) {
+                logServerError('Failed to queue storage transfer:', error);
+            }
+            return;
+
+        case 'storage.copy.cancel':
+            void cancelStorageCopy(command.id);
+            return;
+
+        case 'storage.copy.remove':
+            removeStorageCopy(command.id);
+            return;
+
+        case 'storage.copy.retry':
+            retryStorageCopy(command.id);
+            return;
+    }
 }
 
 function parseSocketCommand(data: RawData): AppSocketCommand | null {
@@ -196,12 +626,14 @@ function parseSocketCommand(data: RawData): AppSocketCommand | null {
             if (!Array.isArray(items)) {
                 return null;
             }
+
             const isQueueItem = (
                 value: unknown
             ): value is DownloadQueueItem => {
                 if (!value || typeof value !== 'object') {
                     return false;
                 }
+
                 const item = value as Record<string, unknown>;
                 return (
                     typeof item.id === 'string' &&
@@ -216,19 +648,57 @@ function parseSocketCommand(data: RawData): AppSocketCommand | null {
                         item.totalBytes === null)
                 );
             };
+
             if (!items.every(isQueueItem)) {
                 return null;
             }
+
             return parsed as AppSocketCommand;
         }
+
+        case 'storage.copy.queue': {
+            const sourcePath = (command as { sourcePath?: unknown }).sourcePath;
+            const destinationPath = (command as { destinationPath?: unknown })
+                .destinationPath;
+            const move = (command as { move?: unknown }).move;
+
+            if (
+                sourcePath !== undefined &&
+                (typeof sourcePath !== 'string' || sourcePath.length === 0)
+            ) {
+                return null;
+            }
+
+            if (
+                destinationPath !== undefined &&
+                destinationPath !== null &&
+                (typeof destinationPath !== 'string' ||
+                    destinationPath.length === 0)
+            ) {
+                return null;
+            }
+
+            if (move !== undefined && typeof move !== 'boolean') {
+                return null;
+            }
+
+            return parsed as AppSocketCommand;
+        }
+
         case 'download.retry':
-        case 'download.remove': {
+        case 'download.remove':
+        case 'download.cancel':
+        case 'storage.copy.remove':
+        case 'storage.copy.retry':
+        case 'storage.copy.cancel': {
             const id = (command as { id?: unknown }).id;
             if (typeof id !== 'string' || id.length === 0) {
                 return null;
             }
+
             return parsed as AppSocketCommand;
         }
+
         default:
             return null;
     }
@@ -242,13 +712,25 @@ type DownloadTitleResult = {
 
 async function downloadTitle(
     titleId: string,
-    onProgress?: (progress: TitleDownloadProgress) => void
+    onProgress?: (progress: TitleDownloadProgress) => void,
+    signal?: AbortSignal
 ): Promise<DownloadTitleResult> {
     const romRoot = await findFirstReadableWiiURoot(getConfig().wiiuRoots);
 
     return generateTitleInstallFiles(titleId, romRoot, {
         onProgress,
+        signal,
     });
+}
+
+let broadcastDownloadQueueTimer: ReturnType<typeof setTimeout> | null = null;
+
+function scheduleBroadcastDownloadQueue(): void {
+    if (broadcastDownloadQueueTimer !== null) return;
+    broadcastDownloadQueueTimer = setTimeout(() => {
+        broadcastDownloadQueueTimer = null;
+        broadcastDownloadQueue();
+    }, 200);
 }
 
 async function processDownloadQueue(): Promise<void> {
@@ -259,70 +741,171 @@ async function processDownloadQueue(): Promise<void> {
     const nextItem = downloadQueue.find((item) => item.state === 'queued');
 
     if (!nextItem) {
-        broadcastDownloadQueue();
+        scheduleBroadcastDownloadQueue();
         return;
     }
 
     activeDownloadItemId = nextItem.id;
+
+    const abortController = new AbortController();
+    activeDownloadAbortControllers.set(nextItem.id, abortController);
+
     nextItem.state = 'downloading';
     nextItem.error = null;
     nextItem.progress = 0;
     nextItem.downloadedBytes = null;
     nextItem.speedText = null;
+    nextItem.completedFiles = null;
+    nextItem.totalFiles = null;
+    nextItem.currentFileName = null;
     nextItem.installedSizeBytes = null;
     nextItem.installedVersion = null;
     nextItem.installedTitleName = null;
-    broadcastDownloadQueue();
+
+    scheduleBroadcastDownloadQueue();
 
     try {
-        const result = await downloadTitle(nextItem.titleId, (progress) => {
-            nextItem.progress =
-                progress.totalFiles > 0
-                    ? Math.round(
-                          (progress.completedFiles / progress.totalFiles) * 100
-                      )
-                    : 0;
+        const result = await downloadTitle(
+            nextItem.titleId,
+            (progress) => {
+                if (
+                    cancelledDownloadIds.has(nextItem.id) ||
+                    !hasDownloadQueueItem(nextItem.id) ||
+                    abortController.signal.aborted
+                ) {
+                    return;
+                }
 
-            nextItem.downloadedBytes = null;
-            nextItem.speedText = `${progress.completedFiles}/${progress.totalFiles} files`;
+                nextItem.progress =
+                    progress.totalFiles > 0
+                        ? Math.round(
+                              (progress.completedFiles / progress.totalFiles) *
+                                  100
+                          )
+                        : 0;
 
-            broadcastDownloadQueue();
-        });
+                nextItem.downloadedBytes = null;
+                nextItem.speedText = null;
+                nextItem.completedFiles = progress.completedFiles;
+                nextItem.totalFiles = progress.totalFiles;
+                nextItem.currentFileName = progress.currentFileName;
+
+                broadcastDownloadQueue();
+            },
+            abortController.signal
+        );
+
+        if (
+            cancelledDownloadIds.has(nextItem.id) ||
+            !hasDownloadQueueItem(nextItem.id) ||
+            abortController.signal.aborted
+        ) {
+            return;
+        }
+
         nextItem.state = 'complete';
         nextItem.error = null;
         nextItem.progress = 100;
         nextItem.downloadedBytes = result.sizeBytes;
         nextItem.speedText = null;
+        nextItem.completedFiles = null;
+        nextItem.totalFiles = null;
+        nextItem.currentFileName = null;
         nextItem.installedSizeBytes = result.sizeBytes;
         nextItem.installedVersion = result.titleVersion;
         nextItem.installedTitleName = result.name;
 
         broadcastDownloadQueue();
     } catch (error) {
+        if (
+            cancelledDownloadIds.has(nextItem.id) ||
+            abortController.signal.aborted
+        ) {
+            return;
+        }
+
         nextItem.state = 'failed';
         nextItem.error = error instanceof Error ? error.message : String(error);
+
         broadcastDownloadQueue();
     } finally {
-        activeDownloadItemId = null;
+        cancelledDownloadIds.delete(nextItem.id);
+        cancelledDownloadKeys.delete(getDownloadQueueKey(nextItem));
+        activeDownloadAbortControllers.delete(nextItem.id);
+
+        if (activeDownloadItemId === nextItem.id) {
+            activeDownloadItemId = null;
+        }
+
         void processDownloadQueue();
     }
+}
+
+function cancelActiveDownload(item: DownloadQueueItem): void {
+    logger.log(
+        'server',
+        `download cancel requested: ${item.groupName} ${item.label} ${item.titleId}`
+    );
+
+    cancelledDownloadIds.add(item.id);
+    cancelledDownloadKeys.add(getDownloadQueueKey(item));
+
+    const abortController = activeDownloadAbortControllers.get(item.id);
+    abortController?.abort();
+
+    logger.log(
+        'server',
+        `download abort signaled: id=${item.id} signalAborted=${abortController?.signal.aborted ? 'yes' : 'no'}`
+    );
+
+    if (activeDownloadItemId === item.id) {
+        activeDownloadItemId = null;
+    }
+
+    downloadQueue = downloadQueue.filter(
+        (candidate) => candidate.id !== item.id
+    );
+
+    broadcastDownloadQueue();
+    void processDownloadQueue();
 }
 
 function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
     switch (command.type) {
         case 'download.queue': {
-            const newItems = command.items.filter(
-                (item) =>
-                    !downloadQueue.some(
-                        (existing) =>
-                            existing.family === item.family &&
-                            existing.kind === item.kind &&
-                            existing.titleId === item.titleId &&
-                            existing.state !== 'complete'
+            logger.log(
+                'server',
+                `download queue requested: ${command.items
+                    .map(
+                        (item) =>
+                            `${item.id}:${item.groupName}:${item.label}:${item.titleId}`
                     )
+                    .join(',')}`
             );
 
+            const existingKeys = new Set(
+                downloadQueue
+                    .filter((item) => item.state !== 'complete')
+                    .map(getDownloadQueueKey)
+            );
+
+            const newItems = command.items.filter((item) => {
+                const key = getDownloadQueueKey(item);
+
+                if (cancelledDownloadKeys.has(key)) {
+                    return false;
+                }
+
+                if (existingKeys.has(key)) {
+                    return false;
+                }
+
+                existingKeys.add(key);
+                return true;
+            });
+
             if (newItems.length === 0) {
+                logger.log('server', 'download queue ignored: no new items');
                 return;
             }
 
@@ -334,6 +917,9 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
                     progress: 0,
                     downloadedBytes: null,
                     speedText: null,
+                    completedFiles: null,
+                    totalFiles: null,
+                    currentFileName: null,
                     installedSizeBytes: null,
                     installedVersion: null,
                     installedTitleName: null,
@@ -354,8 +940,19 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
                 return;
             }
 
+            logger.log(
+                'server',
+                `download retry queued: ${item.groupName} ${item.label} ${item.titleId}`
+            );
+
             item.state = 'queued';
             item.error = null;
+            item.progress = 0;
+            item.downloadedBytes = null;
+            item.speedText = null;
+            item.completedFiles = null;
+            item.totalFiles = null;
+            item.currentFileName = null;
             item.installedSizeBytes = null;
             item.installedVersion = null;
             item.installedTitleName = null;
@@ -370,9 +967,23 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
                 (candidate) => candidate.id === command.id
             );
 
-            if (!item || item.state === 'downloading') {
+            if (!item) {
                 return;
             }
+
+            if (item.state === 'downloading') {
+                logger.log(
+                    'server',
+                    `download remove received for active item; cancelling: ${item.groupName} ${item.label} ${item.titleId}`
+                );
+                cancelActiveDownload(item);
+                return;
+            }
+
+            logger.log(
+                'server',
+                `download removed: ${item.groupName} ${item.label} ${item.titleId}`
+            );
 
             downloadQueue = downloadQueue.filter(
                 (candidate) => candidate.id !== command.id
@@ -381,7 +992,55 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
             broadcastDownloadQueue();
             return;
         }
+
+        case 'download.cancel': {
+            const item = downloadQueue.find(
+                (candidate) => candidate.id === command.id
+            );
+
+            if (!item) {
+                logger.log(
+                    'server',
+                    `download cancel ignored: id=${command.id} item=missing`
+                );
+                return;
+            }
+
+            if (item.state === 'queued') {
+                logger.log(
+                    'server',
+                    `download queued item removed: ${item.groupName} ${item.label} ${item.titleId}`
+                );
+
+                downloadQueue = downloadQueue.filter(
+                    (candidate) => candidate.id !== command.id
+                );
+
+                broadcastDownloadQueue();
+                return;
+            }
+
+            if (item.state !== 'downloading') {
+                logger.log(
+                    'server',
+                    `download cancel ignored: id=${command.id} item=${item.state}:${item.titleId}`
+                );
+                return;
+            }
+
+            cancelActiveDownload(item);
+            return;
+        }
     }
+}
+
+function shouldStopStorageCopy(itemId: string): boolean {
+    return (
+        cancelledStorageCopyIds.has(itemId) ||
+        !hasStorageCopyItem(itemId) ||
+        (activeStorageCopyId === itemId &&
+            activeStorageCopyAbortController?.signal.aborted === true)
+    );
 }
 
 function getErrorCause(error: Error): unknown {
@@ -405,6 +1064,87 @@ function logServerError(message: string, error: unknown): void {
     logger.error('server', `${message} ${formatLogError(error)}`);
 }
 
+type StorageTransferQueueInput = {
+    sourcePath: string | null;
+    requestedDestination: string | null;
+    move: boolean;
+};
+
+type StorageTransferQueueResult = {
+    status: number;
+    body: Record<string, unknown>;
+};
+
+function queueStorageTransfer(
+    input: StorageTransferQueueInput
+): StorageTransferQueueResult {
+    const sourcePath = input.sourcePath ?? getConfig().wiiuRoots[0];
+    if (!sourcePath) {
+        return {
+            status: 400,
+            body: {
+                error: 'No Wii U root configured',
+            },
+        };
+    }
+
+    const requestedDestination = input.requestedDestination;
+    const move = input.move;
+    const copyId = randomUUID();
+
+    const copyItem: StorageCopyItem = {
+        id: copyId,
+        operation: move ? 'move' : 'copy',
+        sourcePath,
+        destinationPath: requestedDestination ?? '',
+        state: 'queued',
+        progress: null,
+        message: 'Queued',
+        sourceSizeBytes: null,
+        completedFiles: 0,
+        totalFiles: null,
+        currentSizeBytes: null,
+        currentFilePath: null,
+        cancelContext: undefined,
+        error: null,
+    };
+
+    const queueItem: StorageCopyQueueItem = {
+        ...copyItem,
+        requestedSourcePath: sourcePath,
+        requestedDestination,
+        command: null,
+    };
+
+    storageCopies = [...storageCopies, copyItem];
+    storageCopyQueue = [...storageCopyQueue, queueItem];
+
+    broadcastStorageCopies();
+    void processStorageCopyQueue();
+
+    return {
+        status: 202,
+        body: {
+            copyId,
+            item: copyItem,
+            sourcePath,
+            requestedDestination,
+            move,
+        },
+    };
+}
+
+function getStorageTransferQueueInput(
+    req: Request,
+    move: boolean
+): StorageTransferQueueInput {
+    return {
+        sourcePath: getStringQuery(req, 'source'),
+        requestedDestination: getStringQuery(req, 'dest'),
+        move,
+    };
+}
+
 function formatUrlHost(host: string): string {
     return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
 }
@@ -419,13 +1159,254 @@ function getListenUrl(host: string, port: number): string {
     return `http://${formatUrlHost(host)}:${port}`;
 }
 
+async function processStorageCopyQueue(): Promise<void> {
+    if (activeStorageCopyId) {
+        return;
+    }
+
+    const nextItem = storageCopyQueue.find((item) => item.state === 'queued');
+
+    if (!nextItem) {
+        broadcastStorageCopies();
+        return;
+    }
+
+    activeStorageCopyId = nextItem.id;
+
+    const abortController = new AbortController();
+    activeStorageCopyAbortController = abortController;
+    activeStorageCopyPid = null;
+
+    nextItem.state = 'copying';
+    nextItem.progress = 0;
+    nextItem.message =
+        nextItem.operation === 'move'
+            ? 'Preparing move...'
+            : 'Preparing copy...';
+    nextItem.error = null;
+
+    updateStorageCopy(nextItem.id, {
+        state: nextItem.state,
+        progress: nextItem.progress,
+        message: nextItem.message,
+        error: nextItem.error,
+    });
+
+    try {
+        const [runtimeOs, volumes] = await Promise.all([
+            getRuntimeOs(),
+            listFat32Volumes(),
+        ]);
+
+        if (shouldStopStorageCopy(nextItem.id)) {
+            return;
+        }
+
+        const storageDestination = resolveFat32Destination(
+            volumes,
+            nextItem.requestedDestination
+        );
+
+        if (!storageDestination) {
+            throw new Error(
+                nextItem.requestedDestination
+                    ? `Requested FAT32 volume was not found: ${nextItem.requestedDestination}`
+                    : `No FAT32 volumes found for runtime OS: ${runtimeOs}`
+            );
+        }
+
+        const readableSourcePath = await resolveReadablePath(
+            nextItem.requestedSourcePath
+        );
+
+        if (shouldStopStorageCopy(nextItem.id)) {
+            return;
+        }
+
+        const sourceStats = await getPathStats(readableSourcePath);
+
+        if (shouldStopStorageCopy(nextItem.id)) {
+            return;
+        }
+
+        const sourceSizeBytes = sourceStats.sizeBytes;
+        const sourceFileCount = sourceStats.fileCount;
+        const freeBytes = storageDestination.freeBytes;
+
+        if (freeBytes !== null && sourceSizeBytes > freeBytes) {
+            throw new Error('Not enough free space on destination');
+        }
+
+        const command = await copyPath({
+            sourcePath: nextItem.requestedSourcePath,
+            destination: storageDestination,
+            move: nextItem.operation === 'move',
+        });
+
+        if (shouldStopStorageCopy(nextItem.id)) {
+            return;
+        }
+
+        const destinationPath = command.args[1] ?? storageDestination.source;
+
+        nextItem.command = command;
+        nextItem.sourcePath = readableSourcePath;
+        nextItem.destinationPath = destinationPath;
+        nextItem.sourceSizeBytes = sourceSizeBytes;
+        nextItem.totalFiles = sourceFileCount;
+        nextItem.completedFiles = 0;
+        nextItem.cancelContext = command.cancelContext;
+        nextItem.message =
+            nextItem.operation === 'move' ? 'Moving...' : 'Copying...';
+
+        updateStorageCopy(nextItem.id, {
+            sourcePath: nextItem.sourcePath,
+            destinationPath: nextItem.destinationPath,
+            sourceSizeBytes: nextItem.sourceSizeBytes,
+            totalFiles: nextItem.totalFiles,
+            completedFiles: nextItem.completedFiles,
+            cancelContext: nextItem.cancelContext,
+            message: nextItem.message,
+        });
+
+        logger.log(
+            'server',
+            `storage ${nextItem.operation} started: ${command.command} ${command.args
+                .map((arg) => JSON.stringify(arg))
+                .join(' ')}`
+        );
+
+        const result = await executeCopyCommand(
+            command,
+            (text) => {
+                if (
+                    cancelledStorageCopyIds.has(nextItem.id) ||
+                    !hasStorageCopyItem(nextItem.id) ||
+                    abortController.signal.aborted
+                ) {
+                    return;
+                }
+
+                const progressUpdate =
+                    command.parseOutput?.(text, {
+                        sourcePath: command.args[0] ?? nextItem.sourcePath,
+                        destinationPath:
+                            command.args[1] ?? nextItem.destinationPath,
+                    }) ?? null;
+
+                if (!progressUpdate) {
+                    return;
+                }
+
+                if (progressUpdate.progress !== null) {
+                    nextItem.progress = progressUpdate.progress;
+                }
+
+                if (progressUpdate.message !== null) {
+                    nextItem.message = progressUpdate.message;
+                }
+
+                nextItem.currentSizeBytes = progressUpdate.currentSizeBytes;
+                nextItem.currentFilePath = progressUpdate.currentFilePath;
+
+                if (progressUpdate.completedFile) {
+                    nextItem.completedFiles =
+                        (nextItem.completedFiles ?? 0) + 1;
+                }
+
+                updateStorageCopy(nextItem.id, {
+                    progress: nextItem.progress,
+                    message: nextItem.message,
+                    completedFiles: nextItem.completedFiles,
+                    currentSizeBytes: nextItem.currentSizeBytes,
+                    currentFilePath: nextItem.currentFilePath,
+                });
+            },
+            (pid) => {
+                activeStorageCopyPid = pid;
+            },
+            abortController.signal
+        );
+
+        if (
+            cancelledStorageCopyIds.has(nextItem.id) ||
+            !hasStorageCopyItem(nextItem.id) ||
+            abortController.signal.aborted
+        ) {
+            return;
+        }
+
+        nextItem.state = 'complete';
+        nextItem.progress = 100;
+        nextItem.message = 'Done';
+        nextItem.currentSizeBytes = null;
+        nextItem.currentFilePath = null;
+        nextItem.error = null;
+
+        logger.log(
+            'server',
+            `storage ${nextItem.operation} completed: exit=${result.exitCode ?? 'null'} signal=${result.signal ?? 'null'}`
+        );
+
+        updateStorageCopy(nextItem.id, {
+            state: nextItem.state,
+            progress: nextItem.progress,
+            message: nextItem.message,
+            currentSizeBytes: nextItem.currentSizeBytes,
+            currentFilePath: nextItem.currentFilePath,
+            error: nextItem.error,
+        });
+
+        removeStorageCopyLater(nextItem.id);
+    } catch (error) {
+        if (
+            cancelledStorageCopyIds.has(nextItem.id) ||
+            abortController.signal.aborted
+        ) {
+            return;
+        }
+
+        nextItem.state = 'failed';
+        nextItem.error = error instanceof Error ? error.message : String(error);
+        nextItem.message = nextItem.error;
+
+        logServerError('Storage copy failed:', error);
+
+        updateStorageCopy(nextItem.id, {
+            state: nextItem.state,
+            error: nextItem.error,
+            message: nextItem.message,
+        });
+    } finally {
+        cancelledStorageCopyIds.delete(nextItem.id);
+
+        if (activeStorageCopyId === nextItem.id) {
+            activeStorageCopyId = null;
+            activeStorageCopyPid = null;
+
+            if (activeStorageCopyAbortController === abortController) {
+                activeStorageCopyAbortController = null;
+            }
+        }
+
+        void processStorageCopyQueue();
+    }
+}
+
 app.use((req, _res, next) => {
     logger.log('server', `${req.method} ${req.url}`);
     next();
 });
 
 app.use(express.json());
-app.use(express.static(clientDir));
+app.use(
+    express.static(clientDir, {
+        etag: false,
+        setHeaders(res) {
+            res.setHeader('Cache-Control', 'no-store');
+        },
+    })
+);
 
 app.get('/api/config', (_req, res) => {
     res.json({
@@ -441,7 +1422,7 @@ app.post('/api/config/validate-root', async (req, res) => {
             await validateWiiURoot(root);
         res.json(response);
     } catch (error) {
-        logServerError('[server] Failed to validate Wii U root:', error);
+        logServerError('Failed to validate Wii U root:', error);
         sendServerError(res, 'Failed to validate Wii U root', error, {
             includeDetails: true,
         });
@@ -455,7 +1436,7 @@ app.post('/api/config', (req, res) => {
         );
         res.json(response);
     } catch (error) {
-        logServerError('[server] Failed to save config:', error);
+        logServerError('Failed to save config:', error);
         sendServerError(res, 'Failed to save config', error, {
             includeDetails: true,
         });
@@ -473,7 +1454,7 @@ app.get('/api/library', async (req, res) => {
             groups,
         });
     } catch (error) {
-        logServerError('[server] Failed to scan library:', error);
+        logServerError('Failed to scan library:', error);
         sendServerError(res, 'Failed to scan library', error);
     }
 });
@@ -517,8 +1498,55 @@ app.get('/api/library/validate', async (_req, res) => {
             error: message,
         });
 
-        logServerError('[server] Failed to validate library:', error);
+        logServerError('Failed to validate library:', error);
         sendServerError(res, 'Failed to validate library', error, {
+            includeDetails: true,
+        });
+    }
+});
+
+app.get('/api/storage/copy', (req, res) => {
+    try {
+        const result = queueStorageTransfer(
+            getStorageTransferQueueInput(req, false)
+        );
+        res.status(result.status).json(result.body);
+    } catch (error) {
+        logServerError('Failed to queue storage copy:', error);
+        sendServerError(res, 'Failed to queue storage copy', error, {
+            includeDetails: true,
+        });
+    }
+});
+
+app.get('/api/storage/move', (req, res) => {
+    try {
+        const result = queueStorageTransfer(
+            getStorageTransferQueueInput(req, true)
+        );
+        res.status(result.status).json(result.body);
+    } catch (error) {
+        logServerError('Failed to queue storage move:', error);
+        sendServerError(res, 'Failed to queue storage move', error, {
+            includeDetails: true,
+        });
+    }
+});
+
+app.get('/api/storage/list-fat32', async (_req, res) => {
+    try {
+        const [runtimeOs, volumes] = await Promise.all([
+            getRuntimeOs(),
+            listFat32Volumes(),
+        ]);
+
+        res.json({
+            runtimeOs,
+            volumes,
+        });
+    } catch (error) {
+        logServerError('Failed to list FAT32 volumes:', error);
+        sendServerError(res, 'Failed to list FAT32 volumes', error, {
             includeDetails: true,
         });
     }
@@ -540,7 +1568,7 @@ app.get('/api/title-icon/:family', async (req, res) => {
         res.set('Content-Type', image.contentType);
         res.send(image.body);
     } catch (error) {
-        logServerError('[server] Failed to load title icon:', error);
+        logServerError('Failed to load title icon:', error);
         sendServerError(res, 'Failed to load title icon', error);
     }
 });
@@ -576,7 +1604,7 @@ app.get('/api/title-metadata', async (req, res) => {
             titleKeyPassword: metadata.titleKeyPassword,
         });
     } catch (error) {
-        logServerError('[server] Failed to download title metadata:', error);
+        logServerError('Failed to download title metadata:', error);
         sendServerError(res, 'Failed to download title metadata', error, {
             includeDetails: true,
         });
@@ -625,7 +1653,7 @@ app.get('/api/title-all', async (req, res) => {
                     : [],
         });
     } catch (error) {
-        logServerError('[server] Failed to load full title metadata:', error);
+        logServerError('Failed to load full title metadata:', error);
         sendServerError(res, 'Failed to load full title metadata', error, {
             includeDetails: true,
         });
@@ -641,7 +1669,7 @@ app.get('/api/title-download', async (req, res) => {
     try {
         res.json(await downloadTitle(titleId));
     } catch (error) {
-        logServerError('[server] Failed to download title:', error);
+        logServerError('Failed to download title:', error);
         sendServerError(res, 'Failed to download title', error, {
             includeDetails: true,
         });
@@ -663,7 +1691,7 @@ app.get('/api/title-update', async (req, res) => {
             titleVersion: metadata.titleVersion,
         });
     } catch (error) {
-        logServerError('[server] Failed to load title update metadata:', error);
+        logServerError('Failed to load title update metadata:', error);
         sendServerError(res, 'Failed to load title update metadata', error, {
             includeDetails: true,
         });
@@ -685,7 +1713,7 @@ app.get('/api/title-dlc', async (req, res) => {
             titleVersion: metadata.titleVersion,
         });
     } catch (error) {
-        logServerError('[server] Failed to load title DLC metadata:', error);
+        logServerError('Failed to load title DLC metadata:', error);
         sendServerError(res, 'Failed to load title DLC metadata', error, {
             includeDetails: true,
         });
@@ -705,13 +1733,34 @@ socketServer.on('connection', (socket) => {
     sendAppSocketEvent(socket, {
         type: 'app.connected',
         downloads: downloadQueue,
+        storageCopies,
         libraryValidationStatus: latestLibraryValidationStatus,
     });
 
     socket.on('message', (data) => {
-        const command = parseSocketCommand(data);
+        const commandText = Buffer.isBuffer(data)
+            ? data.toString('utf8')
+            : Buffer.from(data as ArrayBuffer).toString('utf8');
 
+        const commandType = (() => {
+            try {
+                const raw = JSON.parse(commandText) as { type?: unknown };
+                return typeof raw.type === 'string'
+                    ? raw.type
+                    : `invalid:${String(raw.type)}`;
+            } catch {
+                return 'invalid-json';
+            }
+        })();
+
+        logger.log('server', `socket command received: ${commandType}`);
+
+        const command = parseSocketCommand(data);
         if (!command) {
+            logger.log(
+                'server',
+                `socket command rejected: ${commandType} payload=${commandText}`
+            );
             return;
         }
 

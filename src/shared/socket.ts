@@ -1,35 +1,10 @@
-import { TitleKinds } from './shared.js';
+import { DownloadQueueItem, StorageCopyItem } from './shared.js';
 
 export type AppConnectedEvent = {
     type: 'app.connected';
     downloads: DownloadQueueItem[];
+    storageCopies: StorageCopyItem[];
     libraryValidationStatus?: ValidationStatusEvent | null;
-};
-
-export type DownloadQueueState =
-    | 'queued'
-    | 'downloading'
-    | 'failed'
-    | 'complete';
-
-export type DownloadQueueItem = {
-    id: string;
-    family: string;
-    groupName: string;
-    kind: TitleKinds;
-    label: string;
-    titleId: string;
-    sizeText: string | null;
-    totalBytes: number | null;
-    state: DownloadQueueState;
-    error: string | null;
-
-    progress: number;
-    downloadedBytes: number | null;
-    speedText: string | null;
-    installedSizeBytes: number | null;
-    installedVersion: number | null;
-    installedTitleName: string | null;
 };
 
 export type DownloadSocketCommand =
@@ -44,12 +19,41 @@ export type DownloadSocketCommand =
     | {
           type: 'download.remove';
           id: string;
+      }
+    | {
+          type: 'download.cancel';
+          id: string;
       };
 
 export type DownloadSocketEvent = {
     type: 'download.queueChanged';
     items: DownloadQueueItem[];
 };
+
+export type StorageCopySocketEvent = {
+    type: 'storage.copyChanged';
+    items: StorageCopyItem[];
+};
+
+export type StorageCopySocketCommand =
+    | {
+          type: 'storage.copy.queue';
+          sourcePath?: string;
+          destinationPath?: string | null;
+          move?: boolean;
+      }
+    | {
+          type: 'storage.copy.retry';
+          id: string;
+      }
+    | {
+          type: 'storage.copy.remove';
+          id: string;
+      }
+    | {
+          type: 'storage.copy.cancel';
+          id: string;
+      };
 
 export type ValidationStatus =
     | 'started'
@@ -71,9 +75,10 @@ export type ValidationStatusEvent = {
     error?: string;
 };
 
-export type AppSocketCommand = DownloadSocketCommand;
+export type AppSocketCommand = DownloadSocketCommand | StorageCopySocketCommand;
 
 export type AppSocketEvent =
     | AppConnectedEvent
     | DownloadSocketEvent
+    | StorageCopySocketEvent
     | ValidationStatusEvent;

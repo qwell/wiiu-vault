@@ -17,7 +17,8 @@ import {
 import { normalizeRegion } from '../shared/regions.js';
 import { getUserAppRoot } from './paths.js';
 import { getImmediatePathSizeBytes } from '../shared/file.js';
-import { mapConcurrent, normalizeTitleName } from '../shared/shared.js';
+import { normalizeTitleName } from '../shared/titles.js';
+import { mapConcurrent } from '../shared/shared.js';
 import logger from '../shared/logger.js';
 
 export type Tmd = {
@@ -162,6 +163,7 @@ type ContentFileDownload = (targetFile: string) => Promise<void>;
 export type TitleDownloadProgress = {
     completedFiles: number;
     totalFiles: number;
+    currentFileName: string | null;
 };
 
 export type InstalledTitleValidation = {
@@ -190,6 +192,10 @@ class HttpError extends Error {
         this.name = 'HttpError';
         this.status = status;
     }
+}
+
+function throwIfAborted(signal?: AbortSignal): void {
+    signal?.throwIfAborted();
 }
 
 export type NUSTitleInformation = {
@@ -488,13 +494,20 @@ export async function generateTitleInstallFiles(
     romRoot: string,
     options: {
         onProgress?: (progress: TitleDownloadProgress) => void;
+        signal?: AbortSignal;
     } = {}
 ): Promise<GeneratedTitleInstallFiles> {
     const baseUrl = NUS_BASE_URL;
     const { titleId: normalizedTitleId, kind } =
         normalizeDownloadableTitleId(titleId);
     const commonKey = await readCommonKey();
-    const tmdBytes = await downloadTmd(baseUrl, normalizedTitleId);
+    throwIfAborted(options.signal);
+    const tmdBytes = await downloadTmd(
+        baseUrl,
+        normalizedTitleId,
+        options.signal
+    );
+    throwIfAborted(options.signal);
     const tmd = readTmdFromBuffer(Buffer.from(tmdBytes));
 
     if (!tmd) {
@@ -515,17 +528,21 @@ export async function generateTitleInstallFiles(
     const encryptedFst = await downloadContent(
         baseUrl,
         normalizedTitleId,
-        fstContent.id
+        fstContent.id,
+        options.signal
     );
-    const ticketBytes = await downloadTicket(baseUrl, normalizedTitleId).catch(
-        (error: unknown) => {
-            if (isHttpErrorStatus(error, 404)) {
-                return null;
-            }
-
-            throw error;
+    throwIfAborted(options.signal);
+    const ticketBytes = await downloadTicket(
+        baseUrl,
+        normalizedTitleId,
+        options.signal
+    ).catch((error: unknown) => {
+        if (isHttpErrorStatus(error, 404)) {
+            return null;
         }
-    );
+
+        throw error;
+    });
     const ticket = ticketBytes
         ? readTikFromBuffer(Buffer.from(ticketBytes))
         : null;
@@ -554,7 +571,8 @@ export async function generateTitleInstallFiles(
         tmd,
         titleKey,
         baseUrl,
-        normalizedTitleId
+        normalizedTitleId,
+        options.signal
     );
     const meta = metaXml ? readMetaXml(metaXml) : null;
     const outputDir = path.join(
@@ -595,19 +613,31 @@ export async function generateTitleInstallFiles(
         tmd.contents,
         TITLE_DOWNLOAD_CONCURRENCY,
         async (content) => {
+            throwIfAborted(options.signal);
+            const files = getContentInstallFiles(outputDir, content);
+            options.onProgress?.({
+                completedFiles,
+                totalFiles,
+                currentFileName: files.appName,
+            });
+
             const downloadedContentFile = await downloadTitleContentFile({
                 content,
                 outputDir,
                 titleKey,
                 baseUrl,
                 titleId: normalizedTitleId,
+                signal: options.signal,
             });
 
+            throwIfAborted(options.signal);
             completedFiles += 1;
 
             options.onProgress?.({
                 completedFiles,
                 totalFiles,
+                currentFileName:
+                    downloadedContentFile.app ?? downloadedContentFile.h3,
             });
 
             return downloadedContentFile;
@@ -742,13 +772,16 @@ async function downloadTitleContentFile({
     titleKey,
     baseUrl,
     titleId,
+    signal,
 }: {
     content: TmdContent;
     outputDir: string;
     titleKey: Uint8Array;
     baseUrl: string;
     titleId: string;
+    signal?: AbortSignal;
 }): Promise<DownloadedContentFile> {
+    throwIfAborted(signal);
     const files = getContentInstallFiles(outputDir, content);
 
     if (!isHashedContent(content)) {
@@ -756,8 +789,15 @@ async function downloadTitleContentFile({
             files,
             content,
             titleKey,
+            signal,
             download: (targetFile) =>
-                downloadContentToFile(baseUrl, titleId, content.id, targetFile),
+                downloadContentToFile(
+                    baseUrl,
+                    titleId,
+                    content.id,
+                    targetFile,
+                    signal
+                ),
         });
 
         return {
@@ -771,10 +811,23 @@ async function downloadTitleContentFile({
         files,
         content,
         titleKey,
+        signal,
         downloadApp: (targetFile) =>
-            downloadContentToFile(baseUrl, titleId, content.id, targetFile),
+            downloadContentToFile(
+                baseUrl,
+                titleId,
+                content.id,
+                targetFile,
+                signal
+            ),
         downloadH3: (targetFile) =>
-            downloadContentH3ToFile(baseUrl, titleId, content.id, targetFile),
+            downloadContentH3ToFile(
+                baseUrl,
+                titleId,
+                content.id,
+                targetFile,
+                signal
+            ),
     });
 
     return {
@@ -1353,11 +1406,14 @@ function verifyContentInstallFiles({
     files,
     content,
     titleKey,
+    signal,
 }: {
     files: ContentInstallFiles;
     content: TmdContent;
     titleKey: Uint8Array;
+    signal?: AbortSignal;
 }): Promise<ContentTreeVerification> {
+    throwIfAborted(signal);
     if (isHashedContent(content)) {
         if (!files.h3File) {
             return Promise.resolve({
@@ -1373,6 +1429,7 @@ function verifyContentInstallFiles({
             content,
             titleKey,
             contentId: files.contentId,
+            signal,
         });
     }
 
@@ -1381,6 +1438,7 @@ function verifyContentInstallFiles({
         content,
         titleKey,
         contentId: files.contentId,
+        signal,
     });
 }
 
@@ -1391,6 +1449,7 @@ async function ensureContentInstallFiles({
     download,
     downloadApp,
     downloadH3,
+    signal,
 }: {
     files: ContentInstallFiles;
     content: TmdContent;
@@ -1398,7 +1457,9 @@ async function ensureContentInstallFiles({
     download?: ContentFileDownload;
     downloadApp?: ContentFileDownload;
     downloadH3?: ContentFileDownload;
+    signal?: AbortSignal;
 }): Promise<ContentTreeVerification> {
+    throwIfAborted(signal);
     if (isHashedContent(content)) {
         if (!files.h3File || !downloadApp || !downloadH3) {
             return {
@@ -1416,6 +1477,7 @@ async function ensureContentInstallFiles({
             contentId: files.contentId,
             downloadApp,
             downloadH3,
+            signal,
         });
     }
 
@@ -1433,6 +1495,7 @@ async function ensureContentInstallFiles({
         titleKey,
         contentId: files.contentId,
         download,
+        signal,
     });
 }
 
@@ -1444,6 +1507,7 @@ async function ensureContentTree({
     contentId,
     downloadApp,
     downloadH3,
+    signal,
 }: {
     appFile: string;
     h3File: string;
@@ -1452,13 +1516,16 @@ async function ensureContentTree({
     contentId: string;
     downloadApp: ContentFileDownload;
     downloadH3: ContentFileDownload;
+    signal?: AbortSignal;
 }): Promise<ContentTreeVerification> {
+    throwIfAborted(signal);
     const existing = await verifyContentTree({
         appFile,
         h3File,
         content,
         titleKey,
         contentId,
+        signal,
     });
 
     if (existing.status === 'ok') {
@@ -1470,6 +1537,7 @@ async function ensureContentTree({
     }
 
     logExistingContentInvalid(contentId, existing.error);
+    throwIfAborted(signal);
 
     const h3Downloaded = await downloadH3(h3File)
         .then(() => true)
@@ -1488,7 +1556,9 @@ async function ensureContentTree({
         };
     }
 
+    throwIfAborted(signal);
     await downloadApp(appFile);
+    throwIfAborted(signal);
 
     const verification = await verifyContentTree({
         appFile,
@@ -1496,6 +1566,7 @@ async function ensureContentTree({
         content,
         titleKey,
         contentId,
+        signal,
     });
 
     return verification.status === 'ok'
@@ -1512,24 +1583,29 @@ async function verifyContentTree({
     content,
     titleKey,
     contentId,
+    signal,
 }: {
     appFile: string;
     h3File: string;
     content: TmdContent;
     titleKey: Uint8Array;
     contentId: string;
+    signal?: AbortSignal;
 }): Promise<ContentTreeVerification> {
     try {
+        throwIfAborted(signal);
         await assertExistingContentFileSize(
             appFile,
             getEncryptedContentFileSize(content),
             contentId
         );
+        throwIfAborted(signal);
         await verifyEncryptedContentTreeFile({
             appFile,
             h3File,
             content,
             titleKey,
+            signal,
         });
 
         return {
@@ -1551,18 +1627,22 @@ async function ensureContentHash({
     titleKey,
     contentId,
     download,
+    signal,
 }: {
     appFile: string;
     content: TmdContent;
     titleKey: Uint8Array;
     contentId: string;
     download: ContentFileDownload;
+    signal?: AbortSignal;
 }): Promise<ContentTreeVerification> {
+    throwIfAborted(signal);
     const existing = await verifyContentHash({
         appFile,
         content,
         titleKey,
         contentId,
+        signal,
     });
 
     if (existing.status === 'ok') {
@@ -1574,14 +1654,17 @@ async function ensureContentHash({
     }
 
     logExistingContentInvalid(contentId, existing.error);
+    throwIfAborted(signal);
 
     await download(appFile);
+    throwIfAborted(signal);
 
     const verification = await verifyContentHash({
         appFile,
         content,
         titleKey,
         contentId,
+        signal,
     });
 
     return verification.status === 'ok'
@@ -1597,23 +1680,28 @@ async function verifyContentHash({
     content,
     titleKey,
     contentId,
+    signal,
 }: {
     appFile: string;
     content: TmdContent;
     titleKey: Uint8Array;
     contentId: string;
+    signal?: AbortSignal;
 }): Promise<ContentTreeVerification> {
     try {
+        throwIfAborted(signal);
         await assertExistingContentFileSize(
             appFile,
             getEncryptedContentFileSize(content),
             contentId
         );
+        throwIfAborted(signal);
         const actualHash = await hashDecryptedContentFile(
             appFile,
             titleKey,
             content.index,
-            content.size
+            content.size,
+            signal
         );
 
         assertHashEquals(
@@ -1682,8 +1770,10 @@ async function hashDecryptedContentFile(
     appFile: string,
     titleKey: Uint8Array,
     contentIndex: number,
-    contentSize: bigint
+    contentSize: bigint,
+    signal?: AbortSignal
 ): Promise<Uint8Array> {
+    throwIfAborted(signal);
     const decipher = createDecipheriv(
         'aes-128-cbc',
         Buffer.from(titleKey),
@@ -1694,7 +1784,8 @@ async function hashDecryptedContentFile(
     const hash = createHash('sha1');
     let remaining = contentSize;
 
-    for await (const chunk of readFileChunks(appFile)) {
+    for await (const chunk of readFileChunks(appFile, signal)) {
+        throwIfAborted(signal);
         const decrypted = decipher.update(chunk);
         const hashLength = Number(
             remaining < BigInt(decrypted.length)
@@ -1708,6 +1799,7 @@ async function hashDecryptedContentFile(
         }
     }
 
+    throwIfAborted(signal);
     const final = decipher.final();
     const finalHashLength = Number(
         remaining < BigInt(final.length) ? remaining : BigInt(final.length)
@@ -1726,18 +1818,36 @@ async function hashDecryptedContentFile(
     return new Uint8Array(hash.digest());
 }
 
-async function hashFile(filePath: string): Promise<Uint8Array> {
+async function hashFileWithSignal(
+    filePath: string,
+    signal?: AbortSignal
+): Promise<Uint8Array> {
     const hash = createHash('sha1');
-    for await (const chunk of readFileChunks(filePath)) {
+    for await (const chunk of readFileChunks(filePath, signal)) {
+        throwIfAborted(signal);
         hash.update(chunk);
     }
 
     return new Uint8Array(hash.digest());
 }
 
-async function* readFileChunks(filePath: string): AsyncGenerator<Buffer> {
-    for await (const chunk of createReadStream(filePath)) {
-        yield Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+async function* readFileChunks(
+    filePath: string,
+    signal?: AbortSignal
+): AsyncGenerator<Buffer> {
+    const stream = createReadStream(filePath);
+    const abort = () =>
+        stream.destroy(
+            signal?.reason instanceof Error ? signal.reason : undefined
+        );
+    signal?.addEventListener('abort', abort, { once: true });
+    try {
+        for await (const chunk of stream) {
+            throwIfAborted(signal);
+            yield Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        }
+    } finally {
+        signal?.removeEventListener('abort', abort);
     }
 }
 
@@ -1746,16 +1856,20 @@ async function verifyEncryptedContentTreeFile({
     h3File,
     content,
     titleKey,
+    signal,
 }: {
     appFile: string;
     h3File: string;
     content: TmdContent;
     titleKey: Uint8Array;
+    signal?: AbortSignal;
 }): Promise<void> {
+    throwIfAborted(signal);
     const [h3, h3Hash] = await Promise.all([
         readFile(h3File),
-        hashFile(h3File),
+        hashFileWithSignal(h3File, signal),
     ]);
+    throwIfAborted(signal);
 
     assertHashEquals(
         h3Hash,
@@ -1766,9 +1880,8 @@ async function verifyEncryptedContentTreeFile({
     let pending = Buffer.alloc(0);
     let blockIndex = 0;
 
-    for await (const chunk of createReadStream(appFile, {
-        highWaterMark: HASHED_BLOCK_SIZE,
-    })) {
+    for await (const chunk of readFileChunks(appFile, signal)) {
+        throwIfAborted(signal);
         pending = Buffer.concat([pending, chunk]);
 
         while (pending.length >= HASHED_BLOCK_SIZE) {
@@ -1882,37 +1995,43 @@ function assertHashEquals(
 
 export async function downloadTicket(
     baseUrl: string,
-    titleId: string
+    titleId: string,
+    signal?: AbortSignal
 ): Promise<Uint8Array> {
-    return downloadBinary(getTicketUrl(baseUrl, titleId), 'ticket');
+    return downloadBinary(getTicketUrl(baseUrl, titleId), 'ticket', signal);
 }
 
 export async function downloadTmd(
     baseUrl: string,
-    titleId: string
+    titleId: string,
+    signal?: AbortSignal
 ): Promise<Uint8Array> {
-    return downloadBinary(getTmdUrl(baseUrl, titleId), 'tmd');
+    return downloadBinary(getTmdUrl(baseUrl, titleId), 'tmd', signal);
 }
 
 export async function downloadContent(
     baseUrl: string,
     titleId: string,
-    contentId: number
+    contentId: number,
+    signal?: AbortSignal
 ): Promise<Uint8Array> {
     return downloadBinary(
         getContentUrl(baseUrl, titleId, contentId),
-        `content ${formatContentId(contentId)}`
+        `content ${formatContentId(contentId)}`,
+        signal
     );
 }
 
 export async function downloadContentH3(
     baseUrl: string,
     titleId: string,
-    contentId: number
+    contentId: number,
+    signal?: AbortSignal
 ): Promise<Uint8Array> {
     return downloadBinary(
         getContentH3Url(baseUrl, titleId, contentId),
-        `content ${formatContentId(contentId)}.h3`
+        `content ${formatContentId(contentId)}.h3`,
+        signal
     );
 }
 
@@ -1920,12 +2039,14 @@ async function downloadContentToFile(
     baseUrl: string,
     titleId: string,
     contentId: number,
-    targetFile: string
+    targetFile: string,
+    signal?: AbortSignal
 ): Promise<void> {
     return downloadBinaryToFile(
         getContentUrl(baseUrl, titleId, contentId),
         targetFile,
-        `content ${formatContentId(contentId)}`
+        `content ${formatContentId(contentId)}`,
+        signal
     );
 }
 
@@ -1933,12 +2054,14 @@ async function downloadContentH3ToFile(
     baseUrl: string,
     titleId: string,
     contentId: number,
-    targetFile: string
+    targetFile: string,
+    signal?: AbortSignal
 ): Promise<void> {
     return downloadBinaryToFile(
         getContentH3Url(baseUrl, titleId, contentId),
         targetFile,
-        `content ${formatContentId(contentId)}.h3`
+        `content ${formatContentId(contentId)}.h3`,
+        signal
     );
 }
 
@@ -1977,7 +2100,8 @@ async function extractMetaXmlFromTitle(
     tmd: Tmd,
     titleKey: Uint8Array,
     baseUrl: string,
-    titleId: string
+    titleId: string,
+    signal?: AbortSignal
 ): Promise<Uint8Array | null> {
     const entries = parseFstEntries(decryptedFst, tmd);
     const metaEntry =
@@ -1995,7 +2119,8 @@ async function extractMetaXmlFromTitle(
     const encryptedContent = await downloadContent(
         baseUrl,
         titleId,
-        content.id
+        content.id,
+        signal
     );
     const decryptedContent = decryptTitleContent(
         encryptedContent,
@@ -2549,10 +2674,11 @@ function formatContentId(contentId: number): string {
 
 async function downloadBinary(
     url: string,
-    label = 'file'
+    label = 'file',
+    signal?: AbortSignal
 ): Promise<Uint8Array> {
     logger.log('metadata', `downloading ${label}: ${url}`);
-    const response = await fetch(url);
+    const response = await fetch(url, { signal });
     if (!response.ok) {
         throw new HttpError(url, response.status);
     }
@@ -2567,10 +2693,11 @@ async function downloadBinary(
 async function downloadBinaryToFile(
     url: string,
     targetFile: string,
-    label = 'file'
+    label = 'file',
+    signal?: AbortSignal
 ): Promise<void> {
     logger.log('metadata', `downloading ${label}: ${url}`);
-    const response = await fetch(url);
+    const response = await fetch(url, { signal });
     if (!response.ok) {
         throw new HttpError(url, response.status);
     }
@@ -2583,7 +2710,8 @@ async function downloadBinaryToFile(
     try {
         await pipeline(
             Readable.fromWeb(response.body),
-            createWriteStream(tempFile)
+            createWriteStream(tempFile),
+            { signal }
         );
         await rename(tempFile, targetFile);
     } catch (error) {

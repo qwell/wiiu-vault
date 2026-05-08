@@ -1,4 +1,26 @@
 import {
+    DownloadActionBarCommand,
+    cancelDownload,
+    removeDownload,
+    retryDownload,
+    syncDownloadQueue,
+    renderDownloadActionRow,
+    getDownloadState,
+    formatDownloadIcon,
+    renderDownloadAvailabilityRow,
+    queueDownloads,
+    collectSelectedDownloads,
+    renderDownloadMarkers,
+} from './download.js';
+import {
+    StorageCopyActionBarCommand,
+    cancelStorageCopy,
+    removeStorageCopy,
+    retryStorageCopy,
+    syncStorageCopies,
+    renderStorageCopyActionRow,
+} from './storage.js';
+import {
     type LibraryResponse,
     type TitleGroup,
     type TitleEntry,
@@ -8,16 +30,15 @@ import {
     TitleKinds,
     type ChildKind,
     PARENT_KINDS,
-    formatSize,
     getVirtualConsolePlatform,
     VirtualConsolePlatform,
-} from '../shared/shared.js';
+} from '../shared/titles.js';
 import {
-    AppSocketCommand,
-    AppSocketEvent,
     DownloadQueueItem,
-    DownloadQueueState,
-} from '../shared/socket.js';
+    formatSize,
+    StorageCopyItem,
+} from '../shared/shared.js';
+import { AppSocketCommand, AppSocketEvent } from '../shared/socket.js';
 import {
     type AppConfig,
     type AppConfigResponse,
@@ -43,6 +64,8 @@ type LibraryControlState = {
     search: string;
 };
 
+type ActionBarCommand = DownloadActionBarCommand | StorageCopyActionBarCommand;
+
 let refreshLibrary: (() => Promise<void>) | null = null;
 let showAllTitles = false;
 let selectedFamily: string | null = null;
@@ -65,6 +88,9 @@ let settingsLoading = false;
 let settingsSaving = false;
 let settingsCheckingRoot = false;
 
+const downloadQueue: DownloadQueueItem[] = [];
+const storageCopies: StorageCopyItem[] = [];
+
 let iconObserver: IntersectionObserver | null = null;
 
 const serverStatusModal = document.querySelector<HTMLDivElement>(
@@ -72,8 +98,7 @@ const serverStatusModal = document.querySelector<HTMLDivElement>(
 );
 const settingsRoot = document.querySelector<HTMLDivElement>('#settings-root');
 
-let downloadQueue: DownloadQueueItem[] = [];
-let downloadQueueRoot: HTMLElement | null = null;
+let actionBarRoot: HTMLElement | null = null;
 let appSocket: WebSocket | null = null;
 let reconnectSocketTimer: number | null = null;
 
@@ -119,6 +144,62 @@ function saveViewMode(viewMode: LibraryViewMode): void {
 
 function isSettingsOpen(): boolean {
     return document.body.hasAttribute('data-settings-open');
+}
+
+function configureActionButton(
+    button: HTMLButtonElement,
+    action: ActionBarCommand,
+    itemId: string
+): void {
+    button.dataset.action = action;
+    button.dataset.itemId = itemId;
+}
+
+//FIXME
+function isActionBarCommand(value: string | null): value is ActionBarCommand {
+    switch (value) {
+        case 'download.cancel':
+        case 'download.remove':
+        case 'download.retry':
+        case 'storage.copy.cancel':
+        case 'storage.copy.remove':
+        case 'storage.copy.retry':
+            return true;
+        default:
+            return false;
+    }
+}
+
+//FIXME
+function handleActionBarCommand(
+    action: ActionBarCommand | undefined,
+    itemId: string
+): void {
+    switch (action) {
+        case 'download.cancel':
+            cancelDownload(itemId);
+            return;
+
+        case 'download.remove':
+            removeDownload(itemId);
+            return;
+
+        case 'download.retry':
+            retryDownload(itemId);
+            return;
+
+        case 'storage.copy.cancel':
+            cancelStorageCopy(itemId);
+            return;
+
+        case 'storage.copy.remove':
+            removeStorageCopy(itemId);
+            return;
+
+        case 'storage.copy.retry':
+            retryStorageCopy(itemId);
+            return;
+    }
 }
 
 function updateSettingsStatus(
@@ -241,42 +322,6 @@ function renderAvailabilityRow(
     return row;
 }
 
-function getDownloadItem(
-    family: string,
-    kind: TitleKinds,
-    titleId?: string
-): DownloadQueueItem | null {
-    return (
-        downloadQueue.find(
-            (item) =>
-                item.family === family &&
-                item.kind === kind &&
-                (!titleId || item.titleId === titleId) &&
-                item.state !== 'complete'
-        ) ?? null
-    );
-}
-
-function getDownloadState(
-    family: string,
-    kind: TitleKinds
-): DownloadQueueState | null {
-    return getDownloadItem(family, kind)?.state ?? null;
-}
-
-function getDownloadMarker(state: DownloadQueueState | null): string {
-    switch (state) {
-        case 'downloading':
-            return '⬇';
-        case 'queued':
-            return '⋯';
-        case 'failed':
-            return '!';
-        default:
-            return '';
-    }
-}
-
 function formatValidationStatus(event: AppSocketEvent): string | null {
     if (event.type !== 'library.validationStatus') {
         return null;
@@ -304,24 +349,10 @@ function formatValidationStatus(event: AppSocketEvent): string | null {
     }
 }
 
-function formatDownloadProgress(item: DownloadQueueItem): string {
-    if (item.state === 'queued') {
-        return 'Queued';
-    }
-
-    if (item.state === 'failed') {
-        return 'Failed';
-    }
-
-    if (item.state === 'complete') {
-        return 'Done';
-    }
-
-    if (item.progress !== null) {
-        return `${Math.round(item.progress)}%`;
-    }
-
-    return 'Downloading';
+export function getPathDisplayName(value: string): string {
+    const trimmed = value.replace(/[\\/]+$/, '');
+    const name = trimmed.split(/[\\/]/).pop() || trimmed;
+    return name.replace(/(?:\s+\[[^\]]+\])+$/g, '').trim() || name;
 }
 
 function getSocketUrl(): string {
@@ -329,7 +360,7 @@ function getSocketUrl(): string {
     return `${protocol}//${location.host}/api/socket`;
 }
 
-function sendAppSocketCommand(command: AppSocketCommand): void {
+export function sendAppSocketCommand(command: AppSocketCommand): void {
     if (!appSocket || appSocket.readyState !== WebSocket.OPEN) {
         showServerGoneModal();
         return;
@@ -338,42 +369,17 @@ function sendAppSocketCommand(command: AppSocketCommand): void {
     appSocket.send(JSON.stringify(command));
 }
 
-function syncDownloadQueue(nextQueue: DownloadQueueItem[]): void {
-    const previousById = new Map(downloadQueue.map((item) => [item.id, item]));
-    const shouldReconcileCompleted = previousById.size === 0;
-
-    downloadQueue = nextQueue;
-
-    for (const item of downloadQueue) {
-        const previous = previousById.get(item.id);
-
-        if (
-            ((previous && previous.state !== 'complete') ||
-                shouldReconcileCompleted) &&
-            item.state === 'complete'
-        ) {
-            markSlotBadgeComplete(item.family, item.kind);
-            markDownloadComplete(item);
-        }
-    }
-
-    updateQueueStrip();
-    renderDownloadMarkers();
-
-    const selectedGroup = currentGroups.find(
-        (group) => group.family === selectedFamily
-    );
-
-    if (selectedGroup) {
-        refreshOpenDetailSidebarForGroup(selectedGroup);
-    }
-}
-
 function handleAppSocketEvent(event: AppSocketEvent): void {
     switch (event.type) {
         case 'app.connected':
             hideServerGoneModal();
-            syncDownloadQueue(event.downloads);
+            syncDownloadQueue(
+                downloadQueue,
+                event.downloads,
+                groupSearchHaystacks,
+                currentGroups
+            );
+            syncStorageCopies(storageCopies, event.storageCopies);
 
             if (event.libraryValidationStatus) {
                 handleAppSocketEvent(event.libraryValidationStatus);
@@ -382,7 +388,17 @@ function handleAppSocketEvent(event: AppSocketEvent): void {
 
         case 'download.queueChanged':
             hideServerGoneModal();
-            syncDownloadQueue(event.items);
+            syncDownloadQueue(
+                downloadQueue,
+                event.items,
+                groupSearchHaystacks,
+                currentGroups
+            );
+            return;
+
+        case 'storage.copyChanged':
+            hideServerGoneModal();
+            syncStorageCopies(storageCopies, event.items);
             return;
 
         case 'library.validationStatus': {
@@ -470,7 +486,7 @@ function maybeNumber(value: unknown): number | null {
     return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
-function getAvailableSizeText(entry: unknown): string | null {
+export function getAvailableSizeText(entry: unknown): string | null {
     if (!entry || typeof entry !== 'object') {
         return null;
     }
@@ -479,7 +495,7 @@ function getAvailableSizeText(entry: unknown): string | null {
     return sizeBytes === null ? null : formatSize(sizeBytes);
 }
 
-function getAvailableSizeBytes(entry: unknown): number | null {
+export function getAvailableSizeBytes(entry: unknown): number | null {
     if (!entry || typeof entry !== 'object') {
         return null;
     }
@@ -487,182 +503,162 @@ function getAvailableSizeBytes(entry: unknown): number | null {
     return maybeNumber((entry as { sizeBytes?: unknown }).sizeBytes);
 }
 
-function updateQueueStrip(): void {
-    if (!downloadQueueRoot) {
+export function updateActionBar(): void {
+    if (!actionBarRoot) return;
+
+    const visibleDownloads = downloadQueue.filter(
+        (item) => item.state !== 'complete'
+    );
+    const visibleCopies = storageCopies.filter(
+        (item) => item.state !== 'complete'
+    );
+
+    const isEmpty = visibleDownloads.length === 0 && visibleCopies.length === 0;
+    actionBarRoot.hidden = isEmpty;
+
+    if (isEmpty) {
+        actionBarRoot.replaceChildren();
+        return;
+    }
+
+    rebuildActionBar();
+}
+
+export function createActionBarCell(
+    className: string,
+    textContent = ''
+): HTMLDivElement {
+    const cell = document.createElement('div');
+    cell.className = className;
+    cell.textContent = textContent;
+    return cell;
+}
+
+export function createActionButton(
+    text: string,
+    action: ActionBarCommand,
+    itemId: string
+): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'action-bar-button';
+    button.textContent = text;
+    configureActionButton(button, action, itemId);
+    return button;
+}
+
+function rebuildActionBar(): void {
+    if (!actionBarRoot) {
         return;
     }
 
     const visibleItems = downloadQueue.filter(
         (item) => item.state !== 'complete'
     );
-    const activeCount = visibleItems.filter(
-        (item) => item.state === 'downloading'
-    ).length;
-    const queuedCount = visibleItems.filter(
-        (item) => item.state === 'queued'
-    ).length;
-    const failedCount = visibleItems.filter(
-        (item) => item.state === 'failed'
-    ).length;
-    const currentItem =
-        visibleItems.find((item) => item.state === 'downloading') ??
-        visibleItems.find((item) => item.state === 'failed') ??
-        visibleItems.find((item) => item.state === 'queued') ??
-        null;
+    const visibleCopies = storageCopies.filter(
+        (item) => item.state !== 'complete'
+    );
 
-    downloadQueueRoot.hidden = visibleItems.length === 0;
-    downloadQueueRoot.replaceChildren();
+    const activeCount =
+        visibleItems.filter((item) => item.state === 'downloading').length +
+        visibleCopies.filter((item) => item.state === 'copying').length;
+    const queuedCount =
+        visibleItems.filter((item) => item.state === 'queued').length +
+        visibleCopies.filter((item) => item.state === 'queued').length;
+    const failedCount =
+        visibleItems.filter((item) => item.state === 'failed').length +
+        visibleCopies.filter((item) => item.state === 'failed').length;
 
-    if (visibleItems.length === 0) {
+    actionBarRoot.replaceChildren();
+
+    if (visibleItems.length === 0 && visibleCopies.length === 0) {
         return;
     }
 
     const summary = document.createElement('div');
-    summary.className = 'download-queue-summary';
+    summary.className = 'action-bar-summary';
 
     const counts = document.createElement('div');
-    counts.textContent = `Queue: ${activeCount} active, ${queuedCount} queued, ${failedCount} failed`;
+    counts.textContent = `Actions: ${activeCount} active, ${queuedCount} queued, ${failedCount} failed`;
 
     const current = document.createElement('div');
-    current.className = 'download-queue-current';
-    current.textContent = currentItem
-        ? `${currentItem.groupName} ${currentItem.label} ${formatDownloadProgress(currentItem)}`
-        : 'Idle';
+    current.className = 'action-bar-current';
+    current.textContent =
+        visibleItems.length + visibleCopies.length === 1
+            ? 'One visible action'
+            : `${visibleItems.length + visibleCopies.length} visible actions`;
 
     const size = document.createElement('div');
-    size.textContent = currentItem?.sizeText ?? '';
+    size.textContent = '';
 
     summary.append(counts, current, size);
-    downloadQueueRoot.append(summary);
+    actionBarRoot.append(summary);
 
     const details = document.createElement('div');
-    details.className = 'download-queue-details';
+    details.className = 'action-bar-details';
 
     for (const item of visibleItems) {
-        const row = document.createElement('div');
-        row.className = `download-queue-row download-queue-row-${item.state}`;
-
-        const state = document.createElement('div');
-        state.className = 'download-queue-state';
-        state.textContent = getDownloadMarker(item.state) || 'OK';
-
-        const title = document.createElement('div');
-        title.className = 'download-queue-title';
-        title.title = item.groupName;
-        title.textContent = item.groupName;
-
-        const label = document.createElement('div');
-        label.textContent = item.label;
-
-        const progress = document.createElement('div');
-        progress.textContent = formatDownloadProgress(item);
-
-        const action = document.createElement('div');
-        action.className = 'download-queue-action';
-
-        if (item.state === 'failed') {
-            const retryButton = document.createElement('button');
-            retryButton.type = 'button';
-            retryButton.className = 'download-queue-button';
-            retryButton.textContent = 'Retry';
-            retryButton.addEventListener('click', () => retryDownload(item.id));
-
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'download-queue-button';
-            removeButton.textContent = 'Remove';
-            removeButton.addEventListener('click', () =>
-                removeDownload(item.id)
-            );
-
-            action.append(retryButton, removeButton);
-        } else if (item.state === 'queued') {
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'download-queue-button';
-            removeButton.textContent = 'Remove';
-            removeButton.addEventListener('click', () =>
-                removeDownload(item.id)
-            );
-            action.append(removeButton);
-        }
-
-        row.append(state, title, label, progress, action);
-        details.append(row);
+        details.append(renderDownloadActionRow(item));
     }
 
-    downloadQueueRoot.append(details);
+    for (const item of visibleCopies) {
+        details.append(renderStorageCopyActionRow(item));
+    }
+
+    actionBarRoot.append(details);
 }
 
-function buildDownloadQueueStrip(): HTMLElement {
+function buildActionBar(): HTMLElement {
     const strip = document.createElement('section');
-    strip.className = 'download-queue';
+    strip.className = 'action-bar';
     strip.hidden = true;
-    strip.setAttribute('aria-label', 'Download queue');
+    strip.setAttribute('aria-label', 'Action bar');
     return strip;
 }
 
-function mountDownloadQueueStrip(): void {
-    if (downloadQueueRoot) {
+function mountActionBar(): void {
+    if (actionBarRoot) {
         return;
     }
 
-    downloadQueueRoot = buildDownloadQueueStrip();
-    document.body.append(downloadQueueRoot);
-    updateQueueStrip();
-}
+    actionBarRoot = buildActionBar();
 
-function queueDownloads(items: DownloadQueueItem[]): void {
-    const addedItems = items.filter(
-        (item) => !getDownloadItem(item.family, item.kind, item.titleId)
-    );
+    actionBarRoot.addEventListener('click', (event) => {
+        const target = event.target;
 
-    if (addedItems.length === 0) {
-        return;
-    }
-
-    sendAppSocketCommand({
-        type: 'download.queue',
-        items: addedItems,
-    });
-}
-
-function retryDownload(itemId: string): void {
-    sendAppSocketCommand({
-        type: 'download.retry',
-        id: itemId,
-    });
-}
-
-function removeDownload(itemId: string): void {
-    sendAppSocketCommand({
-        type: 'download.remove',
-        id: itemId,
-    });
-}
-
-function renderDownloadMarkers(): void {
-    for (const badge of document.querySelectorAll<HTMLElement>(
-        '.title-slot-badge'
-    )) {
-        const family = badge.dataset.family;
-        const kind = badge.dataset.kind as TitleKinds | undefined;
-        const marker = badge.querySelector<HTMLElement>(
-            '.title-slot-badge-download'
-        );
-
-        if (!family || !kind || !marker) {
-            continue;
+        if (!(target instanceof Element)) {
+            return;
         }
 
-        const state = getDownloadState(family, kind);
-        marker.textContent = getDownloadMarker(state);
-        marker.hidden = state === null;
-        badge.dataset.downloadState = state ?? '';
-    }
+        const closestButton = target.closest(
+            'button[data-action][data-item-id]'
+        );
+
+        if (
+            !(closestButton instanceof HTMLButtonElement) ||
+            !actionBarRoot?.contains(closestButton)
+        ) {
+            return;
+        }
+
+        const actionValue = closestButton.getAttribute('data-action');
+        const itemId = closestButton.getAttribute('data-item-id');
+
+        if (!isActionBarCommand(actionValue) || !itemId) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        handleActionBarCommand(actionValue, itemId);
+    });
+
+    document.body.append(actionBarRoot);
+    updateActionBar();
 }
 
-function updateGroupStatusFromSlots(group: TitleGroup): void {
+export function updateGroupStatusFromSlots(group: TitleGroup): void {
     const baseState = getGameBadgeState(group);
     const updateState = getSlotBadgeState(group, TitleKinds.Update);
     const dlcState = getSlotBadgeState(group, TitleKinds.DLC);
@@ -702,64 +698,7 @@ function updateGroupStatusFromSlots(group: TitleGroup): void {
     group.status = 'unknown';
 }
 
-function markDownloadComplete(item: DownloadQueueItem): void {
-    const group = currentGroups.find(
-        (candidate) => candidate.family === item.family
-    );
-
-    if (!group) {
-        return;
-    }
-
-    const alreadyDownloaded = group.entries.some(
-        (entry) => entry.kind === item.kind && entry.titleId === item.titleId
-    );
-
-    const installedSizeBytes = item.installedSizeBytes ?? item.totalBytes ?? 0;
-    const installedVersion = item.installedVersion ?? 0;
-    const installedTitleName = item.installedTitleName ?? group.name;
-
-    if (!alreadyDownloaded) {
-        group.entries.push({
-            titleId: item.titleId,
-            version: installedVersion,
-            titleName: installedTitleName,
-            region: group.region,
-            iconUrl: group.iconUrl,
-            kind: item.kind,
-            sizeBytes: installedSizeBytes,
-        });
-        groupSearchHaystacks.delete(group);
-    } else {
-        const existingEntry = group.entries.find(
-            (entry) =>
-                entry.kind === item.kind && entry.titleId === item.titleId
-        );
-
-        if (existingEntry) {
-            if (installedVersion < existingEntry.version) {
-                updateGroupStatusFromSlots(group);
-                updateRenderedTitleGroup(group);
-                refreshOpenDetailSidebarForGroup(group);
-                return;
-            }
-            existingEntry.version = installedVersion;
-            existingEntry.titleName = installedTitleName;
-            existingEntry.sizeBytes = installedSizeBytes;
-            groupSearchHaystacks.delete(group);
-        }
-    }
-
-    group.availableEntries = group.availableEntries.filter(
-        (entry) => !(entry.kind === item.kind && entry.titleId === item.titleId)
-    );
-
-    updateGroupStatusFromSlots(group);
-    updateRenderedTitleGroup(group);
-    refreshOpenDetailSidebarForGroup(group);
-}
-
-function markSlotBadgeComplete(family: string, kind: TitleKinds): void {
+export function markSlotBadgeComplete(family: string, kind: TitleKinds): void {
     for (const badge of document.querySelectorAll<HTMLElement>(
         '.title-slot-badge'
     )) {
@@ -787,7 +726,7 @@ function markSlotBadgeComplete(family: string, kind: TitleKinds): void {
     }
 }
 
-function updateRenderedTitleGroup(group: TitleGroup): void {
+export function updateRenderedTitleGroup(group: TitleGroup): void {
     const element = document.querySelector<HTMLElement>(
         `.title-group[data-family="${CSS.escape(group.family)}"]`
     );
@@ -807,7 +746,7 @@ function updateRenderedTitleGroup(group: TitleGroup): void {
     element.classList.add(`title-group-${group.status}`);
 }
 
-function refreshOpenDetailSidebarForGroup(group: TitleGroup): void {
+export function refreshOpenDetailSidebarForGroup(group: TitleGroup): void {
     if (selectedFamily !== group.family) {
         return;
     }
@@ -841,7 +780,7 @@ function renderDetailSection(title: string): HTMLElement {
     return heading;
 }
 
-function formatVersions(versions: number[]): string {
+export function formatVersions(versions: number[]): string {
     return versions.length > 0
         ? versions.map((version) => `v${version}`).join(', ')
         : '';
@@ -932,8 +871,8 @@ function renderSlotBadge(
     const downloadMarker = document.createElement('span');
     downloadMarker.className = 'title-slot-badge-download';
 
-    const downloadState = getDownloadState(group.family, label);
-    downloadMarker.textContent = getDownloadMarker(downloadState);
+    const downloadState = getDownloadState(downloadQueue, group.family, label);
+    downloadMarker.textContent = formatDownloadIcon(downloadState);
     downloadMarker.hidden = downloadState === null;
     badge.dataset.downloadState = downloadState ?? '';
 
@@ -954,115 +893,6 @@ function renderVirtualConsoleBadge(group: TitleGroup): HTMLElement | null {
     badge.title = 'Virtual Console';
 
     return badge;
-}
-
-function renderDownloadAvailabilityRow(
-    group: TitleGroup,
-    entry: TitleGroup['availableEntries'][number]
-): HTMLLabelElement | HTMLDivElement {
-    const versions = formatVersions(entry.versions);
-    const label = versions ? `${entry.kind} ${versions}` : entry.kind;
-    const sizeText = getAvailableSizeText(entry);
-    const existingQueueItem = getDownloadItem(
-        group.family,
-        entry.kind,
-        entry.titleId
-    );
-
-    if (existingQueueItem) {
-        const row = document.createElement('div');
-        row.className = `title-download-row title-download-row-${existingQueueItem.state}`;
-
-        const state = document.createElement('span');
-        state.className = 'title-download-state';
-        state.textContent = getDownloadMarker(existingQueueItem.state);
-
-        const slot = document.createElement('span');
-        slot.className = 'title-download-slot';
-        slot.textContent = label;
-
-        const titleId = document.createElement('span');
-        titleId.className = 'title-download-id';
-        titleId.textContent = formatDownloadProgress(existingQueueItem);
-
-        const size = document.createElement('span');
-        size.className = 'title-download-size';
-        size.textContent = sizeText ?? '';
-
-        row.append(state, slot, titleId, size);
-        return row;
-    }
-
-    const row = document.createElement('label');
-    row.className = 'title-download-row';
-
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'title-download-checkbox';
-    checkbox.value = entry.titleId;
-    checkbox.dataset.family = group.family;
-    checkbox.dataset.groupName = group.name;
-    checkbox.dataset.kind = entry.kind;
-    checkbox.dataset.label = label;
-    checkbox.dataset.titleId = entry.titleId;
-    checkbox.dataset.sizeText = sizeText ?? '';
-
-    const sizeBytes = getAvailableSizeBytes(entry);
-    if (sizeBytes !== null) {
-        checkbox.dataset.totalBytes = String(sizeBytes);
-    }
-
-    checkbox.disabled = !entry.availableOnCdn;
-    if (!entry.availableOnCdn) {
-        row.classList.add('title-download-row-unavailable');
-    }
-
-    const slot = document.createElement('span');
-    slot.className = 'title-download-slot';
-    slot.textContent = label;
-
-    const titleId = document.createElement('span');
-    titleId.className = 'title-download-id';
-    titleId.textContent = entry.titleId;
-
-    const size = document.createElement('span');
-    size.className = 'title-download-size';
-    size.textContent = entry.availableOnCdn ? (sizeText ?? '') : 'Not on CDN';
-
-    row.append(checkbox, slot, titleId, size);
-    return row;
-}
-
-function collectSelectedDownloads(
-    root: HTMLElement,
-    selectedOnly = true
-): DownloadQueueItem[] {
-    const selector = selectedOnly
-        ? '.title-download-checkbox:checked:not(:disabled)'
-        : '.title-download-checkbox:not(:disabled)';
-
-    return Array.from(root.querySelectorAll<HTMLInputElement>(selector)).map(
-        (checkbox) => ({
-            id: crypto.randomUUID(),
-            family: checkbox.dataset.family ?? '',
-            groupName: checkbox.dataset.groupName ?? '',
-            kind: checkbox.dataset.kind as TitleKinds,
-            label: checkbox.dataset.label ?? '',
-            titleId: checkbox.dataset.titleId ?? '',
-            sizeText: checkbox.dataset.sizeText ?? null,
-            totalBytes: checkbox.dataset.totalBytes
-                ? Number(checkbox.dataset.totalBytes)
-                : null,
-            state: 'queued',
-            error: null,
-            progress: 0,
-            downloadedBytes: null,
-            speedText: null,
-            installedSizeBytes: null,
-            installedVersion: null,
-            installedTitleName: null,
-        })
-    );
 }
 
 function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
@@ -1126,7 +956,9 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
         availableList.className = 'title-download-list';
 
         for (const entry of availableEntries) {
-            availableList.append(renderDownloadAvailabilityRow(group, entry));
+            availableList.append(
+                renderDownloadAvailabilityRow(downloadQueue, group, entry)
+            );
         }
 
         const actions = document.createElement('div');
@@ -1155,6 +987,7 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
                 ).length > 0;
 
             queueDownloads(
+                downloadQueue,
                 collectSelectedDownloads(availableList, hasSelection)
             );
 
@@ -1542,7 +1375,7 @@ function renderGroups(
         grid.append(render);
     }
 
-    renderDownloadMarkers();
+    renderDownloadMarkers(downloadQueue);
 }
 
 function buildControls(
@@ -2402,7 +2235,7 @@ function hideServerGoneModal(): void {
 
 window.addEventListener('pageshow', resetDetailSidebars);
 
-mountDownloadQueueStrip();
+mountActionBar();
 
 connectAppSocket();
 

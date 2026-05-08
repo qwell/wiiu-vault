@@ -11,7 +11,7 @@ import {
     normalizeTitleName,
     RawTitleDatabaseEntry,
     toArray,
-} from '../src/shared/shared.js';
+} from '../src/shared/titles.js';
 
 type Icon = {
     titleId: string;

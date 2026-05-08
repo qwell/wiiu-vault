@@ -47,7 +47,7 @@ body[data-settings-open] {
     overflow: hidden;
 }
 
-body[data-detail-open] .download-queue {
+body[data-detail-open] .action-bar {
     right: 420px;
 }
 
@@ -928,7 +928,7 @@ footer > div:last-child {
 }
 
 .title-download-actions button,
-.download-queue-button {
+.action-bar-button {
     min-height: 22px;
     border: 1px solid var(--border-muted);
     background: var(--bg);
@@ -938,12 +938,12 @@ footer > div:last-child {
 }
 
 .title-download-actions button:disabled,
-.download-queue-button:disabled {
+.action-bar-button:disabled {
     opacity: 0.45;
     cursor: not-allowed;
 }
 
-.download-queue {
+.action-bar {
     position: fixed;
     left: 0;
     right: 0;
@@ -957,7 +957,7 @@ footer > div:last-child {
     box-shadow: 0 -4px 16px rgb(0 0 0 / 0.2);
 }
 
-.download-queue-summary {
+.action-bar-summary {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr) max-content;
     gap: 12px;
@@ -966,7 +966,7 @@ footer > div:last-child {
     padding: 4px 8px;
 }
 
-.download-queue-details {
+.action-bar-details {
     display: grid;
     gap: 4px;
     max-height: 35vh;
@@ -975,41 +975,92 @@ footer > div:last-child {
     border-top: 1px solid var(--border-muted);
 }
 
-.download-queue-row {
+.action-bar-row {
     display: grid;
-    grid-template-columns: 24px minmax(0, 1fr) 10ch 12ch max-content;
-    gap: 8px;
+    grid-template-columns:
+        6ch 11ch 24px 8ch 8ch minmax(18ch, 1fr)
+        minmax(18ch, 1.2fr);
+    column-gap: 5px;
     align-items: center;
     min-height: 24px;
+    min-width: 0;
 }
 
-.download-queue-current,
-.download-queue-title {
+.action-bar-current,
+.action-bar-title,
+.action-bar-files,
+.action-bar-size,
+.action-bar-details-cell {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.download-queue-state {
+.action-bar-progress {
+    overflow: hidden;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.action-bar-files,
+.action-bar-size {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.action-bar-icon {
     min-width: 20px;
     text-align: center;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
 }
 
-.download-queue-row-downloading .download-queue-state {
+.action-bar-state {
+    min-width: 0;
+}
+
+.action-bar-row-downloading .action-bar-icon {
     color: var(--complete);
 }
 
-.download-queue-row-queued .download-queue-state {
+.action-bar-row-copying .action-bar-icon {
+    color: var(--complete);
+}
+
+.action-bar-row-queued .action-bar-icon {
     color: var(--incomplete);
 }
 
-.download-queue-row-failed .download-queue-state {
+.action-bar-row-failed .action-bar-icon {
     color: var(--unknown);
 }
 
-.download-queue-action {
+.action-bar-details-cell {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.action-bar-controls {
     display: flex;
     gap: 4px;
+    justify-content: end;
+    justify-self: end;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+.action-bar-control-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.action-bar-controls .action-bar-button {
+    flex: 0 0 auto;
 }

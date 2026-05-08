@@ -5,6 +5,11 @@ import { mapConcurrent } from './shared.js';
 
 const DIRECTORY_SIZE_CONCURRENCY = 8;
 
+export type PathStats = {
+    sizeBytes: number;
+    fileCount: number;
+};
+
 export async function getImmediatePathSizeBytes(
     targetPath: string
 ): Promise<number> {
@@ -33,4 +38,57 @@ export async function getImmediatePathSizeBytes(
     );
 
     return sizes.reduce((total, size) => total + size, 0);
+}
+
+export async function getPathSizeBytes(targetPath: string): Promise<number> {
+    return (await getPathStats(targetPath)).sizeBytes;
+}
+
+export async function getPathFileCount(targetPath: string): Promise<number> {
+    return (await getPathStats(targetPath)).fileCount;
+}
+
+export async function getPathStats(targetPath: string): Promise<PathStats> {
+    const info = await stat(targetPath);
+
+    if (info.isFile()) {
+        return {
+            sizeBytes: info.size,
+            fileCount: 1,
+        };
+    }
+
+    if (!info.isDirectory()) {
+        return {
+            sizeBytes: 0,
+            fileCount: 0,
+        };
+    }
+
+    const entries = await readdir(targetPath, { withFileTypes: true });
+    const stats = await mapConcurrent(
+        entries,
+        DIRECTORY_SIZE_CONCURRENCY,
+        async (entry) => {
+            try {
+                return await getPathStats(path.join(targetPath, entry.name));
+            } catch {
+                return {
+                    sizeBytes: 0,
+                    fileCount: 0,
+                };
+            }
+        }
+    );
+
+    return stats.reduce(
+        (total, next) => ({
+            sizeBytes: total.sizeBytes + next.sizeBytes,
+            fileCount: total.fileCount + next.fileCount,
+        }),
+        {
+            sizeBytes: 0,
+            fileCount: 0,
+        }
+    );
 }

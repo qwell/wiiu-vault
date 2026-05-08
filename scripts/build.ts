@@ -50,7 +50,7 @@ async function main() {
             },
             build: {
                 outDir: path.join(root, 'dist/client'),
-                emptyOutDir: false,
+                emptyOutDir: true,
                 sourcemap: true,
             },
         }),

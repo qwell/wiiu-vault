@@ -1,60 +1,52 @@
-export enum TitleKinds {
-    vWii = 'vWii',
-    Base = 'Base',
-    Demo = 'Demo',
-    FCT = 'FCT',
-    SystemApp = 'System App',
-    SystemData = 'System Data',
-    SystemApplet = 'System Applet',
-    DLC = 'DLC',
-    Update = 'Update',
-    Unknown = 'Unknown',
-}
+import { CopyCancelContext } from './os.js';
+import { TitleKinds } from './titles.js';
 
-export enum VirtualConsolePlatform {
-    NES = 'NES',
-    SNES = 'SNES',
-    N64 = 'N64',
-    GBA = 'GBA',
-    NDS = 'NDS',
-    Wii = 'Wii',
-    PCE = 'PCE',
-    MSX = 'MSX',
-}
+export type DownloadQueueState =
+    | 'queued'
+    | 'downloading'
+    | 'failed'
+    | 'complete';
+export type DownloadQueueItem = {
+    id: string;
+    family: string;
+    groupName: string;
+    kind: TitleKinds;
+    label: string;
+    titleId: string;
+    sizeText: string | null;
+    totalBytes: number | null;
+    state: DownloadQueueState;
+    error: string | null;
 
-export function getVirtualConsolePlatform(
-    productCode: string | null
-): VirtualConsolePlatform | null {
-    const code = productCode;
+    progress: number;
+    downloadedBytes: number | null;
+    speedText: string | null;
+    completedFiles: number | null;
+    totalFiles: number | null;
+    currentFileName: string | null;
+    installedSizeBytes: number | null;
+    installedVersion: number | null;
+    installedTitleName: string | null;
+};
 
-    if (code === null) {
-        return null;
-    }
-    if (code.startsWith('WUP-N-D')) {
-        return VirtualConsolePlatform.NDS;
-    } else if (code.startsWith('WUP-N-F')) {
-        return VirtualConsolePlatform.NES;
-    } else if (code.startsWith('WUP-N-J')) {
-        return VirtualConsolePlatform.SNES;
-    } else if (code.startsWith('WUP-N-N')) {
-        return VirtualConsolePlatform.N64;
-    } else if (code.startsWith('WUP-N-V')) {
-        return VirtualConsolePlatform.Wii;
-    } else if (code.startsWith('WUP-N-MN')) {
-        return VirtualConsolePlatform.MSX;
-    } else if (
-        code.startsWith('WUP-N-PA') ||
-        code.startsWith('WUP-N-PB') ||
-        code.startsWith('WUP-N-PC') ||
-        code.startsWith('WUP-N-PD')
-    ) {
-        return VirtualConsolePlatform.GBA;
-    } else if (code.startsWith('WUP-N-PN')) {
-        return VirtualConsolePlatform.PCE;
-    }
-
-    return null;
-}
+export type StorageCopyOperation = 'copy' | 'move';
+export type StorageCopyState = 'queued' | 'copying' | 'failed' | 'complete';
+export type StorageCopyItem = {
+    id: string;
+    operation: StorageCopyOperation;
+    sourcePath: string;
+    destinationPath: string;
+    state: StorageCopyState;
+    progress: number | null;
+    message: string | null;
+    sourceSizeBytes: number | null;
+    completedFiles: number | null;
+    totalFiles: number | null;
+    currentSizeBytes: number | null;
+    currentFilePath: string | null;
+    cancelContext?: CopyCancelContext;
+    error: string | null;
+};
 
 export function toArray<T>(value: T | readonly T[] | null | undefined): T[] {
     if (value == null) {
@@ -64,10 +56,6 @@ export function toArray<T>(value: T | readonly T[] | null | undefined): T[] {
     return Array.isArray(value)
         ? Array.from(value as readonly T[])
         : [value as T];
-}
-
-export function normalizeTitleName(name: string): string {
-    return name.replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim() || 'Unknown';
 }
 
 export function formatSize(sizeBytes: number | null): string {
@@ -115,106 +103,3 @@ export async function mapConcurrent<T, U>(
     await Promise.all(workers);
     return results;
 }
-
-export const PARENT_KINDS = [
-    TitleKinds.vWii,
-    TitleKinds.Base,
-    TitleKinds.Demo,
-    TitleKinds.FCT,
-    TitleKinds.SystemApp,
-    TitleKinds.SystemData,
-    TitleKinds.SystemApplet,
-] as const;
-
-export const CHILD_KINDS = [TitleKinds.DLC, TitleKinds.Update] as const;
-
-export type ParentKind = (typeof PARENT_KINDS)[number];
-export type ChildKind = (typeof CHILD_KINDS)[number];
-export type TitleGroupStatus =
-    | 'complete'
-    | 'incomplete'
-    | 'missing'
-    | 'unavailable'
-    | 'unknown';
-
-export type RawTitleDatabaseEntry = {
-    titleId: string;
-    name: string;
-    region: string;
-    companyCode: string | null;
-    iconUrl: string | null;
-    productCode: string | null;
-    baseVersions: number[];
-    updates: number[];
-    dlc: number[];
-    availableOnCdn?: 'Yes' | 'No';
-};
-
-export type TitleDatabaseEntry = {
-    titleId: string;
-    name: string;
-    region: string | null;
-    companyCode: string | null;
-    iconUrl: string | null;
-    productCode: string | null;
-    baseVersions: number[];
-    updates: number[];
-    dlc: number[];
-    availableOnCdn?: 'Yes' | 'No';
-
-    family: string;
-};
-
-export type TitleEntry = {
-    titleId: string;
-    version: number;
-    titleName: string;
-    region: string | null;
-
-    iconUrl: string | null;
-    kind: TitleKinds;
-    sizeBytes: number;
-};
-
-export type TitleInputControl = {
-    type: string;
-    required: boolean;
-};
-
-export type TitleDetails = {
-    tvFormat: string | null;
-    languages: string[];
-    synopsis: string | null;
-    developer: string | null;
-    genre: string[];
-    inputPlayers: number | null;
-    inputControls: TitleInputControl[];
-    sizeBytes: number | null;
-};
-
-export type AvailableTitleEntry = {
-    kind: TitleKinds.Base | TitleKinds.Update | TitleKinds.DLC;
-    titleId: string;
-    versions: number[];
-    availableOnCdn: boolean;
-};
-
-export type TitleGroup = {
-    name: string;
-    region: string | null;
-    productCode: string | null;
-    iconUrl: string | null;
-    details: TitleDetails | null;
-    availableEntries: AvailableTitleEntry[];
-
-    entries: TitleEntry[];
-
-    family: string;
-    titleInDatabase: boolean;
-    expectedChildren: ChildKind[];
-    status: TitleGroupStatus;
-};
-
-export type LibraryResponse = {
-    groups: TitleGroup[];
-};
