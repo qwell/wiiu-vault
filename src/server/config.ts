@@ -168,7 +168,7 @@ function getDefaultConfig(): AppConfig {
 function getConfigPathCandidates(): string[] {
     return [
         path.join(process.cwd(), 'config.json'),
-        path.join(getAppRoot(), 'config.json'),
+        path.join(getAppRoot(import.meta.url), 'config.json'),
         path.join(getUserAppRoot(), 'config.json'),
     ].filter((candidate, index, candidates) => {
         return candidates.indexOf(candidate) === index;

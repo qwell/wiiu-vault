@@ -1,15 +1,22 @@
 {
     "name": "wiiu-vault",
+    "description": "Wii U Vault",
     "version": "0.1.1",
     "repository": "https://github.com/qwell/wiiu-vault",
     "author": "Jason Parker",
     "license": "GPL-3.0-or-later",
     "main": "dist/index.js",
     "type": "module",
-    "typings": "dist/index.d.ts",
+    "typings": "dist/server/index.d.ts",
     "files": [
         "dist/"
     ],
+    "imports": {
+        "#server": {
+            "types": "./src/server/index.ts",
+            "default": "./dist/server/index.js"
+        }
+    },
     "engines": {
         "node": ">=24.0.0"
     },
@@ -19,13 +26,18 @@
         "format": "prettier --write --cache --cache-strategy metadata --cache-location ./.cache/prettier .",
         "hygiene": "yarn format && yarn lint",
         "clean": "rimraf dist/ release/ .cache/",
-        "build": "tsx scripts/build.ts",
+        "build": "tsx scripts/build.ts && yarn build:types",
+        "build:types": "tsc -p tsconfig.server.json --emitDeclarationOnly --declaration --declarationMap --tsBuildInfoFile .cache/.tsbuildinfo.server-declarations",
         "start": "tsx scripts/start.ts",
         "test": "vitest run",
         "release": "yarn clean && yarn build && tsx scripts/release.ts all",
         "release:stage": "yarn clean && yarn build && tsx scripts/release.ts stage",
         "release:zip": "tsx scripts/release.ts zip",
-        "generate:titles": "tsx scripts/generate-titles.ts"
+        "generate:titles": "tsx scripts/generate-titles.ts",
+        "electron:stage": "node scripts/electron-stage.ts",
+        "electron:pack": "yarn build && yarn electron:stage && electron-builder --projectDir dist --dir -c.electronVersion=42.0.1",
+        "electron:dist": "yarn build && yarn electron:stage && electron-builder --projectDir dist --publish never -c.electronVersion=42.0.1",
+        "electron:run": "release/linux-unpacked/wiiu-vault"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -40,6 +52,7 @@
         "@typescript-eslint/parser": "^8.58.2",
         "@yarnpkg/sdks": "^3.2.3",
         "adm-zip": "^0.5.17",
+        "electron-builder": "26.8.1",
         "eslint": "^10.2.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",

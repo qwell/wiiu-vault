@@ -2,17 +2,11 @@ import express, { type Request, type Response } from 'express';
 import open from 'open';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { createServer } from 'node:http';
-import { WebSocket, WebSocketServer, type RawData } from 'ws';
+import { WebSocket, type RawData } from 'ws';
 import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
-import {
-    getConfig,
-    loadConfig,
-    saveConfig,
-    validateWiiURoot,
-} from './config.js';
+import { loadConfig, saveConfig, validateWiiURoot } from './config.js';
 import {
     downloadNusTitleMetadata,
     generateTitleInstallFiles,
@@ -52,14 +46,13 @@ import {
 import { getPathStats } from '../shared/file.js';
 import logger from '../shared/logger.js';
 import { DownloadQueueItem, StorageCopyItem } from '../shared/shared.js';
+import { RunningServer, server, StartOptions } from './server.js';
+
+export { type RunningServer, loadConfig };
 
 const config = loadConfig();
 
-const app = express();
-const host = config.host;
-const port = config.port;
-
-const clientDir = path.join(getAppRoot(), 'client');
+const clientDir = path.join(getAppRoot(import.meta.url), 'client');
 
 let activeStorageCopyPid: number | null = null;
 
@@ -378,7 +371,11 @@ function sendAppSocketEvent(socket: WebSocket, event: AppSocketEvent): void {
 }
 
 function broadcastAppSocketEvent(event: AppSocketEvent): void {
-    for (const client of socketServer.clients) {
+    if (!runningServer) {
+        return;
+    }
+
+    for (const client of runningServer.websocket.clients) {
         sendAppSocketEvent(client, event);
     }
 }
@@ -715,7 +712,7 @@ async function downloadTitle(
     onProgress?: (progress: TitleDownloadProgress) => void,
     signal?: AbortSignal
 ): Promise<DownloadTitleResult> {
-    const romRoot = await findFirstReadableWiiURoot(getConfig().wiiuRoots);
+    const romRoot = await findFirstReadableWiiURoot(config.wiiuRoots);
 
     return generateTitleInstallFiles(titleId, romRoot, {
         onProgress,
@@ -1078,7 +1075,7 @@ type StorageTransferQueueResult = {
 function queueStorageTransfer(
     input: StorageTransferQueueInput
 ): StorageTransferQueueResult {
-    const sourcePath = input.sourcePath ?? getConfig().wiiuRoots[0];
+    const sourcePath = input.sourcePath ?? config.wiiuRoots[0];
     if (!sourcePath) {
         return {
             status: 400,
@@ -1149,7 +1146,7 @@ function formatUrlHost(host: string): string {
     return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
 }
 
-function getBrowserUrl(host: string, port: number): string {
+export function getBrowserUrl(host: string, port: number): string {
     const browserHost =
         host === '0.0.0.0' || host === '::' ? '127.0.0.1' : host;
     return `http://${formatUrlHost(browserHost)}:${port}`;
@@ -1393,341 +1390,349 @@ async function processStorageCopyQueue(): Promise<void> {
     }
 }
 
-app.use((req, _res, next) => {
-    logger.log('server', `${req.method} ${req.url}`);
-    next();
-});
-
-app.use(express.json());
-app.use(
-    express.static(clientDir, {
-        etag: false,
-        setHeaders(res) {
-            res.setHeader('Cache-Control', 'no-store');
-        },
-    })
-);
-
-app.get('/api/config', (_req, res) => {
-    res.json({
-        config: getConfig(),
-        restartRequired: false,
+function setupApp(app: express.Express) {
+    app.use((req, _res, next) => {
+        logger.log('server', `${req.method} ${req.url}`);
+        next();
     });
-});
 
-app.post('/api/config/validate-root', async (req, res) => {
-    try {
-        const root = getConfigRootBodyValue(req.body as unknown);
-        const response: AppConfigValidateRootResponse =
-            await validateWiiURoot(root);
-        res.json(response);
-    } catch (error) {
-        logServerError('Failed to validate Wii U root:', error);
-        sendServerError(res, 'Failed to validate Wii U root', error, {
-            includeDetails: true,
-        });
-    }
-});
+    app.use(express.json());
+    app.use(
+        express.static(clientDir, {
+            etag: false,
+            setHeaders(res) {
+                res.setHeader('Cache-Control', 'no-store');
+            },
+        })
+    );
 
-app.post('/api/config', (req, res) => {
-    try {
-        const response: AppConfigResponse = saveConfig(
-            req.body as AppConfigUpdate
-        );
-        res.json(response);
-    } catch (error) {
-        logServerError('Failed to save config:', error);
-        sendServerError(res, 'Failed to save config', error, {
-            includeDetails: true,
-        });
-    }
-});
-
-app.get('/api/library', async (req, res) => {
-    try {
-        const includeAll = req.query.includeAll === 'true';
-        const groups = await scanWiiUTitleRoots(getConfig().wiiuRoots, {
-            includeAll,
-        });
-
+    app.get('/api/config', (_req, res) => {
         res.json({
-            groups,
+            config: config,
+            restartRequired: false,
         });
-    } catch (error) {
-        logServerError('Failed to scan library:', error);
-        sendServerError(res, 'Failed to scan library', error);
-    }
-});
+    });
 
-app.get('/api/library/validate', async (_req, res) => {
-    try {
-        broadcastLibraryValidationStatus({
-            type: 'library.validationStatus',
-            status: 'started',
-        });
+    app.post('/api/config/validate-root', async (req, res) => {
+        try {
+            const root = getConfigRootBodyValue(req.body as unknown);
+            const response: AppConfigValidateRootResponse =
+                await validateWiiURoot(root);
+            res.json(response);
+        } catch (error) {
+            logServerError('Failed to validate Wii U root:', error);
+            sendServerError(res, 'Failed to validate Wii U root', error, {
+                includeDetails: true,
+            });
+        }
+    });
 
-        const titles = await validateWiiUTitleRoots(
-            getConfig().wiiuRoots,
-            (progress) => {
-                broadcastLibraryValidationStatus({
-                    type: 'library.validationStatus',
-                    ...progress,
+    app.post('/api/config', (req, res) => {
+        try {
+            const response: AppConfigResponse = saveConfig(
+                req.body as AppConfigUpdate
+            );
+            res.json(response);
+        } catch (error) {
+            logServerError('Failed to save config:', error);
+            sendServerError(res, 'Failed to save config', error, {
+                includeDetails: true,
+            });
+        }
+    });
+
+    app.get('/api/library', async (req, res) => {
+        try {
+            const includeAll = req.query.includeAll === 'true';
+            const groups = await scanWiiUTitleRoots(config.wiiuRoots, {
+                includeAll,
+            });
+
+            res.json({
+                groups,
+            });
+        } catch (error) {
+            logServerError('Failed to scan library:', error);
+            sendServerError(res, 'Failed to scan library', error);
+        }
+    });
+
+    app.get('/api/library/validate', async (_req, res) => {
+        try {
+            broadcastLibraryValidationStatus({
+                type: 'library.validationStatus',
+                status: 'started',
+            });
+
+            const titles = await validateWiiUTitleRoots(
+                config.wiiuRoots,
+                (progress) => {
+                    broadcastLibraryValidationStatus({
+                        type: 'library.validationStatus',
+                        ...progress,
+                    });
+                }
+            );
+            const failed = titles.filter(
+                (title) => title.status !== 'ok'
+            ).length;
+
+            broadcastLibraryValidationStatus({
+                type: 'library.validationStatus',
+                status: 'complete',
+                total: titles.length,
+                failed,
+            });
+
+            res.json({
+                status: failed === 0 ? 'ok' : 'failed',
+                total: titles.length,
+                failed,
+                titles,
+            });
+        } catch (error) {
+            const message =
+                error instanceof Error ? error.message : String(error);
+            broadcastLibraryValidationStatus({
+                type: 'library.validationStatus',
+                status: 'failed',
+                error: message,
+            });
+
+            logServerError('Failed to validate library:', error);
+            sendServerError(res, 'Failed to validate library', error, {
+                includeDetails: true,
+            });
+        }
+    });
+
+    app.get('/api/storage/copy', (req, res) => {
+        try {
+            const result = queueStorageTransfer(
+                getStorageTransferQueueInput(req, false)
+            );
+            res.status(result.status).json(result.body);
+        } catch (error) {
+            logServerError('Failed to queue storage copy:', error);
+            sendServerError(res, 'Failed to queue storage copy', error, {
+                includeDetails: true,
+            });
+        }
+    });
+
+    app.get('/api/storage/move', (req, res) => {
+        try {
+            const result = queueStorageTransfer(
+                getStorageTransferQueueInput(req, true)
+            );
+            res.status(result.status).json(result.body);
+        } catch (error) {
+            logServerError('Failed to queue storage move:', error);
+            sendServerError(res, 'Failed to queue storage move', error, {
+                includeDetails: true,
+            });
+        }
+    });
+
+    app.get('/api/storage/list-fat32', async (_req, res) => {
+        try {
+            const [runtimeOs, volumes] = await Promise.all([
+                getRuntimeOs(),
+                listFat32Volumes(),
+            ]);
+
+            res.json({
+                runtimeOs,
+                volumes,
+            });
+        } catch (error) {
+            logServerError('Failed to list FAT32 volumes:', error);
+            sendServerError(res, 'Failed to list FAT32 volumes', error, {
+                includeDetails: true,
+            });
+        }
+    });
+
+    app.get('/api/title-icon/:family', async (req, res) => {
+        try {
+            const iconUrl = await getTitleIconUrl(req.params.family);
+
+            if (!iconUrl) {
+                res.status(404).json({
+                    error: 'Missing title icon',
                 });
+                return;
             }
-        );
-        const failed = titles.filter((title) => title.status !== 'ok').length;
 
-        broadcastLibraryValidationStatus({
-            type: 'library.validationStatus',
-            status: 'complete',
-            total: titles.length,
-            failed,
-        });
+            const image = await getCachedImage(iconUrl);
+            res.set('Cache-Control', 'public, max-age=31536000, immutable');
+            res.set('Content-Type', image.contentType);
+            res.send(image.body);
+        } catch (error) {
+            logServerError('Failed to load title icon:', error);
+            sendServerError(res, 'Failed to load title icon', error);
+        }
+    });
 
-        res.json({
-            status: failed === 0 ? 'ok' : 'failed',
-            total: titles.length,
-            failed,
-            titles,
-        });
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        broadcastLibraryValidationStatus({
-            type: 'library.validationStatus',
-            status: 'failed',
-            error: message,
-        });
-
-        logServerError('Failed to validate library:', error);
-        sendServerError(res, 'Failed to validate library', error, {
-            includeDetails: true,
-        });
-    }
-});
-
-app.get('/api/storage/copy', (req, res) => {
-    try {
-        const result = queueStorageTransfer(
-            getStorageTransferQueueInput(req, false)
-        );
-        res.status(result.status).json(result.body);
-    } catch (error) {
-        logServerError('Failed to queue storage copy:', error);
-        sendServerError(res, 'Failed to queue storage copy', error, {
-            includeDetails: true,
-        });
-    }
-});
-
-app.get('/api/storage/move', (req, res) => {
-    try {
-        const result = queueStorageTransfer(
-            getStorageTransferQueueInput(req, true)
-        );
-        res.status(result.status).json(result.body);
-    } catch (error) {
-        logServerError('Failed to queue storage move:', error);
-        sendServerError(res, 'Failed to queue storage move', error, {
-            includeDetails: true,
-        });
-    }
-});
-
-app.get('/api/storage/list-fat32', async (_req, res) => {
-    try {
-        const [runtimeOs, volumes] = await Promise.all([
-            getRuntimeOs(),
-            listFat32Volumes(),
-        ]);
-
-        res.json({
-            runtimeOs,
-            volumes,
-        });
-    } catch (error) {
-        logServerError('Failed to list FAT32 volumes:', error);
-        sendServerError(res, 'Failed to list FAT32 volumes', error, {
-            includeDetails: true,
-        });
-    }
-});
-
-app.get('/api/title-icon/:family', async (req, res) => {
-    try {
-        const iconUrl = await getTitleIconUrl(req.params.family);
-
-        if (!iconUrl) {
-            res.status(404).json({
-                error: 'Missing title icon',
-            });
+    app.get('/api/title-metadata', async (req, res) => {
+        const titleId = requireTitleIdQuery(req, res);
+        if (!titleId) {
             return;
         }
 
-        const image = await getCachedImage(iconUrl);
-        res.set('Cache-Control', 'public, max-age=31536000, immutable');
-        res.set('Content-Type', image.contentType);
-        res.send(image.body);
-    } catch (error) {
-        logServerError('Failed to load title icon:', error);
-        sendServerError(res, 'Failed to load title icon', error);
-    }
-});
+        try {
+            const metadata = await downloadNusTitleMetadata(titleId);
 
-app.get('/api/title-metadata', async (req, res) => {
-    const titleId = requireTitleIdQuery(req, res);
-    if (!titleId) {
-        return;
-    }
+            if (!metadata) {
+                res.status(404).json({
+                    error: 'Failed to parse title metadata',
+                });
+                return;
+            }
 
-    try {
-        const metadata = await downloadNusTitleMetadata(titleId);
-
-        if (!metadata) {
-            res.status(404).json({
-                error: 'Failed to parse title metadata',
+            res.json({
+                titleId: metadata.titleId,
+                name: metadata.name,
+                region: metadata.region,
+                productCode: metadata.productCode,
+                companyCode: metadata.companyCode,
+                baseVersions:
+                    metadata.titleVersion === null
+                        ? []
+                        : [metadata.titleVersion],
+                metaJson: metadata.metaJson,
+                titleKey: metadata.titleKey
+                    ? Buffer.from(metadata.titleKey).toString('hex')
+                    : null,
+                titleKeyPassword: metadata.titleKeyPassword,
             });
+        } catch (error) {
+            logServerError('Failed to download title metadata:', error);
+            sendServerError(res, 'Failed to download title metadata', error, {
+                includeDetails: true,
+            });
+        }
+    });
+
+    app.get('/api/title-all', async (req, res) => {
+        const titleId = requireTitleIdQuery(req, res);
+        if (!titleId) {
             return;
         }
 
-        res.json({
-            titleId: metadata.titleId,
-            name: metadata.name,
-            region: metadata.region,
-            productCode: metadata.productCode,
-            companyCode: metadata.companyCode,
-            baseVersions:
-                metadata.titleVersion === null ? [] : [metadata.titleVersion],
-            metaJson: metadata.metaJson,
-            titleKey: metadata.titleKey
-                ? Buffer.from(metadata.titleKey).toString('hex')
-                : null,
-            titleKeyPassword: metadata.titleKeyPassword,
-        });
-    } catch (error) {
-        logServerError('Failed to download title metadata:', error);
-        sendServerError(res, 'Failed to download title metadata', error, {
-            includeDetails: true,
-        });
-    }
-});
+        try {
+            const [metadata, updateMetadata, dlcMetadata] = await Promise.all([
+                downloadNusTitleMetadata(titleId),
+                getUpdateMetadata(titleId),
+                getDlcMetadata(titleId),
+            ]);
 
-app.get('/api/title-all', async (req, res) => {
-    const titleId = requireTitleIdQuery(req, res);
-    if (!titleId) {
-        return;
-    }
+            if (!metadata) {
+                res.status(404).json({
+                    error: 'Failed to parse title metadata',
+                });
+                return;
+            }
 
-    try {
-        const [metadata, updateMetadata, dlcMetadata] = await Promise.all([
-            downloadNusTitleMetadata(titleId),
-            getUpdateMetadata(titleId),
-            getDlcMetadata(titleId),
-        ]);
-
-        if (!metadata) {
-            res.status(404).json({
-                error: 'Failed to parse title metadata',
+            res.json({
+                titleId: metadata.titleId,
+                name: metadata.name,
+                region: metadata.region,
+                productCode: metadata.productCode,
+                companyCode: metadata.companyCode,
+                baseVersions:
+                    metadata.titleVersion === null
+                        ? []
+                        : [metadata.titleVersion],
+                titleKey: metadata.titleKey
+                    ? Buffer.from(metadata.titleKey).toString('hex')
+                    : null,
+                titleKeyPassword: metadata.titleKeyPassword,
+                updates:
+                    updateMetadata.exists &&
+                    updateMetadata.titleVersion !== null
+                        ? [updateMetadata.titleVersion]
+                        : [],
+                dlc:
+                    dlcMetadata.exists && dlcMetadata.titleVersion !== null
+                        ? [dlcMetadata.titleVersion]
+                        : [],
             });
+        } catch (error) {
+            logServerError('Failed to load full title metadata:', error);
+            sendServerError(res, 'Failed to load full title metadata', error, {
+                includeDetails: true,
+            });
+        }
+    });
+
+    app.get('/api/title-download', async (req, res) => {
+        const titleId = requireTitleIdQuery(req, res);
+        if (!titleId) {
             return;
         }
 
-        res.json({
-            titleId: metadata.titleId,
-            name: metadata.name,
-            region: metadata.region,
-            productCode: metadata.productCode,
-            companyCode: metadata.companyCode,
-            baseVersions:
-                metadata.titleVersion === null ? [] : [metadata.titleVersion],
-            titleKey: metadata.titleKey
-                ? Buffer.from(metadata.titleKey).toString('hex')
-                : null,
-            titleKeyPassword: metadata.titleKeyPassword,
-            updates:
-                updateMetadata.exists && updateMetadata.titleVersion !== null
-                    ? [updateMetadata.titleVersion]
-                    : [],
-            dlc:
-                dlcMetadata.exists && dlcMetadata.titleVersion !== null
-                    ? [dlcMetadata.titleVersion]
-                    : [],
-        });
-    } catch (error) {
-        logServerError('Failed to load full title metadata:', error);
-        sendServerError(res, 'Failed to load full title metadata', error, {
-            includeDetails: true,
-        });
-    }
-});
+        try {
+            res.json(await downloadTitle(titleId));
+        } catch (error) {
+            logServerError('Failed to download title:', error);
+            sendServerError(res, 'Failed to download title', error, {
+                includeDetails: true,
+            });
+        }
+    });
 
-app.get('/api/title-download', async (req, res) => {
-    const titleId = requireTitleIdQuery(req, res);
-    if (!titleId) {
-        return;
-    }
+    app.get('/api/title-update', async (req, res) => {
+        const titleId = requireTitleIdQuery(req, res);
+        if (!titleId) {
+            return;
+        }
 
-    try {
-        res.json(await downloadTitle(titleId));
-    } catch (error) {
-        logServerError('Failed to download title:', error);
-        sendServerError(res, 'Failed to download title', error, {
-            includeDetails: true,
-        });
-    }
-});
+        try {
+            const metadata = await getUpdateMetadata(titleId);
+            res.json({
+                titleId: metadata.titleId,
+                updateTitleId: metadata.childTitleId,
+                exists: metadata.exists,
+                titleVersion: metadata.titleVersion,
+            });
+        } catch (error) {
+            logServerError('Failed to load title update metadata:', error);
+            sendServerError(
+                res,
+                'Failed to load title update metadata',
+                error,
+                {
+                    includeDetails: true,
+                }
+            );
+        }
+    });
 
-app.get('/api/title-update', async (req, res) => {
-    const titleId = requireTitleIdQuery(req, res);
-    if (!titleId) {
-        return;
-    }
+    app.get('/api/title-dlc', async (req, res) => {
+        const titleId = requireTitleIdQuery(req, res);
+        if (!titleId) {
+            return;
+        }
 
-    try {
-        const metadata = await getUpdateMetadata(titleId);
-        res.json({
-            titleId: metadata.titleId,
-            updateTitleId: metadata.childTitleId,
-            exists: metadata.exists,
-            titleVersion: metadata.titleVersion,
-        });
-    } catch (error) {
-        logServerError('Failed to load title update metadata:', error);
-        sendServerError(res, 'Failed to load title update metadata', error, {
-            includeDetails: true,
-        });
-    }
-});
+        try {
+            const metadata = await getDlcMetadata(titleId);
+            res.json({
+                titleId: metadata.titleId,
+                dlcTitleId: metadata.childTitleId,
+                exists: metadata.exists,
+                titleVersion: metadata.titleVersion,
+            });
+        } catch (error) {
+            logServerError('Failed to load title DLC metadata:', error);
+            sendServerError(res, 'Failed to load title DLC metadata', error, {
+                includeDetails: true,
+            });
+        }
+    });
+}
 
-app.get('/api/title-dlc', async (req, res) => {
-    const titleId = requireTitleIdQuery(req, res);
-    if (!titleId) {
-        return;
-    }
-
-    try {
-        const metadata = await getDlcMetadata(titleId);
-        res.json({
-            titleId: metadata.titleId,
-            dlcTitleId: metadata.childTitleId,
-            exists: metadata.exists,
-            titleVersion: metadata.titleVersion,
-        });
-    } catch (error) {
-        logServerError('Failed to load title DLC metadata:', error);
-        sendServerError(res, 'Failed to load title DLC metadata', error, {
-            includeDetails: true,
-        });
-    }
-});
-
-const server = createServer(app);
-
-const socketServer = new WebSocketServer({
-    server,
-    path: '/api/socket',
-});
-
-socketServer.on('connection', (socket) => {
+function onWebSocketConnection(socket: WebSocket) {
     logger.log('server', 'WebSocket client connected');
 
     sendAppSocketEvent(socket, {
@@ -1744,7 +1749,9 @@ socketServer.on('connection', (socket) => {
 
         const commandType = (() => {
             try {
-                const raw = JSON.parse(commandText) as { type?: unknown };
+                const raw = JSON.parse(commandText) as {
+                    type?: unknown;
+                };
                 return typeof raw.type === 'string'
                     ? raw.type
                     : `invalid:${String(raw.type)}`;
@@ -1777,29 +1784,71 @@ socketServer.on('connection', (socket) => {
             `WebSocket client error: ${formatLogError(error)}`
         );
     });
-});
+}
 
-server.on('error', (error: NodeJS.ErrnoException) => {
-    logger.error(
-        'server',
-        `Failed to listen at ${getListenUrl(host, port)}: ${error.message}`
-    );
-    process.exit(1);
-});
+let runningServer: RunningServer | null = null;
+/*
+if (!runningServer) {
+    await startServer({
+        host: config.host,
+        port: config.port,
+        openBrowser: true,
+    });
+}
+*/
 
-server.on('listening', () => {
-    logger.log('server', `Listening at ${getListenUrl(host, port)}`);
+export function startServer(options: StartOptions): RunningServer {
+    const { host, port } = options;
 
-    if (config.openBrowser) {
-        const url = getBrowserUrl(host, port);
-        logger.log('server', `Opening browser at ${url}`);
-        void open(url).catch((error: unknown) => {
-            logger.warn(
-                'server',
-                `Failed to open browser: ${formatLogError(error)}`
-            );
-        });
+    const app = express();
+    setupApp(app);
+
+    const onListening = () => {
+        const { host, port, openBrowser } = options;
+
+        logger.log('server', `Listening at ${getListenUrl(host, port)}`);
+
+        if (openBrowser) {
+            const url = getBrowserUrl(host, port);
+            logger.log('server', `Opening browser at ${url}`);
+            void open(url).catch((error: unknown) => {
+                logger.warn(
+                    'server',
+                    `Failed to open browser: ${formatLogError(error)}`
+                );
+            });
+        }
+    };
+
+    const onError = (error: NodeJS.ErrnoException) => {
+        logger.error(
+            'server',
+            `Failed to listen at ${getListenUrl(host, port)}: ${error.message}`
+        );
+        process.exit(1);
+    };
+
+    runningServer = server.start(app, {
+        ...options,
+        onListening,
+        onError,
+    });
+
+    if (!runningServer?.server) {
+        throw new Error('Could not start web server.');
     }
-});
 
-server.listen(port, host);
+    if (!runningServer?.websocket) {
+        throw new Error('Could not start web socket.');
+    }
+
+    runningServer.websocket.on('connection', onWebSocketConnection);
+
+    return runningServer;
+}
+
+export function stopServer() {
+    if (runningServer?.server) {
+        runningServer.server.close();
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "rootDir": ".",
+        "types": ["node", "electron"],
+        "noEmit": true
+    },
+    "include": ["electron/**/*.ts", "electron/**/*.d.ts"]
+}
