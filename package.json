@@ -21,6 +21,7 @@
         "clean": "rimraf dist/ release/ .cache/",
         "build": "tsx scripts/build.ts",
         "start": "tsx scripts/start.ts",
+        "start:raw": "yarn build && APP_ROOT=\"$PWD/dist\" node dist/server/index.js",
         "test": "vitest run",
         "release": "yarn clean && yarn build && tsx scripts/release.ts all",
         "release:stage": "yarn clean && yarn build && tsx scripts/release.ts stage",
