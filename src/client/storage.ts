@@ -3,7 +3,6 @@ import {
     StorageCopyItem,
     StorageDeleteItem,
 } from '../shared/shared.js';
-import { TitleKinds } from '../shared/titles.js';
 import {
     createActionBarCell,
     createActionButton,
@@ -64,18 +63,8 @@ export function formatStorageCopySize(item: StorageCopyItem): string {
         : '-';
 }
 
-function formatStorageTitleKind(kind: TitleKinds | null): string | null {
-    if (kind === null) {
-        return null;
-    }
-
-    return kind === TitleKinds.Base ? 'Game' : kind;
-}
-
 export function formatStorageCopyTitle(item: StorageCopyItem): string {
-    const title = item.sourceName;
-    const kind = formatStorageTitleKind(item.titleKind);
-    return kind && !title.includes(`[${kind}]`) ? `${title} [${kind}]` : title;
+    return item.sourceName;
 }
 
 export function formatStorageCopyState(item: StorageCopyItem): string {
@@ -249,9 +238,7 @@ export function formatStorageDeleteProgress(item: StorageDeleteItem): string {
 }
 
 export function formatStorageDeleteTitle(item: StorageDeleteItem): string {
-    const title = item.titleName ?? item.titleId;
-    const kind = formatStorageTitleKind(item.titleKind);
-    return kind ? `${title} [${kind}]` : title;
+    return item.titleName ?? item.titleId;
 }
 
 export function formatStorageDeleteState(item: StorageDeleteItem): string {

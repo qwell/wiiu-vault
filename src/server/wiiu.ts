@@ -111,7 +111,7 @@ function getTitleName(dirname: string, databaseName: string | null): string {
     return 'Unknown';
 }
 
-function classifyTitleId(titleId: string): {
+export function classifyTitleId(titleId: string): {
     family: string;
     kind: TitleKinds;
 } {

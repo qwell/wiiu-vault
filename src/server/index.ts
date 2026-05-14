@@ -24,6 +24,7 @@ import {
 } from './metadata.js';
 import { getCachedImage } from './image-cache.js';
 import {
+    classifyTitleId,
     findFirstReadableWiiURoot,
     findWiiUTitleSourcePaths,
     getTitleIconUrl,
@@ -85,12 +86,17 @@ let libraryGroups: TitleGroup[] = [];
 
 function getLibraryCacheEntry(
     titleId: string
-): { name: string; kind: TitleKinds } | null {
-    for (const group of libraryGroups) {
-        const entry = group.entries.find((e) => e.titleId === titleId);
-        if (entry) return { name: group.name, kind: entry.kind };
+): { name: string; kind: TitleKinds | null } | null {
+    const normalized = titleId.toLowerCase();
+    const family = normalized.slice(8);
+    const group = libraryGroups.find((g) => g.family === family);
+    if (!group || !group.name) {
+        return null;
     }
-    return null;
+    const kind =
+        group.entries.find((e) => e.titleId.toLowerCase() === normalized)
+            ?.kind ?? null;
+    return { name: group.name, kind };
 }
 
 function getTitleKindDisplayName(kind: TitleKinds): string {
@@ -1454,12 +1460,13 @@ function queueStorageTransfer(
     }
 
     const cached = titleId ? getLibraryCacheEntry(titleId) : null;
+    const titleKind = titleId ? classifyTitleId(titleId).kind : null;
     const sourceName = sourcePath
         ? getStorageCopySourceName(sourcePath)
         : cached
-          ? formatTitleDisplayName(cached.name, titleId!, cached.kind)
+          ? formatTitleDisplayName(cached.name, titleId!, titleKind)
           : titleId
-            ? 'Loading...'
+            ? formatTitleDisplayName(null, titleId, titleKind)
             : 'Wii U root';
 
     const copyItem: StorageCopyItem = {
@@ -1467,7 +1474,7 @@ function queueStorageTransfer(
         operation,
         titleId,
         sourceName,
-        titleKind: null,
+        titleKind,
         destinationName: requestedDestination
             ? getStorageCopyDisplayName(requestedDestination)
             : '',
@@ -1554,20 +1561,17 @@ function queueStorageDelete(titleId: string): StorageTransferQueueResult {
     }
 
     const deleteId = randomUUID();
+    const deleteTitleKind = classifyTitleId(normalizedTitleId).kind;
+    const deleteCached = getLibraryCacheEntry(normalizedTitleId);
     const deleteItem: StorageDeleteItem = {
         id: deleteId,
         titleId: normalizedTitleId,
-        titleName: (() => {
-            const cached = getLibraryCacheEntry(normalizedTitleId);
-            return cached
-                ? formatTitleDisplayName(
-                      cached.name,
-                      normalizedTitleId,
-                      cached.kind
-                  )
-                : 'Loading...';
-        })(),
-        titleKind: null,
+        titleName: formatTitleDisplayName(
+            deleteCached?.name ?? null,
+            normalizedTitleId,
+            deleteTitleKind
+        ),
+        titleKind: deleteTitleKind,
         state: 'queued',
         message: 'Queued',
         deletedCount: 0,
