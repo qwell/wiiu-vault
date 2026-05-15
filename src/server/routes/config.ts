@@ -42,7 +42,7 @@ export function createConfigRouter(): Router {
                 await validateWiiURoot(root);
             res.json(response);
         } catch (error) {
-            logger.error(
+            logger.warn(
                 'server',
                 `Failed to validate Wii U root: ${formatLogError(error)}`
             );
@@ -60,7 +60,7 @@ export function createConfigRouter(): Router {
             logger.log('server', `config saved: ${JSON.stringify(response)}`);
             res.json(response);
         } catch (error) {
-            logger.error(
+            logger.warn(
                 'server',
                 `Failed to save config: ${formatLogError(error)}`
             );

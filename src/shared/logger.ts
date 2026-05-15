@@ -11,22 +11,6 @@ function message(color: string | string[], args: unknown[]): string {
     return `${colorPrefix}${format(...args)}${ansi.reset}`;
 }
 
-export function log(subsystem: Subsystems, ...args: unknown[]): void {
-    console.log(`${prefix(subsystem)} ${message([], args)}`);
-}
-
-export function info(subsystem: Subsystems, ...args: unknown[]): void {
-    console.info(`${prefix(subsystem)} ${message(ansi.blue, args)}`);
-}
-
-export function warn(subsystem: Subsystems, ...args: unknown[]): void {
-    console.warn(`${prefix(subsystem)} ${message(ansi.yellow, args)}`);
-}
-
-export function error(subsystem: Subsystems, ...args: unknown[]): void {
-    console.error(`${prefix(subsystem)} ${message(ansi.red, args)}`);
-}
-
 export function debug(subsystem: Subsystems, ...args: unknown[]): void {
     if (process.env.DEBUG !== '1') {
         return;
@@ -37,11 +21,27 @@ export function debug(subsystem: Subsystems, ...args: unknown[]): void {
     );
 }
 
+export function info(subsystem: Subsystems, ...args: unknown[]): void {
+    console.info(`${prefix(subsystem)} ${message(ansi.blue, args)}`);
+}
+
+export function log(subsystem: Subsystems, ...args: unknown[]): void {
+    console.log(`${prefix(subsystem)} ${message([], args)}`);
+}
+
+export function warn(subsystem: Subsystems, ...args: unknown[]): void {
+    console.warn(`${prefix(subsystem)} ${message(ansi.yellow, args)}`);
+}
+
+export function error(subsystem: Subsystems, ...args: unknown[]): void {
+    console.error(`${prefix(subsystem)} ${message(ansi.red, args)}`);
+}
+
 const logger = {
-    log,
+    debug,
     info,
+    log,
     warn,
     error,
-    debug,
 };
 export default logger;

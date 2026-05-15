@@ -126,7 +126,7 @@ export function createTitleRouter(): Router {
                         : [],
             });
         } catch (error) {
-            logger.error(
+            logger.warn(
                 'server',
                 `Failed to load full title metadata: ${formatLogError(error)}`
             );
@@ -145,7 +145,7 @@ export function createTitleRouter(): Router {
         try {
             res.json(await downloadTitle(titleId));
         } catch (error) {
-            logger.error(
+            logger.warn(
                 'server',
                 `Failed to download title: ${formatLogError(error)}`
             );

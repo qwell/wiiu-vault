@@ -54,7 +54,7 @@ export function createAppSocket({
 
             const command = parseSocketCommand(data);
             if (!command) {
-                logger.error(
+                logger.warn(
                     'server',
                     `socket command rejected: ${commandType} payload=${commandText}`
                 );
@@ -70,11 +70,11 @@ export function createAppSocket({
         });
 
         socket.on('close', () => {
-            logger.warn('server', 'WebSocket client disconnected');
+            logger.log('server', 'WebSocket client disconnected');
         });
 
         socket.on('error', (error) => {
-            logger.error('server', `WebSocket client error: ${error.message}`);
+            logger.warn('server', `WebSocket client error: ${error.message}`);
         });
     });
 

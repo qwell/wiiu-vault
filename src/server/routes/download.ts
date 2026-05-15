@@ -162,7 +162,7 @@ function cancelActiveDownload(item: DownloadQueueItem): void {
     const abortController = activeDownloadAbortControllers.get(item.id);
     abortController?.abort();
 
-    logger.error(
+    logger.log(
         'server',
         `download abort signaled: id=${item.id} signalAborted=${abortController?.signal.aborted ? 'yes' : 'no'}`
     );
@@ -199,7 +199,7 @@ export function handleDownloadSocketCommand(
                 const key = getDownloadQueueKey(item);
 
                 if (existingKeys.has(key)) {
-                    logger.error(
+                    logger.log(
                         'server',
                         `download queue rejected: existing key=${JSON.stringify(key)} existing=${downloadQueue
                             .filter(
@@ -220,7 +220,7 @@ export function handleDownloadSocketCommand(
             });
 
             if (newItems.length === 0) {
-                logger.warn('server', 'download queue ignored: no new items');
+                logger.log('server', 'download queue ignored: no new items');
                 return;
             }
 
@@ -285,7 +285,7 @@ export function handleDownloadSocketCommand(
             );
 
             if (!item) {
-                logger.warn(
+                logger.log(
                     'server',
                     `download clear ignored: id=${command.id} item=missing`
                 );
@@ -331,7 +331,7 @@ export function handleDownloadSocketCommand(
             );
 
             if (!item) {
-                logger.warn(
+                logger.log(
                     'server',
                     `download cancel ignored: id=${command.id} item=missing`
                 );
@@ -371,7 +371,7 @@ export function handleDownloadSocketCommand(
                 return;
             }
 
-            logger.warn(
+            logger.log(
                 'server',
                 `download cancel ignored: id=${command.id} item=${item.state}:${item.titleId}`
             );

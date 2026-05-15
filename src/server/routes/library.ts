@@ -35,7 +35,7 @@ export function createLibraryRouter(): Router {
                 groups,
             });
         } catch (error) {
-            logger.error(
+            logger.warn(
                 'server',
                 `Failed to scan library: ${formatLogError(error)}`
             );
@@ -85,7 +85,7 @@ export function createLibraryRouter(): Router {
                 error: message,
             });
 
-            logger.error(
+            logger.warn(
                 'server',
                 `Failed to validate library: ${formatLogError(error)}`
             );

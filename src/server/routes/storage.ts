@@ -481,7 +481,7 @@ export async function processStorageDeleteQueue(): Promise<void> {
         nextItem.error = error instanceof Error ? error.message : String(error);
         nextItem.message = nextItem.error;
 
-        logger.error(
+        logger.warn(
             'server',
             `Storage delete failed: ${formatLogError(error)}`
         );
@@ -627,7 +627,7 @@ function clearStorageCopy(id: string): void {
         storageCopyQueue.find((candidate) => candidate.id === id) ?? null;
 
     if (!item) {
-        logger.warn('server', `storage copy clear ignored: missing id=${id}`);
+        logger.log('server', `storage copy clear ignored: missing id=${id}`);
         broadcastStorageCopies();
         return;
     }
@@ -666,7 +666,7 @@ function cancelStorageCopy(id: string): void {
         storageCopyQueue.find((candidate) => candidate.id === id) ?? null;
 
     if (!item) {
-        logger.warn('server', `storage copy cancel ignored: missing id=${id}`);
+        logger.log('server', `storage copy cancel ignored: missing id=${id}`);
         broadcastStorageCopies();
         return;
     }
@@ -690,7 +690,7 @@ function cancelStorageCopy(id: string): void {
             cancelStorageCopyProcess(id, item);
         }
     } catch (error) {
-        logger.error(
+        logger.warn(
             'server',
             `Failed to cancel storage copy: ${formatLogError(error)}`
         );
@@ -748,7 +748,7 @@ function clearStorageDeleteFromState(id: string): StorageDeleteItem | null {
 function clearStorageDelete(id: string): void {
     const item = clearStorageDeleteFromState(id);
     if (!item) {
-        logger.warn('server', `storage delete clear ignored: missing id=${id}`);
+        logger.log('server', `storage delete clear ignored: missing id=${id}`);
     }
     broadcastStorageDeletes();
 }
