@@ -1,5 +1,6 @@
 import { DownloadQueueItem } from '../../shared/download.js';
 import logger from '../../shared/logger.js';
+import { formatLogError } from '../../shared/shared.js';
 import { DownloadSocketCommand } from '../../shared/socket.js';
 import { broadcastAppSocketEvent } from '../socket.js';
 import { downloadTitle } from './title.js';
@@ -124,6 +125,11 @@ async function processDownloadQueue(): Promise<void> {
         nextItem.installedTitleName = result.name;
         nextItem.installedSourcePath = result.outputDir;
 
+        logger.log(
+            'server',
+            `download completed: ${nextItem.groupName} ${nextItem.label} ${nextItem.titleId}`
+        );
+
         broadcastDownloadQueue();
     } catch (error) {
         if (
@@ -135,6 +141,8 @@ async function processDownloadQueue(): Promise<void> {
 
         nextItem.state = 'failed';
         nextItem.error = error instanceof Error ? error.message : String(error);
+
+        logger.warn('server', `Download failed: ${formatLogError(error)}`);
 
         broadcastDownloadQueue();
     } finally {

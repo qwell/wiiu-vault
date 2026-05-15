@@ -10,17 +10,45 @@ import { sendAppSocketCommand } from './app-socket.js';
 export function syncStorageCopies(
     copies: StorageCopyItem[],
     nextCopies: StorageCopyItem[]
-): void {
+): StorageCopyItem[] {
+    const previousById = new Map(copies.map((item) => [item.id, item]));
+    const shouldReconcileCompleted = previousById.size === 0;
+
     copies.splice(0, copies.length, ...nextCopies);
+
+    const completedItems = copies.filter((item) => {
+        const previous = previousById.get(item.id);
+        return (
+            item.state === 'complete' &&
+            ((previous && previous.state !== 'complete') ||
+                shouldReconcileCompleted)
+        );
+    });
+
     updateActionBar();
+    return completedItems;
 }
 
 export function syncStorageDeletes(
     deletes: StorageDeleteItem[],
     nextDeletes: StorageDeleteItem[]
-): void {
+): StorageDeleteItem[] {
+    const previousById = new Map(deletes.map((item) => [item.id, item]));
+    const shouldReconcileCompleted = previousById.size === 0;
+
     deletes.splice(0, deletes.length, ...nextDeletes);
+
+    const completedItems = deletes.filter((item) => {
+        const previous = previousById.get(item.id);
+        return (
+            item.state === 'complete' &&
+            ((previous && previous.state !== 'complete') ||
+                shouldReconcileCompleted)
+        );
+    });
+
     updateActionBar();
+    return completedItems;
 }
 
 export function formatStorageCopyProgress(item: StorageCopyItem): string {

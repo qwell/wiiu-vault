@@ -78,17 +78,18 @@ export function createAppEventHandler(
                     options.getGroups()
                 );
 
-                syncStorageCopies(options.storageCopies, event.storageCopies);
                 markStorageCopiesComplete(
-                    event.storageCopies,
+                    syncStorageCopies(
+                        options.storageCopies,
+                        event.storageCopies
+                    ),
                     getStorageCompletionOptions()
                 );
-                syncStorageDeletes(
-                    options.storageDeletes,
-                    event.storageDeletes
-                );
                 markStorageDeletesComplete(
-                    event.storageDeletes,
+                    syncStorageDeletes(
+                        options.storageDeletes,
+                        event.storageDeletes
+                    ),
                     getStorageCompletionOptions()
                 );
 
@@ -109,18 +110,16 @@ export function createAppEventHandler(
 
             case 'storage.copyChanged':
                 options.onServerAvailable();
-                syncStorageCopies(options.storageCopies, event.items);
                 markStorageCopiesComplete(
-                    event.items,
+                    syncStorageCopies(options.storageCopies, event.items),
                     getStorageCompletionOptions()
                 );
                 return;
 
             case 'storage.deleteChanged':
                 options.onServerAvailable();
-                syncStorageDeletes(options.storageDeletes, event.items);
                 markStorageDeletesComplete(
-                    event.items,
+                    syncStorageDeletes(options.storageDeletes, event.items),
                     getStorageCompletionOptions()
                 );
                 return;

@@ -213,7 +213,7 @@ function renderDownloadControls(item: DownloadQueueItem): HTMLDivElement {
         detailsCell.title = item.error ?? '';
         detailsCell.append(
             createActionButton('Retry', 'download.retry', item.id),
-            createActionButton('clear', 'download.clear', item.id)
+            createActionButton('Clear', 'download.clear', item.id)
         );
         return detailsCell;
     }
