@@ -1,4 +1,4 @@
-import { Router, type Request, type Response } from 'express';
+import { Router } from 'express';
 
 import {
     downloadNusTitleMetadata,
@@ -8,6 +8,7 @@ import {
     TitleDownloadProgress,
 } from '../metadata.js';
 import { sendServerError } from '../routes.js';
+import { requireTitleIdQuery } from '../request.js';
 import { findFirstReadableWiiURoot } from '../wiiu.js';
 import {
     type TitleDownloadResponse,
@@ -16,51 +17,6 @@ import {
 import { getConfig } from '../../shared/config.js';
 import logger from '../../shared/logger.js';
 import { formatLogError } from '../../shared/shared.js';
-
-type TitleIdQueryResult =
-    | {
-          ok: true;
-          titleId: string;
-      }
-    | {
-          ok: false;
-          error: string;
-      };
-
-function getTitleIdQuery(req: Request): TitleIdQueryResult {
-    const { titleId } = req.query;
-
-    if (typeof titleId !== 'string' || titleId.length === 0) {
-        return {
-            ok: false,
-            error: 'Missing titleId query parameter',
-        };
-    }
-
-    if (!/^[0-9a-f]{16}$/i.test(titleId)) {
-        return {
-            ok: false,
-            error: 'titleId query parameter must be 16 hexadecimal characters',
-        };
-    }
-
-    return {
-        ok: true,
-        titleId: titleId.toLowerCase(),
-    };
-}
-
-function requireTitleIdQuery(req: Request, res: Response): string | null {
-    const result = getTitleIdQuery(req);
-    if (result.ok) {
-        return result.titleId;
-    }
-
-    res.status(400).json({
-        error: result.error,
-    });
-    return null;
-}
 
 export async function downloadTitle(
     titleId: string,

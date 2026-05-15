@@ -11,20 +11,8 @@ import {
 import { validateWiiURoot } from '../../shared/wiiu.js';
 import logger from '../../shared/logger.js';
 import { formatLogError } from '../../shared/shared.js';
+import { getStringBodyField } from '../request.js';
 import { sendServerError } from '../routes.js';
-
-function getConfigRootBodyValue(body: unknown): string {
-    if (
-        typeof body === 'object' &&
-        body !== null &&
-        'root' in body &&
-        typeof body.root === 'string'
-    ) {
-        return body.root;
-    }
-
-    return '';
-}
 
 export function createConfigRouter(): Router {
     const router = Router();
@@ -40,7 +28,7 @@ export function createConfigRouter(): Router {
 
     router.post('/validate-root', async (req, res) => {
         try {
-            const root = getConfigRootBodyValue(req.body as unknown);
+            const root = getStringBodyField(req.body as unknown, 'root');
             const response: ConfigValidateRootResponse =
                 await validateWiiURoot(root);
             res.json(response);

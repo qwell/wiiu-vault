@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import { pipeline } from 'stream/promises';
 import { Router, type Request } from 'express';
 
+import { getStringQuery, requireStringQuery } from '../request.js';
 import { sendServerError } from '../routes.js';
 import { downloadNusTitleMetadata } from '../metadata.js';
 import { broadcastAppSocketEvent } from '../socket.js';
@@ -26,11 +27,7 @@ import {
     resolveFat32Destination,
     resolveReadablePath,
 } from '../../shared/os.js';
-import {
-    formatLogError,
-    formatTitleDisplayName,
-    getStringQuery,
-} from '../../shared/shared.js';
+import { formatLogError, formatTitleDisplayName } from '../../shared/shared.js';
 import {
     type ApiErrorResponse,
     type Fat32ListResponse,
@@ -94,11 +91,13 @@ export function createStorageRouter(): Router {
     });
 
     router.get('/delete', (req, res) => {
-        const titleId = getStringQuery(req, 'titleId');
+        const titleId = requireStringQuery(
+            req,
+            res,
+            'titleId',
+            'Missing titleId query parameter'
+        );
         if (!titleId) {
-            res.status(400).json({
-                error: 'Missing titleId query parameter',
-            });
             return;
         }
 

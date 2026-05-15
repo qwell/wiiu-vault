@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { TitleKinds } from './titles.js';
 
 export function toArray<T>(value: T | readonly T[] | null | undefined): T[] {
@@ -80,16 +79,6 @@ export function nullableString(value: unknown): string | null {
 
 export function nullableNumber(value: unknown): number | null {
     return typeof value === 'number' && Number.isFinite(value) ? value : null;
-}
-
-export function getStringQuery(req: Request, name: string): string | null {
-    const value = req.query[name];
-    if (typeof value !== 'string') {
-        return null;
-    }
-
-    const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : null;
 }
 
 export function formatTitleDisplayName(
