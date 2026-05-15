@@ -22,7 +22,7 @@ export type DownloadSocketCommand =
           id: string;
       }
     | {
-          type: 'download.remove';
+          type: 'download.clear';
           id: string;
       }
     | {
@@ -51,7 +51,7 @@ export type StorageCopySocketCommand =
           id: string;
       }
     | {
-          type: 'storage.copy.remove';
+          type: 'storage.copy.clear';
           id: string;
       }
     | {
@@ -65,7 +65,7 @@ export type StorageDeleteSocketCommand =
           id: string;
       }
     | {
-          type: 'storage.delete.remove';
+          type: 'storage.delete.clear';
           id: string;
       };
 

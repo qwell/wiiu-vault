@@ -12,9 +12,9 @@ import { sendAppSocketCommand } from './app-socket.js';
 
 export type StorageActionBarCommand =
     | 'storage.copy.cancel'
-    | 'storage.copy.remove'
+    | 'storage.copy.clear'
     | 'storage.copy.retry'
-    | 'storage.delete.remove'
+    | 'storage.delete.clear'
     | 'storage.delete.retry';
 
 export function syncStorageCopies(
@@ -170,7 +170,7 @@ function renderStorageCopyControls(item: StorageCopyItem): HTMLDivElement {
         detailsCell.title = item.error ?? '';
         detailsCell.append(
             createActionButton('Retry', 'storage.copy.retry', item.id),
-            createActionButton('Remove', 'storage.copy.remove', item.id)
+            createActionButton('Clear', 'storage.copy.clear', item.id)
         );
         return detailsCell;
     }
@@ -178,7 +178,7 @@ function renderStorageCopyControls(item: StorageCopyItem): HTMLDivElement {
     if (item.state === 'queued') {
         detailsCell.classList.add('action-bar-controls');
         detailsCell.append(
-            createActionButton('Remove', 'storage.copy.remove', item.id)
+            createActionButton('Clear', 'storage.copy.clear', item.id)
         );
         return detailsCell;
     }
@@ -186,7 +186,7 @@ function renderStorageCopyControls(item: StorageCopyItem): HTMLDivElement {
     if (item.state === 'complete') {
         detailsCell.classList.add('action-bar-controls');
         detailsCell.append(
-            createActionButton('Remove', 'storage.copy.remove', item.id)
+            createActionButton('Clear', 'storage.copy.clear', item.id)
         );
         return detailsCell;
     }
@@ -219,9 +219,9 @@ export function retryStorageCopy(itemId: string): void {
     });
 }
 
-export function removeStorageCopy(itemId: string): void {
+export function clearStorageCopy(itemId: string): void {
     sendAppSocketCommand({
-        type: 'storage.copy.remove',
+        type: 'storage.copy.clear',
         id: itemId,
     });
 }
@@ -339,7 +339,7 @@ function renderStorageDeleteControls(item: StorageDeleteItem): HTMLDivElement {
         detailsCell.title = item.error ?? '';
         detailsCell.append(
             createActionButton('Retry', 'storage.delete.retry', item.id),
-            createActionButton('Remove', 'storage.delete.remove', item.id)
+            createActionButton('Clear', 'storage.delete.clear', item.id)
         );
         return detailsCell;
     }
@@ -347,7 +347,7 @@ function renderStorageDeleteControls(item: StorageDeleteItem): HTMLDivElement {
     if (item.state === 'queued' || item.state === 'complete') {
         detailsCell.classList.add('action-bar-controls');
         detailsCell.append(
-            createActionButton('Remove', 'storage.delete.remove', item.id)
+            createActionButton('Clear', 'storage.delete.clear', item.id)
         );
         return detailsCell;
     }
@@ -369,9 +369,9 @@ export function retryStorageDelete(itemId: string): void {
     });
 }
 
-export function removeStorageDelete(itemId: string): void {
+export function clearStorageDelete(itemId: string): void {
     sendAppSocketCommand({
-        type: 'storage.delete.remove',
+        type: 'storage.delete.clear',
         id: itemId,
     });
 }

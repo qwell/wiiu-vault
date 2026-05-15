@@ -1,8 +1,8 @@
 import { type DownloadQueueItem } from '../shared/shared.js';
 import {
     cancelStorageCopy,
-    removeStorageCopy,
-    removeStorageDelete,
+    clearStorageCopy,
+    clearStorageDelete,
     retryStorageCopy,
     retryStorageDelete,
 } from './storage.js';
@@ -18,7 +18,7 @@ import {
     formatDownloadState,
     formatDownloadTitle,
     getDownloadDedupeKey,
-    removeDownload,
+    clearDownload,
     renderDownloadActionRow,
     retryDownload,
 } from './download.js';
@@ -114,11 +114,11 @@ export function createActionBarCommandHandler(
                 );
                 return;
 
-            case 'download.remove':
+            case 'download.clear':
                 sendDownloadCommandForMatches(
                     itemId,
                     options.downloads,
-                    removeDownload
+                    clearDownload
                 );
                 return;
 
@@ -134,16 +134,16 @@ export function createActionBarCommandHandler(
                 cancelStorageCopy(itemId);
                 return;
 
-            case 'storage.copy.remove':
-                removeStorageCopy(itemId);
+            case 'storage.copy.clear':
+                clearStorageCopy(itemId);
                 return;
 
             case 'storage.copy.retry':
                 retryStorageCopy(itemId);
                 return;
 
-            case 'storage.delete.remove':
-                removeStorageDelete(itemId);
+            case 'storage.delete.clear':
+                clearStorageDelete(itemId);
                 return;
 
             case 'storage.delete.retry':
@@ -156,12 +156,12 @@ export function createActionBarCommandHandler(
 function isActionBarCommand(value: string | null): value is ActionBarCommand {
     switch (value) {
         case 'download.cancel':
-        case 'download.remove':
+        case 'download.clear':
         case 'download.retry':
         case 'storage.copy.cancel':
-        case 'storage.copy.remove':
+        case 'storage.copy.clear':
         case 'storage.copy.retry':
-        case 'storage.delete.remove':
+        case 'storage.delete.clear':
         case 'storage.delete.retry':
             return true;
         default:

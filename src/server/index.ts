@@ -5,7 +5,6 @@ import { createReadStream, createWriteStream } from 'node:fs';
 import { mkdir, realpath, rm, stat, unlink } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { pipeline } from 'node:stream/promises';
-import { WebSocket, WebSocketServer, type RawData } from 'ws';
 import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
@@ -23,6 +22,7 @@ import {
     TitleDownloadProgress,
 } from './metadata.js';
 import { getCachedImage } from './image-cache.js';
+import { createAppSocket } from './socket.js';
 import {
     classifyTitleId,
     findFirstReadableWiiURoot,
@@ -34,7 +34,6 @@ import {
 } from './wiiu.js';
 import {
     AppSocketCommand,
-    AppSocketEvent,
     DownloadSocketCommand,
     StorageCopySocketCommand,
     StorageDeleteSocketCommand,
@@ -207,36 +206,23 @@ function createStorageCopyCancelledError(): Error {
     return error;
 }
 
-function formatSocketCommandArgs(command: AppSocketCommand): string {
-    return JSON.stringify(
-        Object.fromEntries(
-            Object.entries(command).filter(([key]) => key !== 'type')
-        )
-    );
-}
-
 function handleAppSocketCommand(command: AppSocketCommand): void {
-    logger.log(
-        'server',
-        `socket command dispatch: ${command.type} args=${formatSocketCommandArgs(command)}`
-    );
-
     switch (command.type) {
         case 'download.queue':
         case 'download.retry':
-        case 'download.remove':
+        case 'download.clear':
         case 'download.cancel':
             handleDownloadSocketCommand(command);
             return;
 
         case 'storage.copy.retry':
-        case 'storage.copy.remove':
+        case 'storage.copy.clear':
         case 'storage.copy.cancel':
             handleStorageCopySocketCommand(command);
             return;
 
         case 'storage.delete.retry':
-        case 'storage.delete.remove':
+        case 'storage.delete.clear':
             handleStorageDeleteSocketCommand(command);
             return;
     }
@@ -276,20 +262,6 @@ let storageDeleteQueue: StorageDeleteQueueItem[] = [];
 let broadcastStorageCopiesTimer: ReturnType<typeof setTimeout> | null = null;
 let broadcastStorageDeletesTimer: ReturnType<typeof setTimeout> | null = null;
 let activeStorageDeleteId: string | null = null;
-
-function sendAppSocketEvent(socket: WebSocket, event: AppSocketEvent): void {
-    if (socket.readyState !== WebSocket.OPEN) {
-        return;
-    }
-
-    socket.send(JSON.stringify(event));
-}
-
-function broadcastAppSocketEvent(event: AppSocketEvent): void {
-    for (const client of socketServer.clients) {
-        sendAppSocketEvent(client, event);
-    }
-}
 
 function broadcastDownloadQueue(): void {
     broadcastAppSocketEvent({
@@ -431,7 +403,7 @@ function retryStorageCopy(id: string): void {
     void processStorageCopyQueue();
 }
 
-function removeStorageCopyFromState(id: string): StorageCopyItem | null {
+function clearStorageCopyFromState(id: string): StorageCopyItem | null {
     const item = storageCopies.find((candidate) => candidate.id === id) ?? null;
 
     storageCopies = storageCopies.filter((candidate) => candidate.id !== id);
@@ -442,13 +414,13 @@ function removeStorageCopyFromState(id: string): StorageCopyItem | null {
     return item;
 }
 
-function removeStorageCopy(id: string): void {
+function clearStorageCopy(id: string): void {
     const item = storageCopies.find((candidate) => candidate.id === id);
     const queueItem =
         storageCopyQueue.find((candidate) => candidate.id === id) ?? null;
 
     if (!item) {
-        logger.log('server', `storage copy remove ignored: missing id=${id}`);
+        logger.log('server', `storage copy clear ignored: missing id=${id}`);
         broadcastStorageCopies();
         return;
     }
@@ -456,8 +428,8 @@ function removeStorageCopy(id: string): void {
     logger.log(
         'server',
         queueItem
-            ? `storage ${queueItem.operation} removed: ${queueItem.sourcePath} -> ${queueItem.destinationPath}`
-            : `storage ${item.operation} removed: ${item.sourceName} -> ${item.destinationName}`
+            ? `storage ${queueItem.operation} cleared: ${queueItem.sourcePath} -> ${queueItem.destinationPath}`
+            : `storage ${item.operation} cleared: ${item.sourceName} -> ${item.destinationName}`
     );
 
     if (activeStorageCopyId === id) {
@@ -466,7 +438,7 @@ function removeStorageCopy(id: string): void {
         cancelStorageCopyProcess(id, item);
     }
 
-    removeStorageCopyFromState(id);
+    clearStorageCopyFromState(id);
     broadcastStorageCopies();
 
     if (activeStorageCopyId !== id) {
@@ -502,7 +474,7 @@ function cancelStorageCopy(id: string): void {
     );
 
     cancelledStorageCopyIds.add(id);
-    removeStorageCopyFromState(id);
+    clearStorageCopyFromState(id);
     broadcastStorageCopies();
 
     try {
@@ -534,8 +506,8 @@ function handleStorageCopySocketCommand(
             cancelStorageCopy(command.id);
             return;
 
-        case 'storage.copy.remove':
-            removeStorageCopy(command.id);
+        case 'storage.copy.clear':
+            clearStorageCopy(command.id);
             return;
 
         case 'storage.copy.retry':
@@ -544,7 +516,7 @@ function handleStorageCopySocketCommand(
     }
 }
 
-function removeStorageDeleteFromState(id: string): StorageDeleteItem | null {
+function clearStorageDeleteFromState(id: string): StorageDeleteItem | null {
     const item =
         storageDeletes.find((candidate) => candidate.id === id) ?? null;
 
@@ -556,10 +528,10 @@ function removeStorageDeleteFromState(id: string): StorageDeleteItem | null {
     return item;
 }
 
-function removeStorageDelete(id: string): void {
-    const item = removeStorageDeleteFromState(id);
+function clearStorageDelete(id: string): void {
+    const item = clearStorageDeleteFromState(id);
     if (!item) {
-        logger.log('server', `storage delete remove ignored: missing id=${id}`);
+        logger.log('server', `storage delete clear ignored: missing id=${id}`);
     }
     broadcastStorageDeletes();
 }
@@ -592,87 +564,13 @@ function handleStorageDeleteSocketCommand(
     command: StorageDeleteSocketCommand
 ): void {
     switch (command.type) {
-        case 'storage.delete.remove':
-            removeStorageDelete(command.id);
+        case 'storage.delete.clear':
+            clearStorageDelete(command.id);
             return;
 
         case 'storage.delete.retry':
             retryStorageDelete(command.id);
             return;
-    }
-}
-
-function parseSocketCommand(data: RawData): AppSocketCommand | null {
-    let parsed: unknown;
-    try {
-        const text = Buffer.isBuffer(data)
-            ? data.toString('utf8')
-            : Buffer.from(data as ArrayBuffer).toString('utf8');
-        parsed = JSON.parse(text) as unknown;
-    } catch {
-        return null;
-    }
-
-    if (!parsed || typeof parsed !== 'object') {
-        return null;
-    }
-
-    const command = parsed as { type?: unknown };
-
-    switch (command.type) {
-        case 'download.queue': {
-            const items = (command as { items?: unknown }).items;
-            if (!Array.isArray(items)) {
-                return null;
-            }
-
-            const isQueueItem = (
-                value: unknown
-            ): value is DownloadQueueItem => {
-                if (!value || typeof value !== 'object') {
-                    return false;
-                }
-
-                const item = value as Record<string, unknown>;
-                return (
-                    typeof item.id === 'string' &&
-                    typeof item.family === 'string' &&
-                    typeof item.groupName === 'string' &&
-                    typeof item.label === 'string' &&
-                    typeof item.titleId === 'string' &&
-                    typeof item.kind === 'string' &&
-                    (typeof item.sizeText === 'string' ||
-                        item.sizeText === null) &&
-                    (typeof item.totalBytes === 'number' ||
-                        item.totalBytes === null)
-                );
-            };
-
-            if (!items.every(isQueueItem)) {
-                return null;
-            }
-
-            return parsed as AppSocketCommand;
-        }
-
-        case 'download.retry':
-        case 'download.remove':
-        case 'download.cancel':
-        case 'storage.copy.remove':
-        case 'storage.copy.retry':
-        case 'storage.copy.cancel':
-        case 'storage.delete.remove':
-        case 'storage.delete.retry': {
-            const id = (command as { id?: unknown }).id;
-            if (typeof id !== 'string' || id.length === 0) {
-                return null;
-            }
-
-            return parsed as AppSocketCommand;
-        }
-
-        default:
-            return null;
     }
 }
 
@@ -1243,7 +1141,7 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
             return;
         }
 
-        case 'download.remove': {
+        case 'download.clear': {
             const item = downloadQueue.find(
                 (candidate) => candidate.id === command.id
             );
@@ -1251,7 +1149,7 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
             if (!item) {
                 logger.log(
                     'server',
-                    `download remove ignored: id=${command.id} item=missing`
+                    `download clear ignored: id=${command.id} item=missing`
                 );
                 return;
             }
@@ -1267,7 +1165,7 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
             if (activeItem) {
                 logger.log(
                     'server',
-                    `download remove received for active item; cancelling: ${activeItem.groupName} ${activeItem.label} ${activeItem.titleId}`
+                    `download clear received for active item; cancelling: ${activeItem.groupName} ${activeItem.label} ${activeItem.titleId}`
                 );
 
                 cancelActiveDownload(activeItem);
@@ -1276,7 +1174,7 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
 
             logger.log(
                 'server',
-                `download removed: ${item.groupName} ${item.label} ${item.titleId}`
+                `download cleared: ${item.groupName} ${item.label} ${item.titleId}`
             );
 
             downloadQueue = downloadQueue.filter(
@@ -1324,7 +1222,7 @@ function handleDownloadSocketCommand(command: DownloadSocketCommand): void {
             if (matchingQueuedItems.length > 0) {
                 logger.log(
                     'server',
-                    `download queued items removed: ${item.groupName} ${item.label} ${item.titleId}`
+                    `download queued items cleared: ${item.groupName} ${item.label} ${item.titleId}`
                 );
 
                 downloadQueue = downloadQueue.filter(
@@ -2064,6 +1962,12 @@ async function processStorageDeleteQueue(): Promise<void> {
     }
 }
 
+function broadcastAppSocketEvent(
+    event: Parameters<typeof appSocket.broadcast>[0]
+): void {
+    appSocket.broadcast(event);
+}
+
 app.use((req, _res, next) => {
     logger.log('server', `${req.method} ${req.url}`);
     next();
@@ -2416,63 +2320,17 @@ app.get('/api/title-dlc', async (req, res) => {
 });
 
 const server = createServer(app);
-
-const socketServer = new WebSocketServer({
+const appSocket = createAppSocket({
     server,
     path: '/api/socket',
-});
-
-socketServer.on('connection', (socket) => {
-    logger.log('server', 'WebSocket client connected');
-
-    sendAppSocketEvent(socket, {
+    getConnectedEvent: () => ({
         type: 'app.connected',
         downloads: downloadQueue,
         storageCopies,
         storageDeletes,
         libraryValidationStatus: latestLibraryValidationStatus,
-    });
-
-    socket.on('message', (data) => {
-        const commandText = Buffer.isBuffer(data)
-            ? data.toString('utf8')
-            : Buffer.from(data as ArrayBuffer).toString('utf8');
-
-        const commandType = (() => {
-            try {
-                const raw = JSON.parse(commandText) as { type?: unknown };
-                return typeof raw.type === 'string'
-                    ? raw.type
-                    : `invalid:${String(raw.type)}`;
-            } catch {
-                return 'invalid-json';
-            }
-        })();
-
-        logger.log('server', `socket command received: ${commandType}`);
-
-        const command = parseSocketCommand(data);
-        if (!command) {
-            logger.log(
-                'server',
-                `socket command rejected: ${commandType} payload=${commandText}`
-            );
-            return;
-        }
-
-        handleAppSocketCommand(command);
-    });
-
-    socket.on('close', () => {
-        logger.warn('server', 'WebSocket client disconnected');
-    });
-
-    socket.on('error', (error) => {
-        logger.warn(
-            'server',
-            `WebSocket client error: ${formatLogError(error)}`
-        );
-    });
+    }),
+    onCommand: handleAppSocketCommand,
 });
 
 server.on('error', (error: NodeJS.ErrnoException) => {

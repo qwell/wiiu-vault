@@ -17,7 +17,7 @@ import { sendAppSocketCommand } from './app-socket.js';
 
 export type DownloadActionBarCommand =
     | 'download.cancel'
-    | 'download.remove'
+    | 'download.clear'
     | 'download.retry';
 
 export type DownloadQueueState =
@@ -212,7 +212,7 @@ function renderDownloadControls(item: DownloadQueueItem): HTMLDivElement {
         detailsCell.title = item.error ?? '';
         detailsCell.append(
             createActionButton('Retry', 'download.retry', item.id),
-            createActionButton('Remove', 'download.remove', item.id)
+            createActionButton('clear', 'download.clear', item.id)
         );
         return detailsCell;
     }
@@ -220,7 +220,7 @@ function renderDownloadControls(item: DownloadQueueItem): HTMLDivElement {
     if (item.state === 'queued') {
         detailsCell.classList.add('action-bar-controls');
         detailsCell.append(
-            createActionButton('Remove', 'download.remove', item.id)
+            createActionButton('Clear', 'download.clear', item.id)
         );
         return detailsCell;
     }
@@ -228,7 +228,7 @@ function renderDownloadControls(item: DownloadQueueItem): HTMLDivElement {
     if (item.state === 'complete') {
         detailsCell.classList.add('action-bar-controls');
         detailsCell.append(
-            createActionButton('Remove', 'download.remove', item.id)
+            createActionButton('Clear', 'download.clear', item.id)
         );
         return detailsCell;
     }
@@ -291,9 +291,9 @@ export function retryDownload(itemId: string): void {
     });
 }
 
-export function removeDownload(itemId: string): void {
+export function clearDownload(itemId: string): void {
     sendAppSocketCommand({
-        type: 'download.remove',
+        type: 'download.clear',
         id: itemId,
     });
 }
