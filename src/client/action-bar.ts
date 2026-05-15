@@ -1,6 +1,6 @@
 import {
     DOWNLOAD_ACTION,
-    DownloadActionBarCommand,
+    type DownloadActionBarCommand,
     isDownloadActionBarCommand,
     type DownloadQueueItem,
 } from '../shared/download.js';
@@ -63,6 +63,34 @@ type ActionCommandOptions = {
 let actionBarRoot: HTMLElement | null = null;
 let actionBarSignature = '';
 let actionBarOptions: ActionBarOptions | null = null;
+
+function isClearableActionBarItem(options: ActionBarOptions): boolean {
+    return (
+        options.downloads.some((item) => item.state !== 'downloading') ||
+        options.storageCopies.some((item) => item.state !== 'copying') ||
+        options.storageDeletes.some((item) => item.state !== 'deleting')
+    );
+}
+
+function clearAllActionBarItems(options: ActionBarOptions): void {
+    for (const item of options.downloads) {
+        if (item.state !== 'downloading') {
+            options.onCommand(DOWNLOAD_ACTION.clear, item.id);
+        }
+    }
+
+    for (const item of options.storageCopies) {
+        if (item.state !== 'copying') {
+            options.onCommand(STORAGE_ACTION.clearCopy, item.id);
+        }
+    }
+
+    for (const item of options.storageDeletes) {
+        if (item.state !== 'deleting') {
+            options.onCommand(STORAGE_ACTION.clearDelete, item.id);
+        }
+    }
+}
 
 function configureActionButton(
     button: HTMLButtonElement,
@@ -467,10 +495,18 @@ function rebuildActionBar(options: ActionBarOptions): void {
             ? 'One visible action'
             : `${visibleActionCount} visible actions`;
 
-    const size = document.createElement('div');
-    size.textContent = '';
+    const controls = document.createElement('div');
+    controls.className = 'action-bar-summary-controls';
 
-    summary.append(counts, current, size);
+    const clearAll = document.createElement('button');
+    clearAll.type = 'button';
+    clearAll.className = 'action-bar-button action-bar-clear-all-button';
+    clearAll.textContent = 'Clear All';
+    clearAll.dataset.actionBarClearAll = 'true';
+    clearAll.disabled = !isClearableActionBarItem(options);
+
+    controls.append(clearAll);
+    summary.append(counts, current, controls);
     actionBarRoot.append(summary);
 
     const details = document.createElement('div');
@@ -513,6 +549,24 @@ export function mountActionBar(options: ActionBarOptions): void {
         const target = event.target;
 
         if (!(target instanceof Element)) {
+            return;
+        }
+
+        const clearAllButton = target.closest(
+            'button[data-action-bar-clear-all]'
+        );
+
+        if (
+            clearAllButton instanceof HTMLButtonElement &&
+            actionBarRoot?.contains(clearAllButton)
+        ) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!clearAllButton.disabled && actionBarOptions) {
+                clearAllActionBarItems(actionBarOptions);
+            }
+
             return;
         }
 

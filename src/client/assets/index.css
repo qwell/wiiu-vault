@@ -995,6 +995,11 @@ footer > div:last-child {
     padding: 4px 8px;
 }
 
+.action-bar-summary-controls {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .action-bar-details {
     display: grid;
     grid-template-columns:
