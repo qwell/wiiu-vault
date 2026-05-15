@@ -127,6 +127,28 @@ yarn generate:titles
 - `GET /api/title-dlc?titleId=...`: Check the DLC title ID and latest DLC version for a base title.
 - `GET /api/title-all?titleId=...`: Fetch base metadata plus update and DLC availability.
 - `GET /api/title-download?titleId=...`: Download a base, update, or DLC title into the first readable `wiiuRoots` directory, generate install files, and verify content hashes.
+- `GET /api/storage/list-fat32`: List FAT32 storage destinations. On WSL, unmounted Windows-only drives are returned for display but must be mounted in WSL before use.
+- `GET /api/storage/copy?titleId=...&dest=...`: Queue a local title copy to a FAT32 destination.
+- `GET /api/storage/move?titleId=...&dest=...`: Queue a local title move to a FAT32 destination and remove the local source after a successful copy.
+- `GET /api/storage/delete?titleId=...`: Queue deletion of all local copies for a title ID.
+
+## WebSocket API
+
+The browser connects to `/api/socket`. On connection, the server sends `app.connected` with current downloads, storage copies, storage deletes, and library validation status.
+
+Server events:
+
+- `download.queueChanged`: Current download queue.
+- `storage.copyChanged`: Current storage copy/move queue.
+- `storage.deleteChanged`: Current storage delete queue.
+- `library.validationStatus`: Library validation progress.
+
+Client commands:
+
+- `download.queue`: Queue title downloads.
+- `download.retry`, `download.remove`, `download.cancel`: Manage download items by ID.
+- `storage.copy.retry`, `storage.copy.remove`, `storage.copy.cancel`: Manage copy/move items by ID.
+- `storage.delete.retry`, `storage.delete.remove`: Manage delete items by ID.
 
 ## Title Data
 
