@@ -872,7 +872,15 @@ footer > div:last-child {
     opacity: 0.55;
 }
 
+.title-storage-copy-row-insufficient-space {
+    opacity: 0.55;
+}
+
 .title-download-row-unavailable .title-download-checkbox {
+    cursor: not-allowed;
+}
+
+.title-storage-copy-row-insufficient-space .title-storage-copy-checkbox {
     cursor: not-allowed;
 }
 
@@ -988,8 +996,7 @@ footer > div:last-child {
 
 .action-bar-summary {
     display: grid;
-    grid-template-columns: max-content minmax(0, 1fr) max-content;
-    gap: 12px;
+    grid-template-columns: max-content minmax(0, 1fr);
     align-items: center;
     min-height: 28px;
     padding: 4px 8px;
@@ -1021,7 +1028,6 @@ footer > div:last-child {
     display: contents;
 }
 
-.action-bar-current,
 .action-bar-title,
 .action-bar-files,
 .action-bar-size,

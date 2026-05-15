@@ -1,4 +1,6 @@
+import { type Fat32ListResponse } from '../shared/api.js';
 import { type DownloadQueueItem } from '../shared/download.js';
+import { type Fat32Volume } from '../shared/os.js';
 import { formatSize } from '../shared/shared.js';
 import {
     PARENT_KINDS,
@@ -30,7 +32,7 @@ type TitleDetailOptions = {
     populateFat32DeviceSelect: (
         select: HTMLSelectElement,
         copyButton: HTMLButtonElement
-    ) => Promise<void>;
+    ) => Promise<Fat32ListResponse | null>;
 };
 
 let selectedFamily: string | null = null;
@@ -139,6 +141,7 @@ function renderDownloadedCopyRow(entry: TitleEntry): HTMLElement {
     checkbox.className = 'title-storage-copy-checkbox';
     checkbox.value = entry.titleId;
     checkbox.dataset.titleId = entry.titleId;
+    checkbox.dataset.copySizeBytes = String(entry.sizeBytes);
 
     const slot = document.createElement('span');
     slot.className = 'title-download-slot';
@@ -172,6 +175,74 @@ function getSelectedDownloadedTitleIds(
     return Array.from(root.querySelectorAll<HTMLInputElement>(selector))
         .map((checkbox) => checkbox.dataset.titleId ?? '')
         .filter((titleId) => titleId.length > 0);
+}
+
+function getSelectedFat32Volume(
+    response: Fat32ListResponse | null,
+    select: HTMLSelectElement
+): Fat32Volume | null {
+    return (
+        response?.volumes.find((volume) => volume.source === select.value) ??
+        null
+    );
+}
+
+function getStorageCopySelectionSizeBytes(
+    root: HTMLElement,
+    entries: TitleEntry[],
+    selectedOnly: boolean
+): number {
+    const entriesByTitleId = new Map(
+        entries.map((entry) => [entry.titleId, entry])
+    );
+    const selector = selectedOnly
+        ? '.title-storage-copy-checkbox:checked'
+        : '.title-storage-copy-checkbox';
+    let sizeBytes = 0;
+
+    for (const checkbox of root.querySelectorAll<HTMLInputElement>(selector)) {
+        const titleId = checkbox.dataset.titleId ?? '';
+        sizeBytes += entriesByTitleId.get(titleId)?.sizeBytes ?? 0;
+    }
+
+    return sizeBytes;
+}
+
+function updateStorageCopyAvailability(
+    root: HTMLElement,
+    entries: TitleEntry[],
+    volume: Fat32Volume | null
+): void {
+    const entriesByTitleId = new Map(
+        entries.map((entry) => [entry.titleId, entry])
+    );
+
+    for (const checkbox of root.querySelectorAll<HTMLInputElement>(
+        '.title-storage-copy-checkbox'
+    )) {
+        const titleId = checkbox.dataset.titleId ?? '';
+        const entry = entriesByTitleId.get(titleId);
+        const cannotFit =
+            entry !== undefined &&
+            volume?.freeBytes !== null &&
+            volume?.freeBytes !== undefined &&
+            entry.sizeBytes > volume.freeBytes;
+
+        const row = checkbox.closest('.title-download-row');
+        row?.classList.toggle(
+            'title-storage-copy-row-insufficient-space',
+            cannotFit
+        );
+        row?.toggleAttribute('data-copy-disabled', cannotFit);
+        if (cannotFit && entry) {
+            row?.setAttribute(
+                'title',
+                `Not enough free space on selected SD: ${formatSize(entry.sizeBytes)} needed, ${formatSize(volume.freeBytes)} available`
+            );
+        } else {
+            row?.removeAttribute('title');
+        }
+    }
 }
 
 function formatDeleteConfirmationEntry(entry: TitleEntry): string {
@@ -322,24 +393,58 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
 
+        let fat32Response: Fat32ListResponse | null = null;
+
         const updateDownloadedButtons = (): void => {
+            const selectedVolume = getSelectedFat32Volume(
+                fat32Response,
+                destinationSelect
+            );
+            updateStorageCopyAvailability(
+                localList,
+                localEntries,
+                selectedVolume
+            );
             const checkedCount = localList.querySelectorAll(
                 '.title-storage-copy-checkbox:checked'
             ).length;
+            const hasCopyDestination =
+                !destinationSelect.disabled && destinationSelect.value !== '';
+            const selectedSizeBytes = getStorageCopySelectionSizeBytes(
+                localList,
+                localEntries,
+                checkedCount > 0
+            );
+            const freeBytes = selectedVolume?.freeBytes;
+            const hasEnoughFreeSpace =
+                freeBytes === null ||
+                freeBytes === undefined ||
+                selectedSizeBytes <= freeBytes;
 
-            copyButton.textContent =
-                checkedCount === 0 ? 'Copy all to SD' : 'Copy selected to SD';
+            copyButton.textContent = !hasEnoughFreeSpace
+                ? 'Free space exceeded'
+                : checkedCount === 0
+                  ? 'Copy all to SD'
+                  : 'Copy selected to SD';
             deleteButton.textContent =
                 checkedCount === 0 ? 'Delete all' : 'Delete selected';
+            copyButton.disabled = !hasCopyDestination || !hasEnoughFreeSpace;
+            copyButton.title =
+                hasCopyDestination && !hasEnoughFreeSpace && selectedVolume
+                    ? `Not enough free space: ${formatSize(selectedSizeBytes)} selected, ${formatSize(freeBytes ?? null)} available`
+                    : '';
         };
 
         updateDownloadedButtons();
         localList.addEventListener('change', updateDownloadedButtons);
+        destinationSelect.addEventListener('change', updateDownloadedButtons);
         if (detailOptions) {
-            void detailOptions.populateFat32DeviceSelect(
-                destinationSelect,
-                copyButton
-            );
+            void detailOptions
+                .populateFat32DeviceSelect(destinationSelect, copyButton)
+                .then((response) => {
+                    fat32Response = response;
+                    updateDownloadedButtons();
+                });
         }
 
         copyButton.addEventListener('click', () => {

@@ -484,17 +484,6 @@ function rebuildActionBar(options: ActionBarOptions): void {
     const counts = document.createElement('div');
     counts.textContent = `Actions: ${activeCount} active, ${queuedCount} queued, ${failedCount} failed, ${finishedCount} finished`;
 
-    const current = document.createElement('div');
-    current.className = 'action-bar-current';
-    const visibleActionCount =
-        options.downloads.length +
-        options.storageCopies.length +
-        options.storageDeletes.length;
-    current.textContent =
-        visibleActionCount === 1
-            ? 'One visible action'
-            : `${visibleActionCount} visible actions`;
-
     const controls = document.createElement('div');
     controls.className = 'action-bar-summary-controls';
 
@@ -506,7 +495,7 @@ function rebuildActionBar(options: ActionBarOptions): void {
     clearAll.disabled = !isClearableActionBarItem(options);
 
     controls.append(clearAll);
-    summary.append(counts, current, controls);
+    summary.append(counts, controls);
     actionBarRoot.append(summary);
 
     const details = document.createElement('div');

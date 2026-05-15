@@ -1,5 +1,5 @@
 import { createReadStream, createWriteStream } from 'fs';
-import { mkdir, realpath, rm, stat, unlink } from 'fs/promises';
+import { mkdir, realpath, rm, stat, statfs, unlink } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { pipeline } from 'stream/promises';
@@ -27,7 +27,12 @@ import {
     resolveFat32Destination,
     resolveReadablePath,
 } from '../../shared/os.js';
-import { formatLogError, formatTitleDisplayName } from '../../shared/shared.js';
+import { isWindowsPath } from '../../shared/os/path.js';
+import {
+    formatLogError,
+    formatSize,
+    formatTitleDisplayName,
+} from '../../shared/shared.js';
 import {
     type ApiErrorResponse,
     type Fat32ListResponse,
@@ -953,16 +958,18 @@ async function processStorageCopyQueue(): Promise<void> {
 
         const sourceSizeBytes = sourceStats.sizeBytes;
         const sourceFileCount = sourceStats.fileCount;
-        const freeBytes = storageDestination.freeBytes;
-
-        if (freeBytes !== null && sourceSizeBytes > freeBytes) {
-            throw new Error('Not enough free space on destination');
-        }
-
-        const destinationPath = await getStreamCopyDestinationPath(
+        const destination = await getStreamCopyDestination(
             readableSourcePath,
             storageDestination.source
         );
+        const destinationPath = destination.path;
+        const freeBytes = destination.freeBytes ?? storageDestination.freeBytes;
+
+        if (freeBytes !== null && sourceSizeBytes > freeBytes) {
+            throw new Error(
+                `Not enough free space on destination: need ${formatSize(sourceSizeBytes)}, available ${formatSize(freeBytes)}`
+            );
+        }
 
         if (shouldStopStorageCopy(nextItem.id)) {
             return;
@@ -1195,14 +1202,33 @@ function getStorageInstallRoot(destinationRoot: string): string {
     return pathApi.join(normalizedRoot, 'install');
 }
 
-async function getStreamCopyDestinationPath(
+type StreamCopyDestination = {
+    path: string;
+    freeBytes: number | null;
+};
+
+async function getStreamCopyDestination(
     sourcePath: string,
+    destinationRoot: string
+): Promise<StreamCopyDestination> {
+    const resolvedDestinationRoot =
+        await ensureStorageInstallRoot(destinationRoot);
+
+    return {
+        path: path.join(
+            resolvedDestinationRoot,
+            path.basename(sourcePath.replace(/[\\/]+$/, ''))
+        ),
+        freeBytes: await getStorageFreeBytes(resolvedDestinationRoot),
+    };
+}
+
+async function ensureStorageInstallRoot(
     destinationRoot: string
 ): Promise<string> {
     let resolvedDestinationRoot: string;
     const installRoot = getStorageInstallRoot(destinationRoot);
-    const isWindowsPath = /^[A-Z]:(?:[\\/]|$)/i.test(installRoot);
-    if (isWindowsPath) {
+    if (isWindowsPath(installRoot)) {
         const resolvedPath = await resolveReadablePath(installRoot).catch(
             () => null
         );
@@ -1224,10 +1250,19 @@ async function getStreamCopyDestinationPath(
         }
     }
 
-    return path.join(
-        resolvedDestinationRoot,
-        path.basename(sourcePath.replace(/[\\/]+$/, ''))
-    );
+    await mkdir(resolvedDestinationRoot, { recursive: true });
+    return resolvedDestinationRoot;
+}
+
+async function getStorageFreeBytes(
+    storagePath: string
+): Promise<number | null> {
+    try {
+        const stats = await statfs(storagePath);
+        return stats.bavail * stats.bsize;
+    } catch {
+        return null;
+    }
 }
 
 function getStorageCopyDisplayName(filePath: string): string {

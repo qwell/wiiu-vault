@@ -160,7 +160,7 @@ function getFat32Devices(): Promise<Fat32ListResponse> {
 async function populateFat32DeviceSelect(
     select: HTMLSelectElement,
     button: HTMLButtonElement
-): Promise<void> {
+): Promise<Fat32ListResponse | null> {
     try {
         const response = await getFat32Devices();
 
@@ -200,6 +200,8 @@ async function populateFat32DeviceSelect(
             option.textContent = 'No FAT32 devices found';
             select.append(option);
         }
+
+        return response;
     } catch {
         select.replaceChildren();
         const option = document.createElement('option');
@@ -207,6 +209,7 @@ async function populateFat32DeviceSelect(
         select.append(option);
         select.disabled = true;
         button.disabled = true;
+        return null;
     }
 }
 
