@@ -11,7 +11,6 @@ import {
     markStorageDeletesComplete,
 } from './library-state.js';
 import { syncStorageCopies, syncStorageDeletes } from './storage.js';
-import { getSocketUrl } from './socket.js';
 
 export type LibraryStatusTone = 'info' | 'success' | 'error';
 
@@ -37,6 +36,11 @@ type AppEventOptions = {
 let appSocket: WebSocket | null = null;
 let reconnectSocketTimer: number | null = null;
 let appSocketOptions: AppSocketOptions | null = null;
+
+function getSocketUrl(): string {
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${location.host}/api/socket`;
+}
 
 export function sendAppSocketCommand(command: AppSocketCommand): void {
     if (!appSocket || appSocket.readyState !== WebSocket.OPEN) {
