@@ -6,6 +6,8 @@ import {
 import {
     type AppSocketCommand,
     type AppSocketEvent,
+    type TitleVerifySocketEvent,
+    type ValidationStatusEvent,
 } from '../shared/socket.js';
 import { type TitleGroup } from '../shared/titles.js';
 import { syncDownloadQueue } from './download.js';
@@ -14,8 +16,6 @@ import {
     markStorageDeletesComplete,
 } from './library-state.js';
 import { syncStorageCopies, syncStorageDeletes } from './storage.js';
-
-export type LibraryStatusTone = 'info' | 'success' | 'error';
 
 type AppSocketOptions = {
     reconnectMs: number;
@@ -33,7 +33,8 @@ type AppEventOptions = {
     onServerAvailable: () => void;
     onGroupChanged: (group: TitleGroup) => void;
     onValidationStateChanged: (validating: boolean) => void;
-    onLibraryStatusChanged: (message: string, tone: LibraryStatusTone) => void;
+    onLibraryValidationChanged: (event: ValidationStatusEvent) => void;
+    onTitleVerificationChanged: (event: TitleVerifySocketEvent) => void;
 };
 
 let appSocket: WebSocket | null = null;
@@ -106,32 +107,6 @@ export function connectAppSocket(options: AppSocketOptions): void {
         options.onGone();
         scheduleAppSocketReconnect();
     });
-}
-
-function formatValidationStatus(event: AppSocketEvent): string | null {
-    if (event.type !== 'library.validationStatus') {
-        return null;
-    }
-
-    switch (event.status) {
-        case 'started':
-            return 'Validating library...';
-
-        case 'validating':
-            return `Validating library... [${event.titleId}] ${event.titleName} [${event.titleKind}] (${event.sizeText})`;
-
-        case 'validated':
-            return `Validated library... [${event.titleId}] ${event.titleName} [${event.titleKind}] (${event.result})`;
-
-        case 'complete':
-            return event.failed === 0
-                ? `Validation passed for ${event.total} titles.`
-                : `Validation failed for ${event.failed} of ${event.total} titles. Check the server logs for details.`;
-        case 'failed':
-            return event.error
-                ? `Failed to validate library. ${event.error}`
-                : 'Failed to validate library.';
-    }
 }
 
 export function createAppEventHandler(
@@ -207,22 +182,14 @@ export function createAppEventHandler(
                     event.status !== 'complete' && event.status !== 'failed'
                 );
 
-                const message = formatValidationStatus(event);
-                if (!message) {
-                    return;
-                }
-
-                const tone =
-                    event.status === 'complete' && event.failed === 0
-                        ? 'success'
-                        : event.status === 'failed' ||
-                            (event.status === 'complete' && event.failed !== 0)
-                          ? 'error'
-                          : 'info';
-
-                options.onLibraryStatusChanged(message, tone);
+                options.onLibraryValidationChanged(event);
                 return;
             }
+
+            case 'title.verify.changed':
+                options.onServerAvailable();
+                options.onTitleVerificationChanged(event);
+                return;
         }
     };
 

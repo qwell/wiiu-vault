@@ -6,8 +6,10 @@ import {
     SOCKET_COMMAND,
     isDownloadSocketCommand,
     isIdSocketCommandType,
+    isLibraryValidationSocketCommand,
     isStorageCopySocketCommand,
     isStorageDeleteSocketCommand,
+    isTitleVerifySocketCommand,
 } from '../shared/socket.js';
 import { type DownloadQueueItem } from '../shared/download.js';
 import logger from '../shared/logger.js';
@@ -16,6 +18,8 @@ import {
     handleStorageDeleteSocketCommand,
 } from './routes/storage.js';
 import { handleDownloadSocketCommand } from './routes/download.js';
+import { handleLibraryValidationSocketCommand } from './routes/library.js';
+import { handleTitleVerifySocketCommand } from './routes/title.js';
 
 type AppSocketOptions = {
     server: Server;
@@ -129,6 +133,16 @@ export function handleAppSocketCommand(command: AppSocketCommand): void {
 
     if (isStorageDeleteSocketCommand(command)) {
         handleStorageDeleteSocketCommand(command);
+        return;
+    }
+
+    if (isLibraryValidationSocketCommand(command)) {
+        handleLibraryValidationSocketCommand(command);
+        return;
+    }
+
+    if (isTitleVerifySocketCommand(command)) {
+        handleTitleVerifySocketCommand(command);
     }
 }
 
@@ -198,6 +212,20 @@ function parseSocketCommand(data: RawData): AppSocketCommand | null {
         const id = (command as { id?: unknown }).id;
 
         if (typeof id !== 'string' || id.length === 0) {
+            return null;
+        }
+
+        return parsed as AppSocketCommand;
+    }
+
+    if (command.type === SOCKET_COMMAND.libraryValidationCancel) {
+        return parsed as AppSocketCommand;
+    }
+
+    if (command.type === SOCKET_COMMAND.titleVerifyQueue) {
+        const titleId = (command as { titleId?: unknown }).titleId;
+
+        if (typeof titleId !== 'string' || !/^[0-9a-f]{16}$/i.test(titleId)) {
             return null;
         }
 

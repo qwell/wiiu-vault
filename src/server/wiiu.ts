@@ -2,11 +2,7 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { type Dirent } from 'node:fs';
 import path from 'node:path';
 import { normalizeRegion } from '../shared/regions.js';
-import {
-    type ContentTreeVerification,
-    TMD_TITLE_FILE,
-    validateTitleInstallFiles,
-} from './metadata.js';
+import { TMD_TITLE_FILE, validateTitleInstallFiles } from './metadata.js';
 
 import {
     type AvailableTitleEntry,
@@ -30,17 +26,7 @@ import { getImmediatePathSizeBytes } from '../shared/file.js';
 import { readTmd } from './metadata.js';
 import logger from '../shared/logger.js';
 import { ansi } from '../shared/ansi.js';
-
-export type LibraryTitleValidation = {
-    root: string | null;
-    directory: string | null;
-    titleName: string;
-    titleId: string | null;
-    titleVersion: number | null;
-    status: 'ok' | 'failed';
-    error: string | null;
-    verification: ContentTreeVerification[];
-};
+import { LibraryValidationTitle } from '../shared/api.js';
 
 type GameTdbLocale = {
     '@lang'?: string;
@@ -349,7 +335,11 @@ async function readGameTdb(): Promise<Map<string, TitleDetails>> {
                 ])
         );
     } catch (error) {
-        logger.warn('wiiu', `failed to read GameTdb at ${filePath}:`, error);
+        logger.warn(
+            'wiiu',
+            `failed to read GameTdb at ${filePath}:`,
+            String(error)
+        );
         return new Map();
     }
 }
@@ -365,9 +355,9 @@ async function readTitleDatabaseFile(
         const message = `[wiiu] failed to read titles DB at ${filePath}:`;
 
         if (required) {
-            logger.error('metadata', message, error);
+            logger.error('metadata', message, String(error));
         } else {
-            logger.warn('metadata', message, error);
+            logger.warn('metadata', message, String(error));
         }
 
         return [];
@@ -778,6 +768,8 @@ type LibraryValidationProgress =
           titleName: string;
           titleKind: TitleKinds;
           sizeText: string;
+          current: number;
+          total: number;
       }
     | {
           status: 'validated';
@@ -785,6 +777,9 @@ type LibraryValidationProgress =
           titleName: string;
           titleKind: TitleKinds;
           result: 'ok' | 'failed';
+          error: string | null;
+          current: number;
+          total: number;
       };
 
 export type LibraryValidationProgressCallback = (
@@ -793,13 +788,23 @@ export type LibraryValidationProgressCallback = (
 
 export async function validateWiiUTitles(
     root: string,
-    onProgress?: (progress: LibraryValidationProgress) => void
-): Promise<LibraryTitleValidation[]> {
-    const directories = await findTitleDirs(root);
-    const validations: LibraryTitleValidation[] = [];
+    onProgress?: (progress: LibraryValidationProgress) => void,
+    options: {
+        directories?: string[];
+        offset?: number;
+        total?: number;
+        signal?: AbortSignal;
+    } = {}
+): Promise<LibraryValidationTitle[]> {
+    const directories = options.directories ?? (await findTitleDirs(root));
+    const validations: LibraryValidationTitle[] = [];
     const titleDatabase = await readTitleDatabase();
+    const offset = options.offset ?? 0;
+    const total = options.total ?? directories.length;
 
-    for (const directory of directories) {
+    for (const [index, directory] of directories.entries()) {
+        throwIfLibraryValidationCancelled(options.signal);
+
         const dirPath = path.join(root, directory);
         const titleEntry = await readTitleEntry(root, directory, titleDatabase);
         const sizeBytes =
@@ -816,6 +821,8 @@ export async function validateWiiUTitles(
             titleName,
             titleKind,
             sizeText,
+            current: offset + index,
+            total,
         });
 
         logger.log(
@@ -823,6 +830,7 @@ export async function validateWiiUTitles(
             `validating title: [${titleId}] ${titleName} [${titleKind}] (${sizeText})`
         );
         const validation = await validateTitleInstallFiles(dirPath);
+        throwIfLibraryValidationCancelled(options.signal);
         const result = validation.status === 'ok' ? 'ok' : 'failed';
         const status =
             validation.status === 'failed'
@@ -841,6 +849,9 @@ export async function validateWiiUTitles(
             titleName,
             titleKind,
             result,
+            error: validation.error,
+            current: offset + index + 1,
+            total,
         });
 
         validations.push({
@@ -849,6 +860,8 @@ export async function validateWiiUTitles(
             titleName,
             titleId: validation.titleId,
             titleVersion: validation.titleVersion,
+            titleKind,
+            sizeText,
             status: validation.status,
             error: validation.error,
             verification: validation.verification,
@@ -860,17 +873,44 @@ export async function validateWiiUTitles(
 
 export async function validateWiiUTitleRoots(
     roots: string[],
-    onProgress?: (progress: LibraryValidationProgress) => void
-): Promise<LibraryTitleValidation[]> {
-    const validations: LibraryTitleValidation[] = [];
+    onProgress?: (progress: LibraryValidationProgress) => void,
+    signal?: AbortSignal
+): Promise<LibraryValidationTitle[]> {
+    const validations: LibraryValidationTitle[] = [];
+    const readableRoots: { root: string; directories: string[] }[] = [];
 
     for (const root of roots) {
+        throwIfLibraryValidationCancelled(signal);
+
         try {
             await assertReadableDirectory(root);
-            validations.push(...(await validateWiiUTitles(root, onProgress)));
+            readableRoots.push({
+                root,
+                directories: await findTitleDirs(root),
+            });
         } catch {
             logger.warn('wiiu', `skipping Wii U root ${root}`);
         }
+    }
+
+    const total = readableRoots.reduce(
+        (sum, root) => sum + root.directories.length,
+        0
+    );
+    let offset = 0;
+
+    for (const root of readableRoots) {
+        throwIfLibraryValidationCancelled(signal);
+
+        validations.push(
+            ...(await validateWiiUTitles(root.root, onProgress, {
+                directories: root.directories,
+                offset,
+                total,
+                signal,
+            }))
+        );
+        offset += root.directories.length;
     }
 
     validations.push(
@@ -883,9 +923,15 @@ export async function validateWiiUTitleRoots(
     return sortLibraryTitleValidations(validations);
 }
 
+function throwIfLibraryValidationCancelled(signal?: AbortSignal): void {
+    if (signal?.aborted) {
+        throw new Error('Validation cancelled');
+    }
+}
+
 function sortLibraryTitleValidations(
-    validations: LibraryTitleValidation[]
-): LibraryTitleValidation[] {
+    validations: LibraryValidationTitle[]
+): LibraryValidationTitle[] {
     return validations.sort((a, b) => {
         const nameComparison = a.titleName.localeCompare(b.titleName);
         if (nameComparison !== 0) {
@@ -900,14 +946,14 @@ function sortLibraryTitleValidations(
 
 function createMissingExpectedChildValidations(
     groups: TitleGroup[],
-    existingValidations: LibraryTitleValidation[]
-): LibraryTitleValidation[] {
+    existingValidations: LibraryValidationTitle[]
+): LibraryValidationTitle[] {
     const installedTitleIds = new Set(
         existingValidations
             .map((validation) => validation.titleId)
             .filter((titleId): titleId is string => titleId !== null)
     );
-    const missing: LibraryTitleValidation[] = [];
+    const missing: LibraryValidationTitle[] = [];
 
     for (const group of groups) {
         if (group.entries.length === 0) {
@@ -932,6 +978,8 @@ function createMissingExpectedChildValidations(
                 titleName: group.name,
                 titleId: expectedEntry.titleId,
                 titleVersion: expectedEntry.versions[0] ?? null,
+                titleKind: expectedKind,
+                sizeText: null,
                 status: 'failed',
                 error: `Missing expected ${expectedKind}`,
                 verification: [],

@@ -10,10 +10,15 @@ import {
 import { getConfig } from '../../shared/config.js';
 import logger from '../../shared/logger.js';
 import { formatLogError } from '../../shared/shared.js';
-import { type ValidationStatusEvent } from '../../shared/socket.js';
+import {
+    SOCKET_COMMAND,
+    type LibraryValidationSocketCommand,
+    type ValidationStatusEvent,
+} from '../../shared/socket.js';
 import { setLibraryCacheGroups } from '../../shared/wiiu.js';
 
 let latestLibraryValidationStatus: ValidationStatusEvent | null = null;
+let activeLibraryValidationAbortController: AbortController | null = null;
 
 export function getLatestLibraryValidationStatus(): ValidationStatusEvent | null {
     return latestLibraryValidationStatus;
@@ -49,6 +54,9 @@ export function createLibraryRouter(): Router {
     });
 
     router.get('/validate', async (_req, res) => {
+        const abortController = new AbortController();
+        activeLibraryValidationAbortController = abortController;
+
         try {
             broadcastLibraryValidationStatus({
                 type: 'library.validationStatus',
@@ -62,7 +70,8 @@ export function createLibraryRouter(): Router {
                         type: 'library.validationStatus',
                         ...progress,
                     });
-                }
+                },
+                abortController.signal
             );
             const failed = titles.filter(
                 (title) => title.status !== 'ok'
@@ -98,8 +107,22 @@ export function createLibraryRouter(): Router {
             sendServerError(res, 'Failed to validate library', error, {
                 includeDetails: true,
             });
+        } finally {
+            if (activeLibraryValidationAbortController === abortController) {
+                activeLibraryValidationAbortController = null;
+            }
         }
     });
 
     return router;
+}
+
+export function handleLibraryValidationSocketCommand(
+    command: LibraryValidationSocketCommand
+): void {
+    switch (command.type) {
+        case SOCKET_COMMAND.libraryValidationCancel:
+            activeLibraryValidationAbortController?.abort();
+            return;
+    }
 }

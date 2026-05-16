@@ -4,7 +4,7 @@ import {
 } from './config.js';
 import { type Fat32Volume, type RuntimeOs } from './os.js';
 import { type StorageCopyItem, type StorageDeleteItem } from './storage.js';
-import { type TitleGroup } from './titles.js';
+import { type TitleGroup, type TitleKinds } from './titles.js';
 
 export type ApiErrorResponse = {
     error: string;
@@ -30,6 +30,8 @@ export type LibraryValidationTitle = {
     titleName: string;
     titleId: string | null;
     titleVersion: number | null;
+    titleKind: TitleKinds;
+    sizeText: string | null;
     status: 'ok' | 'failed';
     error: string | null;
     verification: unknown[];

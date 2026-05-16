@@ -138,7 +138,7 @@ export type TitleDetails = {
 };
 
 export type AvailableTitleEntry = {
-    kind: TitleKinds.Base | TitleKinds.Update | TitleKinds.DLC;
+    kind: TitleKinds;
     titleId: string;
     versions: number[];
     availableOnCdn: boolean;

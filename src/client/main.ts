@@ -2,10 +2,18 @@ import { renderDownloadMarkers } from './download.js';
 import { getLibrary, listFat32Volumes, validateLibrary } from './api.js';
 import { type Fat32ListResponse } from '../shared/api.js';
 import {
+    type TitleVerifySocketEvent,
+    type ValidationStatusEvent,
+} from '../shared/socket.js';
+import {
     type StorageCopyItem,
     type StorageDeleteItem,
 } from '../shared/storage.js';
-import { createActionBarCommandHandler, mountActionBar } from './action-bar.js';
+import {
+    createActionBarCommandHandler,
+    mountActionBar,
+    setLibraryValidationAction,
+} from './action-bar.js';
 import {
     type TitleGroup,
     type TitleGroupStatus,
@@ -23,11 +31,7 @@ import {
     openSettingsSidebar,
     setupSettingsSidebar,
 } from './settings.js';
-import {
-    connectAppSocket,
-    createAppEventHandler,
-    type LibraryStatusTone,
-} from './app-socket.js';
+import { connectAppSocket, createAppEventHandler } from './app-socket.js';
 import {
     buildDetailSidebar,
     closeDetailSidebar,
@@ -38,7 +42,10 @@ import {
     toggleDetailSidebar,
     refreshOpenDetailSidebarForGroup,
     updateRenderedTitleGroup,
+    mergeFailedValidationsIntoAvailable,
+    isVerificationFailed,
 } from './title-detail.js';
+import logger from '../shared/logger.js';
 
 declare const __APP_VERSION__: string;
 const SOCKET_RECONNECT_MS = 2000;
@@ -65,14 +72,15 @@ let libraryControlState: LibraryControlState = {
     vc: 'all',
     search: '',
 };
-let libraryStatusMessage = '';
-let libraryStatusTone: LibraryStatusTone = 'info';
+let libraryValidation: ValidationStatusEvent | null = null;
 let validatingLibrary = false;
 let libraryLoading = false;
 let activeLibraryRequestId = 0;
 const downloadQueue: DownloadQueueItem[] = [];
 const storageCopies: StorageCopyItem[] = [];
 const storageDeletes: StorageDeleteItem[] = [];
+const libraryValidationFailures: ValidationStatusEvent[] = [];
+const titleVerifications = new Map<string, TitleVerifySocketEvent>();
 
 function handleTitleGroupChanged(group: TitleGroup): void {
     updateRenderedTitleGroup(group);
@@ -619,29 +627,37 @@ function buildControls(
             }
 
             validatingLibrary = true;
+            libraryValidation = {
+                type: 'library.validationStatus',
+                status: 'started',
+            };
+            setLibraryValidationAction(libraryValidation);
             updateValidationButtonState();
 
-            libraryStatusMessage = 'Validating library...';
-            libraryStatusTone = 'info';
-            updateLibraryStatusLine();
-
             try {
-                const result = await validateLibrary();
+                const response = await validateLibrary();
 
-                libraryStatusMessage =
-                    result.failed === 0
-                        ? `Validation passed for ${result.total} titles.`
-                        : `Validation failed for ${result.failed} of ${result.total} titles. Check the server logs for details.`;
+                const changedGroups = mergeFailedValidationsIntoAvailable(
+                    currentGroups,
+                    response.titles
+                );
 
-                libraryStatusTone = result.failed === 0 ? 'success' : 'error';
+                for (const group of changedGroups) {
+                    syncGroupStatusFromSlots(group);
+                    handleTitleGroupChanged(group);
+                }
             } catch (error) {
                 console.error(error);
-                libraryStatusMessage = 'Failed to validate library.';
-                libraryStatusTone = 'error';
+                libraryValidation = {
+                    type: 'library.validationStatus',
+                    status: 'failed',
+                    error:
+                        error instanceof Error ? error.message : String(error),
+                };
+                setLibraryValidationAction(libraryValidation);
             } finally {
                 validatingLibrary = false;
                 updateValidationButtonState();
-                updateLibraryStatusLine();
             }
         })();
     });
@@ -740,8 +756,8 @@ function buildLibraryContent(
     );
 
     const loadingLine = document.createElement('div');
-    loadingLine.className = `library-loading library-loading-${loading ? 'info' : libraryStatusTone}`;
-    loadingLine.textContent = loading ? 'Loading...' : libraryStatusMessage;
+    loadingLine.className = 'library-loading library-loading-info';
+    loadingLine.textContent = loading ? 'Loading...' : '';
     loadingLine.setAttribute('role', 'status');
     loadingLine.setAttribute('aria-live', 'polite');
 
@@ -773,18 +789,6 @@ function updateValidationButtonState(): void {
     validateIcon.className = validatingLibrary
         ? 'fa-solid fa-spinner fa-spin'
         : 'fa-solid fa-check-double';
-}
-
-function updateLibraryStatusLine(): void {
-    const loadingLine =
-        document.querySelector<HTMLDivElement>('.library-loading');
-
-    if (!loadingLine) {
-        return;
-    }
-
-    loadingLine.className = `library-loading library-loading-${libraryStatusTone}`;
-    loadingLine.textContent = libraryStatusMessage;
 }
 
 async function loadLibrary(output: HTMLElement): Promise<void> {
@@ -889,6 +893,7 @@ function setupSidebars(): void {
     );
     setupTitleDetails({
         downloads: downloadQueue,
+        titleVerifications,
         populateFat32DeviceSelect,
         observeIcon(image, src) {
             if (iconObserver) {
@@ -957,6 +962,8 @@ mountActionBar({
     downloads: downloadQueue,
     storageCopies,
     storageDeletes,
+    libraryValidation,
+    libraryValidationFailures,
     onCommand: createActionBarCommandHandler({
         downloads: downloadQueue,
     }),
@@ -978,13 +985,51 @@ connectAppSocket({
             validatingLibrary = validating;
             updateValidationButtonState();
         },
-        onLibraryStatusChanged(message, tone) {
-            libraryStatusMessage = message;
-            libraryStatusTone = tone;
-            updateLibraryStatusLine();
+        onLibraryValidationChanged(event) {
+            libraryValidation = event;
+            setLibraryValidationAction(libraryValidation);
+        },
+        onTitleVerificationChanged(event) {
+            titleVerifications.set(event.titleId, event);
+
+            const group = currentGroups.find(
+                (candidate) => candidate.family === event.titleId.slice(8)
+            );
+
+            if (group) {
+                if (isVerificationFailed(event)) {
+                    const entry = group.entries.find(
+                        (candidate) =>
+                            candidate.titleId.toLowerCase() ===
+                            event.titleId.toLowerCase()
+                    );
+
+                    if (entry) {
+                        const alreadyAvailable = group.availableEntries.some(
+                            (candidate) =>
+                                candidate.kind === entry.kind &&
+                                candidate.titleId.toLowerCase() ===
+                                    entry.titleId.toLowerCase()
+                        );
+                        if (!alreadyAvailable) {
+                            group.availableEntries.push({
+                                kind: entry.kind,
+                                titleId: entry.titleId.toLowerCase(),
+                                versions:
+                                    entry.version > 0 ? [entry.version] : [],
+                                availableOnCdn: true,
+                            });
+                        }
+                    }
+                }
+
+                refreshOpenDetailSidebarForGroup(group);
+            }
         },
     }),
 });
+
+logger.log('client', 'Client initialized');
 
 setupSidebars();
 

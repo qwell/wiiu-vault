@@ -864,6 +864,12 @@ footer > div:last-child {
     color: var(--fg);
 }
 
+.title-storage-copy-row {
+    grid-template-columns:
+        18px 13ch minmax(0, 1fr) max-content max-content
+        max-content;
+}
+
 .title-download-row input {
     margin: 0;
 }
@@ -903,6 +909,23 @@ footer > div:last-child {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.title-storage-verification-state {
+    min-width: 0;
+    color: var(--border-muted);
+    font-size: 0.9em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.title-storage-verification-state-ok {
+    color: var(--complete);
+}
+
+.title-storage-verification-state-failed {
+    color: var(--unknown);
 }
 
 .title-download-size {
@@ -1012,7 +1035,7 @@ footer > div:last-child {
     grid-template-columns:
         6ch 11ch 24px minmax(8ch, max-content) minmax(8ch, max-content) minmax(
             18ch,
-            max-content
+            1fr
         )
         minmax(18ch, 1fr);
     column-gap: 8px;
@@ -1085,6 +1108,14 @@ footer > div:last-child {
 }
 
 .action-bar-row-copying .action-bar-icon {
+    color: var(--complete);
+}
+
+.action-bar-row-validating .action-bar-icon {
+    color: var(--incomplete);
+}
+
+.action-bar-row-complete .action-bar-icon {
     color: var(--complete);
 }
 

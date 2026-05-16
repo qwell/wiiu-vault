@@ -736,6 +736,78 @@ export async function validateTitleInstallFiles(
     };
 }
 
+export async function validateTitleInstallFileSizes(
+    dirPath: string
+): Promise<InstalledTitleValidation> {
+    const tmd = await readTmd(dirPath);
+    if (!tmd) {
+        return createFailedInstalledValidation(
+            null,
+            null,
+            `Missing or invalid ${TMD_TITLE_FILE}`
+        );
+    }
+
+    const titleId = getTitleIdHex(tmd.header.titleId);
+    const titleVersion = tmd.header.titleVersion;
+    const verification: ContentTreeVerification[] = [];
+
+    for (const content of tmd.contents) {
+        verification.push(
+            await verifyInstalledContentFileSize(dirPath, content)
+        );
+    }
+
+    return {
+        titleId,
+        titleVersion,
+        status: verification.every((result) => result.status === 'ok')
+            ? 'ok'
+            : 'failed',
+        error: null,
+        verification,
+    };
+}
+
+async function verifyInstalledContentFileSize(
+    dirPath: string,
+    content: TmdContent
+): Promise<ContentTreeVerification> {
+    const files = getContentInstallFiles(dirPath, content);
+    const expectedSize = getEncryptedContentFileSize(content);
+
+    try {
+        await assertExistingContentFileSize(
+            files.appFile,
+            expectedSize,
+            files.contentId
+        );
+
+        if (isHashedContent(content)) {
+            if (!files.h3File) {
+                return {
+                    contentId: files.contentId,
+                    status: 'failed',
+                    error: 'Missing H3 file path for hashed content',
+                };
+            }
+
+            await stat(files.h3File);
+        }
+
+        return {
+            contentId: files.contentId,
+            status: 'ok',
+        };
+    } catch (error) {
+        return {
+            contentId: files.contentId,
+            status: 'failed',
+            error: error instanceof Error ? error.message : String(error),
+        };
+    }
+}
+
 function createFailedInstalledValidation(
     titleId: string | null,
     titleVersion: number | null,
@@ -878,7 +950,7 @@ export function readMetaXmlJson(
         };
         return parsed.menu ?? null;
     } catch (error) {
-        logger.warn('metadata', 'failed to parse meta.xml:', error);
+        logger.warn('metadata', 'failed to parse meta.xml:', String(error));
         return null;
     }
 }
@@ -930,7 +1002,7 @@ export async function readTikHeader(dirPath: string): Promise<Tik | null> {
         logger.warn(
             'metadata',
             `failed to read ${TIK_TITLE_FILE} from ${dirPath}:`,
-            error
+            String(error)
         );
         return null;
     }
@@ -1026,7 +1098,7 @@ export async function readTmd(dirPath: string): Promise<Tmd | null> {
         logger.warn(
             'metadata',
             `failed to read ${TMD_TITLE_FILE} from ${dirPath}:`,
-            error
+            String(error)
         );
         return null;
     }

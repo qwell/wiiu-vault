@@ -1,8 +1,16 @@
-import { type Fat32ListResponse } from '../shared/api.js';
+import {
+    LibraryValidationTitle,
+    type Fat32ListResponse,
+} from '../shared/api.js';
 import { type DownloadQueueItem } from '../shared/download.js';
 import { type Fat32Volume } from '../shared/os.js';
+import {
+    SOCKET_COMMAND,
+    type TitleVerifySocketEvent,
+} from '../shared/socket.js';
 import { formatSize } from '../shared/shared.js';
 import {
+    AvailableTitleEntry,
     PARENT_KINDS,
     type TitleDetails,
     type TitleEntry,
@@ -25,9 +33,11 @@ import {
     getChildBadgeState,
     type SlotBadgeState,
 } from './library-state.js';
+import { sendAppSocketCommand } from './app-socket.js';
 
 type TitleDetailOptions = {
     downloads: DownloadQueueItem[];
+    titleVerifications: Map<string, TitleVerifySocketEvent>;
     observeIcon: (image: HTMLImageElement, src: string) => void;
     populateFat32DeviceSelect: (
         select: HTMLSelectElement,
@@ -110,8 +120,53 @@ function formatInput(details: TitleDetails): string {
     return parts.join('; ') || '-';
 }
 
-function hasLocalEntry(group: TitleGroup, kind: TitleKinds): boolean {
-    return group.entries.some((entry) => entry.kind === kind);
+function isLocalEntryVerificationFailed(
+    entry: TitleEntry,
+    titleVerifications: Map<string, TitleVerifySocketEvent> | null
+): boolean {
+    const verification = titleVerifications?.get(entry.titleId) ?? null;
+
+    return isVerificationFailed(verification);
+}
+
+export function isVerificationFailed(
+    event: TitleVerifySocketEvent | null
+): boolean {
+    if (!event) {
+        return false;
+    }
+
+    if (event.status === 'failed') {
+        return true;
+    }
+
+    if (event.status !== 'complete') {
+        return false;
+    }
+
+    return event.copies.some((copy) => copy.status === 'failed');
+}
+
+function hasUsableLocalEntry(
+    group: TitleGroup,
+    kind: TitleKinds,
+    titleVerifications: Map<string, TitleVerifySocketEvent> | null
+): boolean {
+    const localEntries = group.entries.filter((entry) => entry.kind === kind);
+
+    if (localEntries.length === 0) {
+        return false;
+    }
+
+    return localEntries.some((entry) => {
+        const verification = titleVerifications?.get(entry.titleId) ?? null;
+
+        if (verification === null) {
+            return false;
+        }
+
+        return !isVerificationFailed(verification);
+    });
 }
 
 function renderDetailRow(label: string, value: string | null): HTMLElement {
@@ -128,13 +183,35 @@ function renderDetailRow(label: string, value: string | null): HTMLElement {
     return row;
 }
 
-function formatTitleKindLabel(kind: TitleKinds): string {
-    return kind === TitleKinds.Base ? 'Game' : kind;
+export function formatTitleKind(kind: TitleKinds | string): string {
+    return kind === String(TitleKinds.Base) ? 'Game' : kind;
+}
+
+function formatTitleVerificationStatus(
+    event: TitleVerifySocketEvent | null
+): string {
+    if (!event) {
+        return '';
+    }
+
+    switch (event.status) {
+        case 'verifying':
+            return 'Checking';
+        case 'failed':
+            return 'Check failed';
+        case 'complete': {
+            const failedCount = event.copies.reduce(
+                (sum, copy) => sum + (copy.status === 'failed' ? 1 : 0),
+                0
+            );
+            return failedCount > 0 ? `${failedCount} failed` : 'Verified';
+        }
+    }
 }
 
 function renderDownloadedCopyRow(entry: TitleEntry): HTMLElement {
     const row = document.createElement('label');
-    row.className = 'title-download-row';
+    row.className = 'title-download-row title-storage-copy-row';
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -145,7 +222,7 @@ function renderDownloadedCopyRow(entry: TitleEntry): HTMLElement {
 
     const slot = document.createElement('span');
     slot.className = 'title-download-slot';
-    slot.textContent = `${formatTitleKindLabel(entry.kind)} v${entry.version}`;
+    slot.textContent = `${formatTitleKind(entry.kind)} v${entry.version}`;
 
     const titleId = document.createElement('span');
     titleId.className = 'title-download-id';
@@ -156,11 +233,35 @@ function renderDownloadedCopyRow(entry: TitleEntry): HTMLElement {
     copyCount.textContent =
         entry.copyCount > 1 ? `(${entry.copyCount} copies)` : '';
 
+    const verification = options?.titleVerifications.get(entry.titleId) ?? null;
+    const verificationStatus = document.createElement('span');
+    verificationStatus.className = 'title-storage-verification-state';
+    verificationStatus.textContent =
+        formatTitleVerificationStatus(verification);
+    if (verification?.status === 'complete') {
+        const failedCount = verification.copies.reduce(
+            (sum, copy) => sum + (copy.status === 'failed' ? 1 : 0),
+            0
+        );
+        verificationStatus.classList.toggle(
+            'title-storage-verification-state-failed',
+            failedCount > 0
+        );
+        verificationStatus.classList.toggle(
+            'title-storage-verification-state-ok',
+            failedCount === 0
+        );
+    } else if (verification?.status === 'failed') {
+        verificationStatus.classList.add(
+            'title-storage-verification-state-failed'
+        );
+    }
+
     const size = document.createElement('span');
     size.className = 'title-download-size';
     size.textContent = formatSize(entry.sizeBytes);
 
-    row.append(checkbox, slot, titleId, copyCount, size);
+    row.append(checkbox, slot, titleId, copyCount, verificationStatus, size);
     return row;
 }
 
@@ -247,7 +348,7 @@ function updateStorageCopyAvailability(
 
 function formatDeleteConfirmationEntry(entry: TitleEntry): string {
     const copyText = entry.copyCount > 1 ? ` (${entry.copyCount} copies)` : '';
-    return `${entry.titleName} v${entry.version} [${formatTitleKindLabel(entry.kind)}] ${entry.titleId}${copyText}`;
+    return `${entry.titleName} v${entry.version} [${formatTitleKind(entry.kind)}] ${entry.titleId}${copyText}`;
 }
 
 function getKindSortValue(kind: TitleKinds): number {
@@ -364,13 +465,26 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
     const availability = document.createElement('div');
     availability.className = 'title-detail-availability';
 
-    if (group.entries.length > 0) {
+    const localEntries = group.entries
+        .filter((entry) => {
+            const verification =
+                detailOptions?.titleVerifications?.get(entry.titleId) ?? null;
+            if (verification === null) return false;
+            return !isVerificationFailed(verification);
+        })
+        .sort((a, b) => getKindSortValue(a.kind) - getKindSortValue(b.kind));
+
+    const actionableLocalEntries = localEntries.filter(
+        (entry) =>
+            !isLocalEntryVerificationFailed(
+                entry,
+                detailOptions?.titleVerifications ?? null
+            )
+    );
+
+    if (localEntries.length > 0) {
         const localList = document.createElement('div');
         localList.className = 'title-download-list';
-
-        const localEntries = [...group.entries].sort(
-            (a, b) => getKindSortValue(a.kind) - getKindSortValue(b.kind)
-        );
 
         for (const entry of localEntries) {
             localList.append(renderDownloadedCopyRow(entry));
@@ -402,7 +516,7 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
             );
             updateStorageCopyAvailability(
                 localList,
-                localEntries,
+                actionableLocalEntries,
                 selectedVolume
             );
             const checkedCount = localList.querySelectorAll(
@@ -412,7 +526,7 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
                 !destinationSelect.disabled && destinationSelect.value !== '';
             const selectedSizeBytes = getStorageCopySelectionSizeBytes(
                 localList,
-                localEntries,
+                actionableLocalEntries,
                 checkedCount > 0
             );
             const freeBytes = selectedVolume?.freeBytes;
@@ -428,7 +542,11 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
                   : 'Copy selected to SD';
             deleteButton.textContent =
                 checkedCount === 0 ? 'Delete all' : 'Delete selected';
-            copyButton.disabled = !hasCopyDestination || !hasEnoughFreeSpace;
+            copyButton.disabled =
+                actionableLocalEntries.length === 0 ||
+                !hasCopyDestination ||
+                !hasEnoughFreeSpace;
+            deleteButton.disabled = actionableLocalEntries.length === 0;
             copyButton.title =
                 hasCopyDestination && !hasEnoughFreeSpace && selectedVolume
                     ? `Not enough free space: ${formatSize(selectedSizeBytes)} selected, ${formatSize(freeBytes ?? null)} available`
@@ -471,7 +589,9 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
                         })
                     );
                 } finally {
-                    copyButton.disabled = destinationSelect.disabled;
+                    copyButton.disabled =
+                        actionableLocalEntries.length === 0 ||
+                        destinationSelect.disabled;
                 }
             })();
         });
@@ -492,7 +612,7 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
                 }
 
                 const selectedTitleIds = new Set(titleIds);
-                const selectedEntries = localEntries.filter((entry) =>
+                const selectedEntries = actionableLocalEntries.filter((entry) =>
                     selectedTitleIds.has(entry.titleId)
                 );
                 const selectedText = selectedEntries
@@ -534,7 +654,15 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
     }
 
     const availableEntries = group.availableEntries
-        .filter((entry) => !hasLocalEntry(group, entry.kind))
+        .filter((entry) => {
+            const usable = hasUsableLocalEntry(
+                group,
+                entry.kind,
+                detailOptions?.titleVerifications ?? null
+            );
+
+            return !usable;
+        })
         .sort((a, b) => getKindSortValue(a.kind) - getKindSortValue(b.kind));
 
     if (availableEntries.length > 0) {
@@ -654,6 +782,7 @@ function showDetailSidebar(sidebar: HTMLElement, group: TitleGroup): void {
 
     const body = sidebar.querySelector('.title-detail-body');
     body?.replaceChildren(renderGroupDetailContent(group));
+    requestTitleVerification(group);
 
     for (const groupElement of document.querySelectorAll('.title-group')) {
         groupElement.toggleAttribute(
@@ -661,6 +790,106 @@ function showDetailSidebar(sidebar: HTMLElement, group: TitleGroup): void {
             groupElement.getAttribute('data-family') === group.family
         );
     }
+}
+
+function requestTitleVerification(group: TitleGroup): void {
+    for (const entry of group.entries) {
+        sendAppSocketCommand({
+            type: SOCKET_COMMAND.titleVerifyQueue,
+            titleId: entry.titleId,
+        });
+    }
+}
+
+function isDownloadableValidationKind(
+    kind: TitleKinds
+): kind is TitleKinds.Base | TitleKinds.Update | TitleKinds.DLC {
+    return (
+        kind === TitleKinds.Base ||
+        kind === TitleKinds.Update ||
+        kind === TitleKinds.DLC
+    );
+}
+
+function validationToAvailableEntry(
+    title: LibraryValidationTitle
+): AvailableTitleEntry | null {
+    if (
+        title.status !== 'failed' ||
+        title.titleId === null ||
+        !isDownloadableValidationKind(title.titleKind)
+    ) {
+        return null;
+    }
+
+    return {
+        kind: title.titleKind,
+        titleId: title.titleId.toLowerCase(),
+        versions: title.titleVersion === null ? [] : [title.titleVersion],
+        availableOnCdn: true,
+    };
+}
+
+function getTitleFamily(titleId: string): string {
+    const normalized = titleId.toLowerCase();
+
+    return normalized.slice(8);
+}
+
+export function mergeFailedValidationsIntoAvailable(
+    groups: TitleGroup[],
+    titles: LibraryValidationTitle[]
+): TitleGroup[] {
+    const changedGroups: TitleGroup[] = [];
+
+    for (const title of titles) {
+        const entry = validationToAvailableEntry(title);
+
+        if (!entry) {
+            continue;
+        }
+
+        const family = getTitleFamily(entry.titleId);
+        const group = groups.find(
+            (candidate) => candidate.family.toLowerCase() === family
+        );
+
+        if (!group) {
+            console.warn('No group found for failed validation', {
+                titleId: entry.titleId,
+                family,
+                title,
+            });
+            continue;
+        }
+
+        // Remove the failed entry from group.entries so it no longer
+        // appears in the Downloaded section or influences status computation.
+        const entryIndex = group.entries.findIndex(
+            (candidate) =>
+                candidate.kind === entry.kind &&
+                candidate.titleId.toLowerCase() === entry.titleId
+        );
+        if (entryIndex !== -1) {
+            group.entries.splice(entryIndex, 1);
+        }
+
+        const alreadyAvailable = group.availableEntries.some(
+            (candidate) =>
+                candidate.kind === entry.kind &&
+                candidate.titleId.toLowerCase() === entry.titleId
+        );
+
+        if (!alreadyAvailable) {
+            group.availableEntries.push(entry);
+        }
+
+        if (!changedGroups.includes(group)) {
+            changedGroups.push(group);
+        }
+    }
+
+    return changedGroups;
 }
 
 export function toggleDetailSidebar(

@@ -8,6 +8,7 @@ import {
 } from './action-bar.js';
 import { getAvailableSizeBytes, getAvailableSizeText } from './main.js';
 import {
+    formatTitleKind,
     formatVersions,
     markSlotBadgeComplete,
     refreshOpenDetailSidebarForGroup,
@@ -103,12 +104,8 @@ export function formatDownloadState(item: DownloadQueueItem): string {
     }
 }
 
-function formatDownloadKind(kind: TitleKinds): string {
-    return kind === TitleKinds.Base ? 'Game' : kind;
-}
-
 export function formatDownloadTitle(item: DownloadQueueItem): string {
-    return `${item.groupName} [${formatDownloadKind(item.kind)}]`;
+    return `${item.groupName} [${formatTitleKind(item.kind)}]`;
 }
 
 function formatDownloadDetails(item: DownloadQueueItem): string {
