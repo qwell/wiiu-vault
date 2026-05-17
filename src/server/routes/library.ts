@@ -20,10 +20,31 @@ import {
     type LibraryValidateSocketCommand,
     type LibraryValidateStatusEvent,
 } from '../../shared/socket.js';
-import { setLibraryCacheGroups } from '../../shared/wiiu.js';
+import { TitleGroup, TitleKinds } from '../../shared/titles.js';
 
 let latestLibraryValidateStatus: LibraryValidateStatusEvent | null = null;
 let activeLibraryValidateAbortController: AbortController | null = null;
+
+let libraryGroups: TitleGroup[] = [];
+
+export function setLibraryCacheGroups(groups: TitleGroup[]): void {
+    libraryGroups = groups;
+}
+
+export function getLibraryCacheEntry(
+    titleId: string
+): { name: string; kind: TitleKinds | null } | null {
+    const normalized = titleId.toLowerCase();
+    const family = normalized.slice(8);
+    const group = libraryGroups.find((g) => g.family === family);
+    if (!group || !group.name) {
+        return null;
+    }
+    const kind =
+        group.entries.find((e) => e.titleId.toLowerCase() === normalized)
+            ?.kind ?? null;
+    return { name: group.name, kind };
+}
 
 export function getLatestLibraryValidateStatus(): LibraryValidateStatusEvent | null {
     return latestLibraryValidateStatus;

@@ -54,7 +54,7 @@ import {
     type StorageCopySocketCommand,
     type StorageDeleteSocketCommand,
 } from '../../shared/socket.js';
-import { getLibraryCacheEntry } from '../../shared/wiiu.js';
+import { getLibraryCacheEntry } from './library.js';
 
 type RouteResult<TBody> = {
     status: number;

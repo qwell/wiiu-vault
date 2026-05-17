@@ -65,6 +65,19 @@ type LocalTitleEntry = Omit<TitleEntry, 'copyCount'> & {
     sourcePath: string;
 };
 
+const TITLE_KIND_BY_PREFIX: Record<string, TitleKinds> = {
+    '00000007': TitleKinds.vWii,
+    '00050000': TitleKinds.Base,
+    '00050002': TitleKinds.Demo,
+    '0005000b': TitleKinds.FCT,
+    '0005000c': TitleKinds.DLC,
+    '0005000d': TitleKinds.Unknown,
+    '0005000e': TitleKinds.Update,
+    '00050010': TitleKinds.SystemApp,
+    '0005001b': TitleKinds.SystemData,
+    '00050030': TitleKinds.SystemApplet,
+};
+
 const LIBRARY_SCAN_CONCURRENCY = 8;
 const availableOnCdnByTitleId = new Map<string, boolean>();
 
@@ -83,6 +96,14 @@ function cleanDirectoryName(dirname: string): string {
         .basename(dirname)
         .replace(/\s*\[.*$/, '')
         .trim();
+}
+
+function normalizeRelativeTitleDir(value: string): string {
+    return value === '' ? '.' : value;
+}
+
+function getApiIconUrl(family: string): string {
+    return `/api/icon/${encodeURIComponent(family)}`;
 }
 
 function getTitleName(dirname: string, databaseName: string | null): string {
@@ -112,40 +133,7 @@ export function classifyTitleId(titleId: string): {
     const prefix = normalized.slice(0, 8);
     const family = normalized.slice(8);
 
-    switch (prefix) {
-        case '00000007':
-            return { family, kind: TitleKinds.vWii };
-
-        case '00050000':
-            return { family, kind: TitleKinds.Base };
-
-        case '00050002':
-            return { family, kind: TitleKinds.Demo };
-
-        case '0005000b':
-            return { family, kind: TitleKinds.FCT };
-
-        case '0005000c':
-            return { family, kind: TitleKinds.DLC };
-
-        case '0005000d':
-            return { family, kind: TitleKinds.Unknown };
-
-        case '0005000e':
-            return { family, kind: TitleKinds.Update };
-
-        case '00050010':
-            return { family, kind: TitleKinds.SystemApp };
-
-        case '0005001b':
-            return { family, kind: TitleKinds.SystemData };
-
-        case '00050030':
-            return { family, kind: TitleKinds.SystemApplet };
-
-        default:
-            return { family, kind: TitleKinds.Unknown };
-    }
+    return { family, kind: TITLE_KIND_BY_PREFIX[prefix] ?? TitleKinds.Unknown };
 }
 
 export async function readWiiUTitleIdentity(
@@ -249,6 +237,38 @@ function replaceTitleKind(titleId: string, kind: TitleKinds): string {
         default:
             return titleId;
     }
+}
+
+function updateEntryWithNewerVersion(
+    target: TitleEntry,
+    source: Pick<
+        TitleEntry,
+        'version' | 'name' | 'region' | 'iconUrl' | 'sizeBytes'
+    >
+): void {
+    if (source.version <= target.version) {
+        return;
+    }
+
+    target.version = source.version;
+    target.name = source.name;
+    target.region = source.region;
+    target.iconUrl = source.iconUrl;
+    target.sizeBytes = source.sizeBytes;
+}
+
+function mergeTitleEntry(entries: TitleEntry[], entry: TitleEntry): void {
+    const existing = entries.find(
+        (candidate) => candidate.titleId === entry.titleId
+    );
+
+    if (!existing) {
+        entries.push({ ...entry });
+        return;
+    }
+
+    existing.copyCount += entry.copyCount;
+    updateEntryWithNewerVersion(existing, entry);
 }
 
 function getAvailableEntries(
@@ -555,34 +575,16 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
             groups.set(entry.family, group);
         }
 
-        const existingEntry = group.entries.find(
-            (candidate) => candidate.titleId === entry.titleId
-        );
-
-        if (existingEntry) {
-            existingEntry.copyCount += 1;
-            if (entry.version > existingEntry.version) {
-                existingEntry.version = entry.version;
-                existingEntry.name = entry.name;
-                existingEntry.region = entry.region;
-                existingEntry.iconUrl = entry.iconUrl;
-                existingEntry.sizeBytes = entry.sizeBytes;
-            }
-            continue;
-        }
-
-        const publicEntry: TitleEntry = {
+        mergeTitleEntry(group.entries, {
             titleId: entry.titleId,
             version: entry.version,
             name: entry.name,
             region: entry.region,
-
             iconUrl: entry.iconUrl,
             kind: entry.kind,
             sizeBytes: entry.sizeBytes,
             copyCount: 1,
-        };
-        group.entries.push(publicEntry);
+        });
     }
 
     for (const family of titleDatabase.keys()) {
@@ -615,13 +617,13 @@ export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
             group.name = parentEntry.name;
             group.region = parentEntry.region;
             group.iconUrl = databaseEntry?.iconUrl
-                ? `/api/icon/${encodeURIComponent(group.family)}`
+                ? getApiIconUrl(group.family)
                 : parentEntry.iconUrl;
         } else if (databaseEntry) {
             group.name = databaseEntry.name;
             group.region = databaseEntry.region;
             group.iconUrl = databaseEntry.iconUrl
-                ? `/api/icon/${encodeURIComponent(group.family)}`
+                ? getApiIconUrl(group.family)
                 : null;
         } else {
             const firstLocalChild = group.entries.find((entry) =>
@@ -655,23 +657,16 @@ function mergeTitleGroups(groups: TitleGroup[]): TitleGroup[] {
         }
 
         for (const entry of group.entries) {
-            const existingEntry = existing.entries.find(
-                (candidate) => candidate.titleId === entry.titleId
-            );
-
-            if (!existingEntry) {
-                existing.entries.push(entry);
-                continue;
-            }
-
-            existingEntry.copyCount += entry.copyCount;
-            if (entry.version > existingEntry.version) {
-                existingEntry.version = entry.version;
-                existingEntry.name = entry.name;
-                existingEntry.region = entry.region;
-                existingEntry.iconUrl = entry.iconUrl;
-                existingEntry.sizeBytes = entry.sizeBytes;
-            }
+            mergeTitleEntry(group.entries, {
+                titleId: entry.titleId,
+                version: entry.version,
+                name: entry.name,
+                region: entry.region,
+                iconUrl: entry.iconUrl,
+                kind: entry.kind,
+                sizeBytes: entry.sizeBytes,
+                copyCount: 1,
+            });
         }
 
         if (existing.status === 'missing' && group.status !== 'missing') {
@@ -800,7 +795,7 @@ export async function validateWiiUTitles(
     const cachedEntries = await scanTitleEntries(root, titleDatabase);
     const entriesByDirectory = new Map(
         cachedEntries.map((entry) => [
-            path.relative(root, entry.sourcePath),
+            normalizeRelativeTitleDir(path.relative(root, entry.sourcePath)),
             entry,
         ])
     );
@@ -810,8 +805,9 @@ export async function validateWiiUTitles(
 
         const dirPath = path.join(root, directory);
 
-        const titleEntry = entriesByDirectory.get(directory) ?? null;
-        //const titleEntry = await readTitleEntry(root, directory, titleDatabase);
+        const titleEntry =
+            entriesByDirectory.get(normalizeRelativeTitleDir(directory)) ??
+            null;
 
         const sizeBytes =
             titleEntry?.sizeBytes ?? (await getImmediatePathSizeBytes(dirPath));

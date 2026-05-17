@@ -2,7 +2,6 @@ import path from 'path';
 import fs from 'fs';
 
 import { DEFAULT_ROM_DIR } from './config.js';
-import { TitleGroup, TitleKinds } from './titles.js';
 
 type WiiURootInspection = {
     normalizedRoot: string;
@@ -10,12 +9,6 @@ type WiiURootInspection = {
     isDirectory: boolean;
     readable: boolean;
 };
-
-let libraryGroups: TitleGroup[] = [];
-
-export function setLibraryCacheGroups(groups: TitleGroup[]): void {
-    libraryGroups = groups;
-}
 
 export function readWiiURoots(
     config: Record<string, unknown>,
@@ -158,19 +151,4 @@ export async function validateWiiURoot(root: string): Promise<{
             ? 'Path exists and is readable.'
             : 'Directory exists but is not readable.',
     };
-}
-
-export function getLibraryCacheEntry(
-    titleId: string
-): { name: string; kind: TitleKinds | null } | null {
-    const normalized = titleId.toLowerCase();
-    const family = normalized.slice(8);
-    const group = libraryGroups.find((g) => g.family === family);
-    if (!group || !group.name) {
-        return null;
-    }
-    const kind =
-        group.entries.find((e) => e.titleId.toLowerCase() === normalized)
-            ?.kind ?? null;
-    return { name: group.name, kind };
 }
