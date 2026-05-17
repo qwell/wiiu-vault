@@ -41,13 +41,10 @@ export function createLibraryRouter(): Router {
 
     router.get('/', async (req, res) => {
         try {
-            const includeAll = req.query.includeAll === 'true';
-            const groups = await scanWiiUTitleRoots(getConfig().wiiuRoots, {
-                includeAll,
-            });
+            const groups = await scanWiiUTitleRoots(getConfig().wiiuRoots);
 
             setLibraryCacheGroups(groups);
-            clearTitleScanCache();
+
             const response: LibraryResponse = {
                 groups,
             };

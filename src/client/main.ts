@@ -77,6 +77,7 @@ let libraryValidate: LibraryValidateStatusEvent | null = null;
 let validatingLibrary = false;
 let libraryLoading = false;
 let activeLibraryRequestId = 0;
+let allLibraryGroups: TitleGroup[] = [];
 const downloadQueue: DownloadQueueItem[] = [];
 const storageCopies: StorageCopyItem[] = [];
 const storageDeletes: StorageDeleteItem[] = [];
@@ -362,6 +363,10 @@ function renderGroups(
     const normalizedSearch = normalizeSearchText(searchValue.trim());
 
     const filteredGroups = [...allGroups].filter((group) => {
+        if (!showAllTitles && group.entries.length === 0) {
+            return false;
+        }
+
         if (statusValue !== 'all' && group.status !== statusValue) {
             return false;
         }
@@ -392,21 +397,68 @@ function renderGroups(
     grid.replaceChildren();
     resetIconObserver();
 
-    for (const group of filteredGroups) {
+    let renderedCount = 0;
+    const BATCH_SIZE = 50;
+
+    const sentinel = document.createElement('div');
+    sentinel.className = 'library-grid-sentinel';
+
+    const firstBatch = filteredGroups.slice(0, BATCH_SIZE);
+    const fragment = document.createDocumentFragment();
+    for (const group of firstBatch) {
         const render = renderGroup(group, (selectedGroup) =>
             toggleDetailSidebar(sidebar, selectedGroup)
         );
-        if (!render) {
-            continue;
-        }
+        if (render) fragment.append(render);
+    }
+    grid.append(fragment, sentinel);
+    renderedCount = firstBatch.length;
+    renderDownloadMarkers(downloadQueue);
 
-        grid.append(render);
+    if (renderedCount >= filteredGroups.length) {
+        sentinel.remove();
+        return;
     }
 
-    renderDownloadMarkers(downloadQueue);
+    const observer = new IntersectionObserver(
+        (entries) => {
+            for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+
+                const fragment = document.createDocumentFragment();
+                const next = filteredGroups.slice(
+                    renderedCount,
+                    renderedCount + BATCH_SIZE
+                );
+
+                for (const group of next) {
+                    const render = renderGroup(group, (selectedGroup) =>
+                        toggleDetailSidebar(sidebar, selectedGroup)
+                    );
+                    if (render) fragment.append(render);
+                }
+
+                grid.insertBefore(fragment, sentinel);
+                renderedCount += next.length;
+
+                if (renderedCount >= filteredGroups.length) {
+                    observer.disconnect();
+                    sentinel.remove();
+                }
+
+                renderDownloadMarkers(downloadQueue);
+            }
+        },
+        { rootMargin: '400px' }
+    );
+
+    observer.observe(sentinel);
+
+    //renderDownloadMarkers(downloadQueue);
 }
 
 function buildControls(
+    allGroups: TitleGroup[],
     groups: TitleGroup[],
     grid: HTMLDivElement,
     sidebar: HTMLElement,
@@ -581,7 +633,7 @@ function buildControls(
         };
 
         renderGroups(
-            groups,
+            allGroups,
             grid,
             sidebar,
             libraryControlState.status,
@@ -604,10 +656,7 @@ function buildControls(
 
     titleCheckbox.addEventListener('change', () => {
         showAllTitles = titleCheckbox.checked;
-
-        if (options.onRefresh) {
-            refresh();
-        }
+        update();
     });
 
     refreshButton.addEventListener('click', () => {
@@ -727,6 +776,7 @@ function buildViewControl(grid: HTMLDivElement): HTMLDivElement {
 }
 
 function buildLibraryContent(
+    allGroups: TitleGroup[],
     groups: TitleGroup[],
     controlState: LibraryControlState,
     options: LibraryContentOptions = {}
@@ -744,6 +794,7 @@ function buildLibraryContent(
         controlState
     );
     const controls = buildControls(
+        allGroups,
         groups,
         grid,
         sidebar,
@@ -795,7 +846,7 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
     resetDetailSidebars();
 
     output.replaceChildren(
-        buildLibraryContent([], nextControlState, {
+        buildLibraryContent(allLibraryGroups, [], nextControlState, {
             loading: true,
         })
     );
@@ -803,7 +854,7 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
     updateValidationButtonState();
 
     try {
-        const data = await getLibrary(showAllTitles);
+        const data = await getLibrary();
 
         if (requestId !== activeLibraryRequestId) {
             return;
@@ -814,14 +865,18 @@ async function loadLibrary(output: HTMLElement): Promise<void> {
             syncGroupStatusFromSlots(group);
         }
 
-        const groups = [...data.groups].sort(compareGroups);
+        allLibraryGroups = [...data.groups].sort(compareGroups);
+        const groups = allLibraryGroups.filter(
+            (group) => showAllTitles || group.entries.length > 0
+        );
+
         libraryControlState = normalizeLibraryControlState(
             groups,
             nextControlState
         );
 
         output.replaceChildren(
-            buildLibraryContent(groups, libraryControlState, {
+            buildLibraryContent(allLibraryGroups, groups, libraryControlState, {
                 loading: false,
                 onRefresh: () => loadLibrary(output),
             })

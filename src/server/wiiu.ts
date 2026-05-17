@@ -537,10 +537,7 @@ function getGroupStatus(group: TitleGroup): TitleGroupStatus {
     return 'complete';
 }
 
-export async function scanWiiUTitles(
-    root: string,
-    options: { includeAll?: boolean } = {}
-): Promise<TitleGroup[]> {
+export async function scanWiiUTitles(root: string): Promise<TitleGroup[]> {
     const [titleDatabase, gameTdb] = await Promise.all([
         readTitleDatabase(),
         readGameTdb(),
@@ -639,9 +636,7 @@ export async function scanWiiUTitles(
         group.entries.sort((a, b) => b.version - a.version);
     }
 
-    return [...groups.values()]
-        .filter((group) => options.includeAll || group.entries.length > 0)
-        .sort((a, b) => a.name.localeCompare(b.name));
+    return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function mergeTitleGroups(groups: TitleGroup[]): TitleGroup[] {
@@ -699,30 +694,21 @@ function mergeTitleGroups(groups: TitleGroup[]): TitleGroup[] {
 }
 
 export async function scanWiiUTitleRoots(
-    roots: string[],
-    options: { includeAll?: boolean } = {}
+    roots: string[]
 ): Promise<TitleGroup[]> {
     const scannedGroups: TitleGroup[] = [];
-    let scannedRootCount = 0;
 
     for (const root of roots) {
         logger.log('wiiu', `scanning Wii U root: ${root}`);
         try {
             await assertReadableDirectory(root);
-            scannedGroups.push(
-                ...(await scanWiiUTitles(root, {
-                    includeAll: options.includeAll && scannedRootCount === 0,
-                }))
-            );
-            scannedRootCount += 1;
+            scannedGroups.push(...(await scanWiiUTitles(root)));
         } catch {
             logger.warn('wiiu', `skipping Wii U root ${root}`);
         }
     }
 
-    return mergeTitleGroups(scannedGroups).filter(
-        (group) => options.includeAll || group.entries.length > 0
-    );
+    return mergeTitleGroups(scannedGroups);
 }
 
 export async function findWiiUTitleSourcePaths(

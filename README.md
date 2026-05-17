@@ -120,7 +120,7 @@ yarn generate:titles
 
 ## API
 
-- `GET /api/library?includeAll=true`: Scan the configured library. Omit `includeAll` to return only groups with local entries.
+- `GET /api/library`: Scan the configured library.
 - `GET /api/title-icon/:family`: Proxy/cache a title icon from the title database.
 - `GET /api/title-metadata?titleId=...`: Fetch base NUS metadata for a title ID.
 - `GET /api/title-update?titleId=...`: Check the update title ID and latest update version for a base title.

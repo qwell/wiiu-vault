@@ -10,10 +10,8 @@ import {
 } from '../shared/api.js';
 import { type AppConfigUpdate } from '../shared/config.js';
 
-export function getLibrary(includeAll: boolean): Promise<LibraryResponse> {
-    return requestJson(
-        includeAll ? '/api/library?includeAll=true' : '/api/library'
-    );
+export function getLibrary(): Promise<LibraryResponse> {
+    return requestJson('/api/library');
 }
 
 export function validateLibrary(): Promise<LibraryValidateResponse> {
