@@ -17,10 +17,11 @@ import { createConfigRouter } from './routes/config.js';
 import { createIconRouter } from './routes/icon.js';
 import {
     createLibraryRouter,
-    getLatestLibraryValidationStatus,
+    getLatestLibraryValidateStatus,
 } from './routes/library.js';
 import { createTitleRouter } from './routes/title.js';
 import { getDownloadQueue } from './routes/download.js';
+import { APP_SOCKET_EVENT } from '../shared/socket.js';
 
 const config = getConfig();
 
@@ -70,11 +71,11 @@ createAppSocket({
     server,
     path: '/api/socket',
     getConnectedEvent: () => ({
-        type: 'app.connected',
+        type: APP_SOCKET_EVENT.connected,
         downloads: getDownloadQueue(),
         storageCopies: getStorageCopies(),
         storageDeletes: getStorageDeletes(),
-        libraryValidationStatus: getLatestLibraryValidationStatus(),
+        libraryValidateStatus: getLatestLibraryValidateStatus(),
     }),
     onCommand: handleAppSocketCommand,
 });

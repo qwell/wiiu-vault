@@ -1,9 +1,10 @@
 import { renderDownloadMarkers } from './download.js';
 import { getLibrary, listFat32Volumes, validateLibrary } from './api.js';
-import { type Fat32ListResponse } from '../shared/api.js';
+import { type StorageFat32ListResponse } from '../shared/api.js';
 import {
     type TitleVerifySocketEvent,
-    type ValidationStatusEvent,
+    type LibraryValidateStatusEvent,
+    LIBRARY_VALIDATE_SOCKET_EVENT,
 } from '../shared/socket.js';
 import {
     type StorageCopyItem,
@@ -12,7 +13,7 @@ import {
 import {
     createActionBarCommandHandler,
     mountActionBar,
-    setLibraryValidationAction,
+    setLibraryValidateAction,
 } from './action-bar.js';
 import {
     type TitleGroup,
@@ -24,7 +25,7 @@ import { type DownloadQueueItem } from '../shared/download.js';
 import { formatSize } from '../shared/shared.js';
 import { type Fat32Volume, type RuntimeOs } from '../shared/os.js';
 import { isWindowsPath } from '../shared/os/path.js';
-import { syncGroupStatusFromSlots } from './library-state.js';
+import { syncGroupStatusFromSlots } from './library.js';
 import {
     closeSettingsSidebar,
     isSettingsOpen,
@@ -65,22 +66,22 @@ type LibraryContentOptions = {
 
 let showAllTitles = false;
 let currentGroups: TitleGroup[] = [];
-let fat32ListPromise: Promise<Fat32ListResponse> | null = null;
+let fat32ListPromise: Promise<StorageFat32ListResponse> | null = null;
 let libraryControlState: LibraryControlState = {
     region: 'all',
     status: 'all',
     vc: 'all',
     search: '',
 };
-let libraryValidation: ValidationStatusEvent | null = null;
+let libraryValidate: LibraryValidateStatusEvent | null = null;
 let validatingLibrary = false;
 let libraryLoading = false;
 let activeLibraryRequestId = 0;
 const downloadQueue: DownloadQueueItem[] = [];
 const storageCopies: StorageCopyItem[] = [];
 const storageDeletes: StorageDeleteItem[] = [];
-const libraryValidationFailures: ValidationStatusEvent[] = [];
-const titleVerifications = new Map<string, TitleVerifySocketEvent>();
+const libraryValidateFailures: LibraryValidateStatusEvent[] = [];
+const titleVerify = new Map<string, TitleVerifySocketEvent>();
 
 function handleTitleGroupChanged(group: TitleGroup): void {
     updateRenderedTitleGroup(group);
@@ -156,7 +157,7 @@ function formatFat32VolumeOption(
     return `${label}${volume.source}${size}`;
 }
 
-function getFat32Devices(): Promise<Fat32ListResponse> {
+function getFat32Devices(): Promise<StorageFat32ListResponse> {
     fat32ListPromise ??= listFat32Volumes().catch((error) => {
         fat32ListPromise = null;
         throw error;
@@ -168,7 +169,7 @@ function getFat32Devices(): Promise<Fat32ListResponse> {
 async function populateFat32DeviceSelect(
     select: HTMLSelectElement,
     button: HTMLButtonElement
-): Promise<Fat32ListResponse | null> {
+): Promise<StorageFat32ListResponse | null> {
     try {
         const response = await getFat32Devices();
 
@@ -263,12 +264,7 @@ function getGroupSearchHaystack(group: TitleGroup): string {
             group.region,
         ];
         for (const entry of group.entries) {
-            parts.push(
-                entry.titleId,
-                entry.titleName,
-                entry.kind,
-                entry.region
-            );
+            parts.push(entry.titleId, entry.name, entry.kind, entry.region);
         }
         haystack = parts.map(normalizeSearchText).join('\n');
         groupSearchHaystacks.set(group, haystack);
@@ -627,11 +623,11 @@ function buildControls(
             }
 
             validatingLibrary = true;
-            libraryValidation = {
-                type: 'library.validationStatus',
+            libraryValidate = {
+                type: LIBRARY_VALIDATE_SOCKET_EVENT.status,
                 status: 'started',
             };
-            setLibraryValidationAction(libraryValidation);
+            setLibraryValidateAction(libraryValidate);
             updateValidationButtonState();
 
             try {
@@ -648,13 +644,13 @@ function buildControls(
                 }
             } catch (error) {
                 console.error(error);
-                libraryValidation = {
-                    type: 'library.validationStatus',
+                libraryValidate = {
+                    type: LIBRARY_VALIDATE_SOCKET_EVENT.status,
                     status: 'failed',
                     error:
                         error instanceof Error ? error.message : String(error),
                 };
-                setLibraryValidationAction(libraryValidation);
+                setLibraryValidateAction(libraryValidate);
             } finally {
                 validatingLibrary = false;
                 updateValidationButtonState();
@@ -893,7 +889,7 @@ function setupSidebars(): void {
     );
     setupTitleDetails({
         downloads: downloadQueue,
-        titleVerifications,
+        titleVerifications: titleVerify,
         populateFat32DeviceSelect,
         observeIcon(image, src) {
             if (iconObserver) {
@@ -962,8 +958,8 @@ mountActionBar({
     downloads: downloadQueue,
     storageCopies,
     storageDeletes,
-    libraryValidation,
-    libraryValidationFailures,
+    libraryValidate,
+    libraryValidateFailures,
     onCommand: createActionBarCommandHandler({
         downloads: downloadQueue,
     }),
@@ -985,12 +981,12 @@ connectAppSocket({
             validatingLibrary = validating;
             updateValidationButtonState();
         },
-        onLibraryValidationChanged(event) {
-            libraryValidation = event;
-            setLibraryValidationAction(libraryValidation);
+        onLibraryValidateChanged(event) {
+            libraryValidate = event;
+            setLibraryValidateAction(libraryValidate);
         },
         onTitleVerificationChanged(event) {
-            titleVerifications.set(event.titleId, event);
+            titleVerify.set(event.titleId, event);
 
             const group = currentGroups.find(
                 (candidate) => candidate.family === event.titleId.slice(8)

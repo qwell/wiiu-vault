@@ -10,6 +10,7 @@ import {
     type StorageCopyItem,
     type StorageDeleteItem,
 } from '../shared/storage.js';
+import { LIBRARY_VALIDATE_SOCKET_COMMAND } from '../shared/socket.js';
 
 export type SlotBadgeState =
     | 'complete'
@@ -23,6 +24,9 @@ type MarkStorageCompleteOptions = {
     haystacks: WeakMap<TitleGroup, string>;
     onGroupChanged: (group: TitleGroup) => void;
 };
+
+export type LibraryActionBarCommand =
+    (typeof LIBRARY_VALIDATE_SOCKET_COMMAND)[keyof typeof LIBRARY_VALIDATE_SOCKET_COMMAND];
 
 export function getEntry(
     group: TitleGroup,

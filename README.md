@@ -141,7 +141,7 @@ Server events:
 - `download.queueChanged`: Current download queue.
 - `storage.copyChanged`: Current storage copy/move queue.
 - `storage.deleteChanged`: Current storage delete queue.
-- `library.validationStatus`: Library validation progress.
+- `library.validateStatus`: Library validation progress.
 
 Client commands:
 

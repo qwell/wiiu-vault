@@ -26,7 +26,7 @@ import { getImmediatePathSizeBytes } from '../shared/file.js';
 import { readTmd } from './metadata.js';
 import logger from '../shared/logger.js';
 import { ansi } from '../shared/ansi.js';
-import { LibraryValidationTitle } from '../shared/api.js';
+import { LibraryValidateTitle } from '../shared/api.js';
 
 type GameTdbLocale = {
     '@lang'?: string;
@@ -67,6 +67,8 @@ type LocalTitleEntry = Omit<TitleEntry, 'copyCount'> & {
 
 const LIBRARY_SCAN_CONCURRENCY = 8;
 const availableOnCdnByTitleId = new Map<string, boolean>();
+
+const titleScanCache = new Map<string, LocalTitleEntry[]>();
 
 async function assertReadableDirectory(root: string): Promise<void> {
     const info = await stat(root);
@@ -189,8 +191,8 @@ function parseTitleDatabaseEntries(jsonText: string): TitleDatabaseEntry[] {
                 entry.baseVersions?.filter((version) =>
                     Number.isFinite(version)
                 ) ?? [],
-            updates: entry.updates,
-            dlc: entry.dlc,
+            updateVersions: entry.updateVersions ?? [],
+            dlcVersions: entry.dlcVersions ?? [],
 
             family,
             availableOnCdn: entry.availableOnCdn,
@@ -265,22 +267,22 @@ function getAvailableEntries(
         },
     ];
 
-    if (entry.updates.length > 0) {
+    if (entry.updateVersions.length > 0) {
         available.push({
             kind: TitleKinds.Update,
             titleId: replaceTitleKind(entry.titleId, TitleKinds.Update),
-            versions: latestVersion(entry.updates),
+            versions: latestVersion(entry.updateVersions),
             availableOnCdn: getTitleAvailableOnCdn(
                 replaceTitleKind(entry.titleId, TitleKinds.Update)
             ),
         });
     }
 
-    if (entry.dlc.length > 0) {
+    if (entry.dlcVersions.length > 0) {
         available.push({
             kind: TitleKinds.DLC,
             titleId: replaceTitleKind(entry.titleId, TitleKinds.DLC),
-            versions: latestVersion(entry.dlc),
+            versions: latestVersion(entry.dlcVersions),
             availableOnCdn: getTitleAvailableOnCdn(
                 replaceTitleKind(entry.titleId, TitleKinds.DLC)
             ),
@@ -378,7 +380,7 @@ async function readTitleDatabase(): Promise<Map<string, TitleDatabaseEntry>> {
         if (entry.availableOnCdn !== undefined) {
             availableOnCdnByTitleId.set(
                 entry.titleId.toLowerCase(),
-                entry.availableOnCdn !== 'No'
+                entry.availableOnCdn === true
             );
         }
     }
@@ -412,7 +414,7 @@ async function readTitleEntry(
         titleId,
         sourcePath: dirPath,
         version: tmd.header.titleVersion,
-        titleName: getTitleName(dirname, databaseEntry?.name ?? null),
+        name: getTitleName(dirname, databaseEntry?.name ?? null),
         region: normalizeRegion(
             databaseEntry?.region ?? tmd.header.region,
             databaseEntry?.productCode
@@ -423,6 +425,28 @@ async function readTitleEntry(
         family,
         sizeBytes: await getImmediatePathSizeBytes(dirPath),
     };
+}
+
+async function scanTitleEntries(
+    root: string,
+    titleDatabase: Map<string, TitleDatabaseEntry>
+): Promise<LocalTitleEntry[]> {
+    const cached = titleScanCache.get(root);
+    if (cached) {
+        return cached;
+    }
+
+    const directories = await findTitleDirs(root);
+    const entries = (
+        await mapConcurrent(
+            directories,
+            LIBRARY_SCAN_CONCURRENCY,
+            async (dirname) => readTitleEntry(root, dirname, titleDatabase)
+        )
+    ).filter((entry): entry is LocalTitleEntry => entry !== null);
+
+    titleScanCache.set(root, entries);
+    return entries;
 }
 
 async function findTitleDirs(root: string): Promise<string[]> {
@@ -522,15 +546,7 @@ export async function scanWiiUTitles(
         readGameTdb(),
     ]);
 
-    const directories = await findTitleDirs(root);
-
-    const scanned = (
-        await mapConcurrent(
-            directories,
-            LIBRARY_SCAN_CONCURRENCY,
-            async (dirname) => readTitleEntry(root, dirname, titleDatabase)
-        )
-    ).filter((entry): entry is LocalTitleEntry => entry !== null);
+    const scanned = await scanTitleEntries(root, titleDatabase);
 
     const groups = new Map<string, TitleGroup>();
 
@@ -550,7 +566,7 @@ export async function scanWiiUTitles(
             existingEntry.copyCount += 1;
             if (entry.version > existingEntry.version) {
                 existingEntry.version = entry.version;
-                existingEntry.titleName = entry.titleName;
+                existingEntry.name = entry.name;
                 existingEntry.region = entry.region;
                 existingEntry.iconUrl = entry.iconUrl;
                 existingEntry.sizeBytes = entry.sizeBytes;
@@ -561,7 +577,7 @@ export async function scanWiiUTitles(
         const publicEntry: TitleEntry = {
             titleId: entry.titleId,
             version: entry.version,
-            titleName: entry.titleName,
+            name: entry.name,
             region: entry.region,
 
             iconUrl: entry.iconUrl,
@@ -593,13 +609,13 @@ export async function scanWiiUTitles(
             }
 
             return kind === TitleKinds.Update
-                ? databaseEntry.updates.length > 0
-                : databaseEntry.dlc.length > 0;
+                ? databaseEntry.updateVersions.length > 0
+                : databaseEntry.dlcVersions.length > 0;
         });
         group.status = getGroupStatus(group);
 
         if (parentEntry) {
-            group.name = parentEntry.titleName;
+            group.name = parentEntry.name;
             group.region = parentEntry.region;
             group.iconUrl = databaseEntry?.iconUrl
                 ? `/api/icon/${encodeURIComponent(group.family)}`
@@ -615,7 +631,7 @@ export async function scanWiiUTitles(
                 CHILD_KINDS.includes(entry.kind as ChildKind)
             );
 
-            group.name = firstLocalChild?.titleName ?? 'Unknown';
+            group.name = firstLocalChild?.name ?? 'Unknown';
             group.region = firstLocalChild?.region ?? null;
             group.iconUrl = firstLocalChild?.iconUrl ?? null;
         }
@@ -656,7 +672,7 @@ function mergeTitleGroups(groups: TitleGroup[]): TitleGroup[] {
             existingEntry.copyCount += entry.copyCount;
             if (entry.version > existingEntry.version) {
                 existingEntry.version = entry.version;
-                existingEntry.titleName = entry.titleName;
+                existingEntry.name = entry.name;
                 existingEntry.region = entry.region;
                 existingEntry.iconUrl = entry.iconUrl;
                 existingEntry.sizeBytes = entry.sizeBytes;
@@ -690,6 +706,7 @@ export async function scanWiiUTitleRoots(
     let scannedRootCount = 0;
 
     for (const root of roots) {
+        logger.log('wiiu', `scanning Wii U root: ${root}`);
         try {
             await assertReadableDirectory(root);
             scannedGroups.push(
@@ -719,15 +736,7 @@ export async function findWiiUTitleSourcePaths(
     for (const root of roots) {
         try {
             await assertReadableDirectory(root);
-            const directories = await findTitleDirs(root);
-            const entries = (
-                await mapConcurrent(
-                    directories,
-                    LIBRARY_SCAN_CONCURRENCY,
-                    async (dirname) =>
-                        readTitleEntry(root, dirname, titleDatabase)
-                )
-            ).filter((entry): entry is LocalTitleEntry => entry !== null);
+            const entries = await scanTitleEntries(root, titleDatabase);
 
             sourcePaths.push(
                 ...entries
@@ -761,12 +770,12 @@ export async function findFirstReadableWiiURoot(
     throw new Error(`No readable Wii U roots found. ${errors.join('; ')}`);
 }
 
-type LibraryValidationProgress =
+type LibraryValidateProgress =
     | {
           status: 'validating';
           titleId: string;
-          titleName: string;
-          titleKind: TitleKinds;
+          name: string;
+          kind: TitleKinds;
           sizeText: string;
           current: number;
           total: number;
@@ -774,43 +783,54 @@ type LibraryValidationProgress =
     | {
           status: 'validated';
           titleId: string;
-          titleName: string;
-          titleKind: TitleKinds;
+          name: string;
+          kind: TitleKinds;
           result: 'ok' | 'failed';
           error: string | null;
           current: number;
           total: number;
       };
 
-export type LibraryValidationProgressCallback = (
-    progress: LibraryValidationProgress
+export type LibraryValidateProgressCallback = (
+    progress: LibraryValidateProgress
 ) => void;
 
 export async function validateWiiUTitles(
     root: string,
-    onProgress?: (progress: LibraryValidationProgress) => void,
+    onProgress?: (progress: LibraryValidateProgress) => void,
     options: {
         directories?: string[];
         offset?: number;
         total?: number;
         signal?: AbortSignal;
     } = {}
-): Promise<LibraryValidationTitle[]> {
+): Promise<LibraryValidateTitle[]> {
     const directories = options.directories ?? (await findTitleDirs(root));
-    const validations: LibraryValidationTitle[] = [];
+    const validations: LibraryValidateTitle[] = [];
     const titleDatabase = await readTitleDatabase();
     const offset = options.offset ?? 0;
     const total = options.total ?? directories.length;
 
+    const cachedEntries = await scanTitleEntries(root, titleDatabase);
+    const entriesByDirectory = new Map(
+        cachedEntries.map((entry) => [
+            path.relative(root, entry.sourcePath),
+            entry,
+        ])
+    );
+
     for (const [index, directory] of directories.entries()) {
-        throwIfLibraryValidationCancelled(options.signal);
+        throwIfLibraryValidateCancelled(options.signal);
 
         const dirPath = path.join(root, directory);
-        const titleEntry = await readTitleEntry(root, directory, titleDatabase);
+
+        const titleEntry = entriesByDirectory.get(directory) ?? null;
+        //const titleEntry = await readTitleEntry(root, directory, titleDatabase);
+
         const sizeBytes =
             titleEntry?.sizeBytes ?? (await getImmediatePathSizeBytes(dirPath));
         const titleId = titleEntry?.titleId ?? 'unknown';
-        const titleName = titleEntry?.titleName ?? directory;
+        const titleName = titleEntry?.name ?? directory;
         const titleKind = titleEntry?.kind ?? TitleKinds.Unknown;
 
         const sizeText = formatSize(sizeBytes);
@@ -818,8 +838,8 @@ export async function validateWiiUTitles(
         onProgress?.({
             status: 'validating',
             titleId,
-            titleName,
-            titleKind,
+            name: titleName,
+            kind: titleKind,
             sizeText,
             current: offset + index,
             total,
@@ -830,7 +850,7 @@ export async function validateWiiUTitles(
             `validating title: [${titleId}] ${titleName} [${titleKind}] (${sizeText})`
         );
         const validation = await validateTitleInstallFiles(dirPath);
-        throwIfLibraryValidationCancelled(options.signal);
+        throwIfLibraryValidateCancelled(options.signal);
         const result = validation.status === 'ok' ? 'ok' : 'failed';
         const status =
             validation.status === 'failed'
@@ -846,8 +866,8 @@ export async function validateWiiUTitles(
         onProgress?.({
             status: 'validated',
             titleId,
-            titleName,
-            titleKind,
+            name: titleName,
+            kind: titleKind,
             result,
             error: validation.error,
             current: offset + index + 1,
@@ -857,10 +877,10 @@ export async function validateWiiUTitles(
         validations.push({
             root,
             directory,
-            titleName,
+            name: titleName,
             titleId: validation.titleId,
-            titleVersion: validation.titleVersion,
-            titleKind,
+            version: validation.titleVersion,
+            kind: titleKind,
             sizeText,
             status: validation.status,
             error: validation.error,
@@ -873,14 +893,14 @@ export async function validateWiiUTitles(
 
 export async function validateWiiUTitleRoots(
     roots: string[],
-    onProgress?: (progress: LibraryValidationProgress) => void,
+    onProgress?: (progress: LibraryValidateProgress) => void,
     signal?: AbortSignal
-): Promise<LibraryValidationTitle[]> {
-    const validations: LibraryValidationTitle[] = [];
+): Promise<LibraryValidateTitle[]> {
+    const validations: LibraryValidateTitle[] = [];
     const readableRoots: { root: string; directories: string[] }[] = [];
 
     for (const root of roots) {
-        throwIfLibraryValidationCancelled(signal);
+        throwIfLibraryValidateCancelled(signal);
 
         try {
             await assertReadableDirectory(root);
@@ -900,7 +920,7 @@ export async function validateWiiUTitleRoots(
     let offset = 0;
 
     for (const root of readableRoots) {
-        throwIfLibraryValidationCancelled(signal);
+        throwIfLibraryValidateCancelled(signal);
 
         validations.push(
             ...(await validateWiiUTitles(root.root, onProgress, {
@@ -923,17 +943,17 @@ export async function validateWiiUTitleRoots(
     return sortLibraryTitleValidations(validations);
 }
 
-function throwIfLibraryValidationCancelled(signal?: AbortSignal): void {
+function throwIfLibraryValidateCancelled(signal?: AbortSignal): void {
     if (signal?.aborted) {
         throw new Error('Validation cancelled');
     }
 }
 
 function sortLibraryTitleValidations(
-    validations: LibraryValidationTitle[]
-): LibraryValidationTitle[] {
+    validations: LibraryValidateTitle[]
+): LibraryValidateTitle[] {
     return validations.sort((a, b) => {
-        const nameComparison = a.titleName.localeCompare(b.titleName);
+        const nameComparison = a.name.localeCompare(b.name);
         if (nameComparison !== 0) {
             return nameComparison;
         }
@@ -946,14 +966,14 @@ function sortLibraryTitleValidations(
 
 function createMissingExpectedChildValidations(
     groups: TitleGroup[],
-    existingValidations: LibraryValidationTitle[]
-): LibraryValidationTitle[] {
+    existingValidations: LibraryValidateTitle[]
+): LibraryValidateTitle[] {
     const installedTitleIds = new Set(
         existingValidations
             .map((validation) => validation.titleId)
             .filter((titleId): titleId is string => titleId !== null)
     );
-    const missing: LibraryValidationTitle[] = [];
+    const missing: LibraryValidateTitle[] = [];
 
     for (const group of groups) {
         if (group.entries.length === 0) {
@@ -975,10 +995,10 @@ function createMissingExpectedChildValidations(
             missing.push({
                 root: null,
                 directory: null,
-                titleName: group.name,
+                name: group.name,
                 titleId: expectedEntry.titleId,
-                titleVersion: expectedEntry.versions[0] ?? null,
-                titleKind: expectedKind,
+                version: expectedEntry.versions[0] ?? null,
+                kind: expectedKind,
                 sizeText: null,
                 status: 'failed',
                 error: `Missing expected ${expectedKind}`,
@@ -988,4 +1008,8 @@ function createMissingExpectedChildValidations(
     }
 
     return missing;
+}
+
+export function clearTitleScanCache(): void {
+    titleScanCache.clear();
 }

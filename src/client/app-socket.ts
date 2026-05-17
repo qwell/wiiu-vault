@@ -4,24 +4,29 @@ import {
     type StorageDeleteItem,
 } from '../shared/storage.js';
 import {
-    type AppSocketCommand,
-    type AppSocketEvent,
+    type SocketCommand,
+    type SocketEvent,
     type TitleVerifySocketEvent,
-    type ValidationStatusEvent,
+    type LibraryValidateStatusEvent,
+    APP_SOCKET_EVENT,
+    DOWNLOAD_SOCKET_EVENT,
+    STORAGE_COPY_SOCKET_EVENT,
+    LIBRARY_VALIDATE_SOCKET_EVENT,
+    TITLE_VERIFY_SOCKET_EVENT,
 } from '../shared/socket.js';
 import { type TitleGroup } from '../shared/titles.js';
 import { syncDownloadQueue } from './download.js';
 import {
     markStorageCopiesComplete,
     markStorageDeletesComplete,
-} from './library-state.js';
+} from './library.js';
 import { syncStorageCopies, syncStorageDeletes } from './storage.js';
 
 type AppSocketOptions = {
     reconnectMs: number;
     onAvailable: () => void;
     onGone: () => void;
-    onEvent: (event: AppSocketEvent) => void;
+    onEvent: (event: SocketEvent) => void;
 };
 
 type AppEventOptions = {
@@ -33,7 +38,7 @@ type AppEventOptions = {
     onServerAvailable: () => void;
     onGroupChanged: (group: TitleGroup) => void;
     onValidationStateChanged: (validating: boolean) => void;
-    onLibraryValidationChanged: (event: ValidationStatusEvent) => void;
+    onLibraryValidateChanged: (event: LibraryValidateStatusEvent) => void;
     onTitleVerificationChanged: (event: TitleVerifySocketEvent) => void;
 };
 
@@ -41,7 +46,7 @@ let appSocket: WebSocket | null = null;
 let reconnectSocketTimer: number | null = null;
 let appSocketOptions: AppSocketOptions | null = null;
 
-export function sendAppSocketCommand(command: AppSocketCommand): void {
+export function sendAppSocketCommand(command: SocketCommand): void {
     if (!appSocket || appSocket.readyState !== WebSocket.OPEN) {
         appSocketOptions?.onGone();
         return;
@@ -91,7 +96,7 @@ export function connectAppSocket(options: AppSocketOptions): void {
 
     appSocket.addEventListener('message', (event: MessageEvent) => {
         try {
-            const data = JSON.parse(String(event.data)) as AppSocketEvent;
+            const data = JSON.parse(String(event.data)) as SocketEvent;
             options.onEvent(data);
         } catch (error) {
             console.error(error);
@@ -111,16 +116,16 @@ export function connectAppSocket(options: AppSocketOptions): void {
 
 export function createAppEventHandler(
     options: AppEventOptions
-): (event: AppSocketEvent) => void {
+): (event: SocketEvent) => void {
     const getStorageCompletionOptions = () => ({
         groups: options.getGroups(),
         haystacks: options.haystacks,
         onGroupChanged: options.onGroupChanged,
     });
 
-    const handle = (event: AppSocketEvent): void => {
+    const handle = (event: SocketEvent): void => {
         switch (event.type) {
-            case 'app.connected':
+            case APP_SOCKET_EVENT.connected:
                 options.onServerAvailable();
 
                 syncDownloadQueue(
@@ -145,12 +150,12 @@ export function createAppEventHandler(
                     getStorageCompletionOptions()
                 );
 
-                if (event.libraryValidationStatus) {
-                    handle(event.libraryValidationStatus);
+                if (event.libraryValidateStatus) {
+                    handle(event.libraryValidateStatus);
                 }
                 return;
 
-            case 'download.queueChanged':
+            case DOWNLOAD_SOCKET_EVENT.changed:
                 options.onServerAvailable();
                 syncDownloadQueue(
                     options.downloads,
@@ -160,7 +165,7 @@ export function createAppEventHandler(
                 );
                 return;
 
-            case 'storage.copyChanged':
+            case STORAGE_COPY_SOCKET_EVENT.changed:
                 options.onServerAvailable();
                 markStorageCopiesComplete(
                     syncStorageCopies(options.storageCopies, event.items),
@@ -176,17 +181,17 @@ export function createAppEventHandler(
                 );
                 return;
 
-            case 'library.validationStatus': {
+            case LIBRARY_VALIDATE_SOCKET_EVENT.status: {
                 options.onServerAvailable();
                 options.onValidationStateChanged(
                     event.status !== 'complete' && event.status !== 'failed'
                 );
 
-                options.onLibraryValidationChanged(event);
+                options.onLibraryValidateChanged(event);
                 return;
             }
 
-            case 'title.verify.changed':
+            case TITLE_VERIFY_SOCKET_EVENT.changed:
                 options.onServerAvailable();
                 options.onTitleVerificationChanged(event);
                 return;

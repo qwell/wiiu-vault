@@ -35,7 +35,7 @@ import {
 } from '../../shared/shared.js';
 import {
     type ApiErrorResponse,
-    type Fat32ListResponse,
+    type StorageFat32ListResponse,
     type StorageDeleteQueuedResponse,
     type StorageTransferQueuedResponse,
 } from '../../shared/api.js';
@@ -47,7 +47,10 @@ import {
     type StorageTransferQueueInput,
 } from '../../shared/storage.js';
 import {
-    SOCKET_COMMAND,
+    STORAGE_COPY_SOCKET_COMMAND,
+    STORAGE_COPY_SOCKET_EVENT,
+    STORAGE_DELETE_SOCKET_COMMAND,
+    STORAGE_DELETE_SOCKET_EVENT,
     type StorageCopySocketCommand,
     type StorageDeleteSocketCommand,
 } from '../../shared/socket.js';
@@ -127,7 +130,7 @@ export function createStorageRouter(): Router {
                 listFat32Volumes(),
             ]);
 
-            const response: Fat32ListResponse = {
+            const response: StorageFat32ListResponse = {
                 runtimeOs,
                 volumes,
             };
@@ -427,7 +430,7 @@ export async function processStorageDeleteQueue(): Promise<void> {
 
             const titleIdentity = await readWiiUTitleIdentity(
                 safeSourcePaths[0]
-            ).catch(() => null);
+            );
 
             nextItem.sourcePaths = safeSourcePaths;
             nextItem.totalCount = safeSourcePaths.length;
@@ -537,7 +540,7 @@ function broadcastStorageDeletes(): void {
     }
 
     broadcastAppSocketEvent({
-        type: 'storage.deleteChanged',
+        type: STORAGE_DELETE_SOCKET_EVENT.changed,
         items: storageDeletes,
     });
 }
@@ -728,7 +731,7 @@ function broadcastStorageCopies(): void {
     }
 
     broadcastAppSocketEvent({
-        type: 'storage.copyChanged',
+        type: STORAGE_COPY_SOCKET_EVENT.changed,
         items: storageCopies,
     });
 }
@@ -737,15 +740,15 @@ export function handleStorageCopySocketCommand(
     command: StorageCopySocketCommand
 ): void {
     switch (command.type) {
-        case SOCKET_COMMAND.storageCopyCancel:
+        case STORAGE_COPY_SOCKET_COMMAND.cancel:
             cancelStorageCopy(command.id);
             return;
 
-        case SOCKET_COMMAND.storageCopyClear:
+        case STORAGE_COPY_SOCKET_COMMAND.clear:
             clearStorageCopy(command.id);
             return;
 
-        case SOCKET_COMMAND.storageCopyRetry:
+        case STORAGE_COPY_SOCKET_COMMAND.retry:
             retryStorageCopy(command.id);
             return;
     }
@@ -799,11 +802,11 @@ export function handleStorageDeleteSocketCommand(
     command: StorageDeleteSocketCommand
 ): void {
     switch (command.type) {
-        case SOCKET_COMMAND.storageDeleteClear:
+        case STORAGE_DELETE_SOCKET_COMMAND.clear:
             clearStorageDelete(command.id);
             return;
 
-        case SOCKET_COMMAND.storageDeleteRetry:
+        case STORAGE_DELETE_SOCKET_COMMAND.retry:
             retryStorageDelete(command.id);
             return;
     }

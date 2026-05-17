@@ -1,28 +1,8 @@
+import { DOWNLOAD_SOCKET_COMMAND } from './socket.js';
 import { TitleKinds } from './titles.js';
 
 export type DownloadActionBarCommand =
-    (typeof DOWNLOAD_ACTION)[keyof typeof DOWNLOAD_ACTION];
-
-export const DOWNLOAD_ACTION = {
-    cancel: 'download.cancel',
-    clear: 'download.clear',
-    retry: 'download.retry',
-} as const;
-
-export const DOWNLOAD_ACTION_BAR_COMMAND_TYPES = Object.values(
-    DOWNLOAD_ACTION
-) as DownloadActionBarCommand[];
-
-export function isDownloadActionBarCommand(
-    value: string | null
-): value is DownloadActionBarCommand {
-    return (
-        value !== null &&
-        DOWNLOAD_ACTION_BAR_COMMAND_TYPES.includes(
-            value as DownloadActionBarCommand
-        )
-    );
-}
+    (typeof DOWNLOAD_SOCKET_COMMAND)[keyof typeof DOWNLOAD_SOCKET_COMMAND];
 
 export type DownloadQueueState =
     | 'queued'

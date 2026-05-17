@@ -81,42 +81,32 @@ export type TitleGroupStatus =
     | 'unavailable'
     | 'unknown';
 
-export type RawTitleDatabaseEntry = {
-    titleId: string;
-    name: string;
-    region: string;
-    companyCode: string | null;
-    iconUrl: string | null;
-    productCode: string | null;
-    baseVersions: number[];
-    updates: number[];
-    dlc: number[];
-    availableOnCdn?: 'Yes' | 'No';
-};
-
-export type TitleDatabaseEntry = {
-    titleId: string;
+export type TitleBase = {
     name: string;
     region: string | null;
-    companyCode: string | null;
     iconUrl: string | null;
+};
+
+export type RawTitleDatabaseEntry = TitleBase & {
+    titleId: string;
+    companyCode: string | null;
     productCode: string | null;
     baseVersions: number[];
-    updates: number[];
-    dlc: number[];
-    availableOnCdn?: 'Yes' | 'No';
+    updateVersions: number[];
+    dlcVersions: number[];
+    availableOnCdn?: boolean;
+};
 
+export type TitleDatabaseEntry = RawTitleDatabaseEntry & {
     family: string;
 };
 
-export type TitleEntry = {
+export type TitleEntry = TitleBase & {
     titleId: string;
     version: number;
-    titleName: string;
-    region: string | null;
-
-    iconUrl: string | null;
     kind: TitleKinds;
+    iconUrl: string | null;
+
     sizeBytes: number;
     copyCount: number;
 };
@@ -144,9 +134,7 @@ export type AvailableTitleEntry = {
     availableOnCdn: boolean;
 };
 
-export type TitleGroup = {
-    name: string;
-    region: string | null;
+export type TitleGroup = TitleBase & {
     productCode: string | null;
     iconUrl: string | null;
     details: TitleDetails | null;

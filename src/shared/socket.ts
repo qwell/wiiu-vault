@@ -12,128 +12,185 @@ export const SOCKET_COMMAND = {
     storageCopyCancel: 'storage.copy.cancel',
     storageDeleteRetry: 'storage.delete.retry',
     storageDeleteClear: 'storage.delete.clear',
-    libraryValidationCancel: 'library.validation.cancel',
+    libraryValidateCancel: 'library.validate.cancel',
+    libraryValidateClear: 'library.validate.clear',
+    libraryValidateFailureClear: 'library.validate.failure.clear',
+    libraryValidateFailureDownload: 'library.validate.failure.download',
     titleVerifyQueue: 'title.verify.queue',
 } as const;
 
-export const DOWNLOAD_SOCKET_COMMAND_TYPES = [
-    SOCKET_COMMAND.downloadQueue,
-    SOCKET_COMMAND.downloadRetry,
-    SOCKET_COMMAND.downloadClear,
-    SOCKET_COMMAND.downloadCancel,
-] as const;
+export const SOCKET_EVENT = {
+    appConnected: 'app.connected',
+    downloadQueueChanged: 'download.queueChanged',
+    storageCopyChanged: 'storage.copyChanged',
+    storageDeleteChanged: 'storage.deleteChanged',
+    libraryValidateStatus: 'library.validateStatus',
+    titleVerifyChanged: 'title.verify.changed',
+} as const;
 
-export const DOWNLOAD_ID_SOCKET_COMMAND_TYPES = [
-    SOCKET_COMMAND.downloadRetry,
-    SOCKET_COMMAND.downloadClear,
-    SOCKET_COMMAND.downloadCancel,
-] as const;
+export const DOWNLOAD_SOCKET_COMMAND = {
+    queue: SOCKET_COMMAND.downloadQueue,
+    retry: SOCKET_COMMAND.downloadRetry,
+    clear: SOCKET_COMMAND.downloadClear,
+    cancel: SOCKET_COMMAND.downloadCancel,
+} as const;
 
-export const STORAGE_COPY_SOCKET_COMMAND_TYPES = [
-    SOCKET_COMMAND.storageCopyRetry,
-    SOCKET_COMMAND.storageCopyClear,
-    SOCKET_COMMAND.storageCopyCancel,
-] as const;
+export const STORAGE_COPY_SOCKET_COMMAND = {
+    retry: SOCKET_COMMAND.storageCopyRetry,
+    clear: SOCKET_COMMAND.storageCopyClear,
+    cancel: SOCKET_COMMAND.storageCopyCancel,
+} as const;
 
-export const STORAGE_DELETE_SOCKET_COMMAND_TYPES = [
-    SOCKET_COMMAND.storageDeleteRetry,
-    SOCKET_COMMAND.storageDeleteClear,
-] as const;
+export const STORAGE_DELETE_SOCKET_COMMAND = {
+    retry: SOCKET_COMMAND.storageDeleteRetry,
+    clear: SOCKET_COMMAND.storageDeleteClear,
+} as const;
 
-export const LIBRARY_VALIDATION_SOCKET_COMMAND_TYPES = [
-    SOCKET_COMMAND.libraryValidationCancel,
-] as const;
+export const LIBRARY_VALIDATE_SOCKET_COMMAND = {
+    cancel: SOCKET_COMMAND.libraryValidateCancel,
+    clear: SOCKET_COMMAND.libraryValidateClear,
+    failureClear: SOCKET_COMMAND.libraryValidateFailureClear,
+    failureDownload: SOCKET_COMMAND.libraryValidateFailureDownload,
+} as const;
 
-export const TITLE_VERIFY_SOCKET_COMMAND_TYPES = [
-    SOCKET_COMMAND.titleVerifyQueue,
-] as const;
+export const TITLE_VERIFY_SOCKET_COMMAND = {
+    queue: SOCKET_COMMAND.titleVerifyQueue,
+} as const;
 
-export const ID_SOCKET_COMMAND_TYPES = [
-    ...DOWNLOAD_ID_SOCKET_COMMAND_TYPES,
-    ...STORAGE_COPY_SOCKET_COMMAND_TYPES,
-    ...STORAGE_DELETE_SOCKET_COMMAND_TYPES,
-] as const;
+export const APP_SOCKET_EVENT = {
+    connected: SOCKET_EVENT.appConnected,
+} as const;
 
-export type IdSocketCommandType = (typeof ID_SOCKET_COMMAND_TYPES)[number];
+export const DOWNLOAD_SOCKET_EVENT = {
+    changed: SOCKET_EVENT.downloadQueueChanged,
+} as const;
 
-export function isIdSocketCommandType(
-    value: unknown
-): value is IdSocketCommandType {
-    return ID_SOCKET_COMMAND_TYPES.includes(value as IdSocketCommandType);
-}
+export const STORAGE_COPY_SOCKET_EVENT = {
+    changed: SOCKET_EVENT.storageCopyChanged,
+} as const;
 
-export type AppConnectedEvent = {
-    type: 'app.connected';
-    downloads: DownloadQueueItem[];
-    storageCopies: StorageCopyItem[];
-    storageDeletes: StorageDeleteItem[];
-    libraryValidationStatus?: ValidationStatusEvent | null;
-};
+export const STORAGE_DELETE_SOCKET_EVENT = {
+    changed: SOCKET_EVENT.storageDeleteChanged,
+} as const;
+
+export const LIBRARY_VALIDATE_SOCKET_EVENT = {
+    status: SOCKET_EVENT.libraryValidateStatus,
+} as const;
+
+export const TITLE_VERIFY_SOCKET_EVENT = {
+    changed: SOCKET_EVENT.titleVerifyChanged,
+} as const;
 
 export type DownloadSocketCommand =
     | {
-          type: 'download.queue';
+          type: typeof DOWNLOAD_SOCKET_COMMAND.queue;
           items: DownloadQueueItem[];
       }
     | {
-          type: 'download.retry';
+          type: typeof DOWNLOAD_SOCKET_COMMAND.retry;
           id: string;
       }
     | {
-          type: 'download.clear';
+          type: typeof DOWNLOAD_SOCKET_COMMAND.clear;
           id: string;
       }
     | {
-          type: 'download.cancel';
+          type: typeof DOWNLOAD_SOCKET_COMMAND.cancel;
           id: string;
       };
 
-export type DownloadSocketEvent = {
-    type: 'download.queueChanged';
-    items: DownloadQueueItem[];
-};
-
-export type StorageCopySocketEvent = {
-    type: 'storage.copyChanged';
-    items: StorageCopyItem[];
-};
-
-export type StorageDeleteSocketEvent = {
-    type: 'storage.deleteChanged';
-    items: StorageDeleteItem[];
-};
-
 export type StorageCopySocketCommand =
     | {
-          type: 'storage.copy.retry';
+          type: typeof STORAGE_COPY_SOCKET_COMMAND.retry;
           id: string;
       }
     | {
-          type: 'storage.copy.clear';
+          type: typeof STORAGE_COPY_SOCKET_COMMAND.clear;
           id: string;
       }
     | {
-          type: 'storage.copy.cancel';
+          type: typeof STORAGE_COPY_SOCKET_COMMAND.cancel;
           id: string;
       };
 
 export type StorageDeleteSocketCommand =
     | {
-          type: 'storage.delete.retry';
+          type: typeof STORAGE_DELETE_SOCKET_COMMAND.retry;
           id: string;
       }
     | {
-          type: 'storage.delete.clear';
+          type: typeof STORAGE_DELETE_SOCKET_COMMAND.clear;
           id: string;
       };
 
-export type LibraryValidationSocketCommand = {
-    type: 'library.validation.cancel';
-};
+export type LibraryValidateSocketCommand =
+    | {
+          type: typeof LIBRARY_VALIDATE_SOCKET_COMMAND.cancel;
+      }
+    | {
+          type: typeof LIBRARY_VALIDATE_SOCKET_COMMAND.clear;
+      }
+    | {
+          type: typeof LIBRARY_VALIDATE_SOCKET_COMMAND.failureClear;
+      }
+    | {
+          type: typeof LIBRARY_VALIDATE_SOCKET_COMMAND.failureDownload;
+      };
 
 export type TitleVerifySocketCommand = {
-    type: 'title.verify.queue';
+    type: typeof TITLE_VERIFY_SOCKET_COMMAND.queue;
     titleId: string;
+};
+
+export type SocketCommand =
+    | DownloadSocketCommand
+    | StorageCopySocketCommand
+    | StorageDeleteSocketCommand
+    | LibraryValidateSocketCommand
+    | TitleVerifySocketCommand;
+
+export type AppConnectedEvent = {
+    type: typeof APP_SOCKET_EVENT.connected;
+    downloads: DownloadQueueItem[];
+    storageCopies: StorageCopyItem[];
+    storageDeletes: StorageDeleteItem[];
+    libraryValidateStatus?: LibraryValidateStatusEvent | null;
+};
+
+export type DownloadSocketEvent = {
+    type: typeof DOWNLOAD_SOCKET_EVENT.changed;
+    items: DownloadQueueItem[];
+};
+
+export type StorageCopySocketEvent = {
+    type: typeof STORAGE_COPY_SOCKET_EVENT.changed;
+    items: StorageCopyItem[];
+};
+
+export type StorageDeleteSocketEvent = {
+    type: typeof STORAGE_DELETE_SOCKET_EVENT.changed;
+    items: StorageDeleteItem[];
+};
+
+export type LibraryValidateStatus =
+    | 'started'
+    | 'validating'
+    | 'validated'
+    | 'complete'
+    | 'failed';
+
+export type LibraryValidateStatusEvent = {
+    type: typeof SOCKET_EVENT.libraryValidateStatus;
+    status: LibraryValidateStatus;
+    titleId?: string;
+    name?: string;
+    kind?: string;
+    sizeText?: string;
+    result?: 'ok' | 'failed';
+    current?: number;
+    total?: number;
+    failed?: number;
+    error?: string | null;
 };
 
 export type TitleVerifyCopyResult = {
@@ -148,85 +205,33 @@ export type TitleVerifyCopyResult = {
 };
 
 export type TitleVerifySocketEvent = {
-    type: 'title.verify.changed';
+    type: typeof SOCKET_EVENT.titleVerifyChanged;
     titleId: string;
     status: 'verifying' | 'complete' | 'failed';
     copies: TitleVerifyCopyResult[];
     error?: string | null;
 };
 
-export type ValidationStatus =
-    | 'started'
-    | 'validating'
-    | 'validated'
-    | 'complete'
-    | 'failed';
-
-export type ValidationStatusEvent = {
-    type: 'library.validationStatus';
-    status: ValidationStatus;
-    titleId?: string;
-    titleName?: string;
-    titleKind?: string;
-    sizeText?: string;
-    result?: 'ok' | 'failed';
-    current?: number;
-    total?: number;
-    failed?: number;
-    error?: string | null;
-};
-
-export type AppSocketCommand =
-    | DownloadSocketCommand
-    | StorageCopySocketCommand
-    | StorageDeleteSocketCommand
-    | LibraryValidationSocketCommand
-    | TitleVerifySocketCommand;
-
-export function isDownloadSocketCommand(
-    command: AppSocketCommand
-): command is DownloadSocketCommand {
-    return DOWNLOAD_SOCKET_COMMAND_TYPES.includes(
-        command.type as (typeof DOWNLOAD_SOCKET_COMMAND_TYPES)[number]
-    );
-}
-
-export function isStorageCopySocketCommand(
-    command: AppSocketCommand
-): command is StorageCopySocketCommand {
-    return STORAGE_COPY_SOCKET_COMMAND_TYPES.includes(
-        command.type as (typeof STORAGE_COPY_SOCKET_COMMAND_TYPES)[number]
-    );
-}
-
-export function isStorageDeleteSocketCommand(
-    command: AppSocketCommand
-): command is StorageDeleteSocketCommand {
-    return STORAGE_DELETE_SOCKET_COMMAND_TYPES.includes(
-        command.type as (typeof STORAGE_DELETE_SOCKET_COMMAND_TYPES)[number]
-    );
-}
-
-export function isLibraryValidationSocketCommand(
-    command: AppSocketCommand
-): command is LibraryValidationSocketCommand {
-    return LIBRARY_VALIDATION_SOCKET_COMMAND_TYPES.includes(
-        command.type as (typeof LIBRARY_VALIDATION_SOCKET_COMMAND_TYPES)[number]
-    );
-}
-
-export function isTitleVerifySocketCommand(
-    command: AppSocketCommand
-): command is TitleVerifySocketCommand {
-    return TITLE_VERIFY_SOCKET_COMMAND_TYPES.includes(
-        command.type as (typeof TITLE_VERIFY_SOCKET_COMMAND_TYPES)[number]
-    );
-}
-
-export type AppSocketEvent =
+export type SocketEvent =
     | AppConnectedEvent
     | DownloadSocketEvent
     | StorageCopySocketEvent
     | StorageDeleteSocketEvent
-    | ValidationStatusEvent
+    | LibraryValidateStatusEvent
     | TitleVerifySocketEvent;
+
+export function isSocketCommand<T extends SocketCommand['type']>(
+    command: SocketCommand,
+    type?: T | readonly T[] | Record<string, T>
+): command is Extract<SocketCommand, { type: T }> {
+    if (!type) {
+        return Object.values(SOCKET_COMMAND).includes(command.type);
+    }
+    if (typeof type === 'object' && !Array.isArray(type)) {
+        return Object.values(type).includes(command.type as T);
+    }
+    if (Array.isArray(type)) {
+        return type.includes(command.type);
+    }
+    return type === command.type;
+}

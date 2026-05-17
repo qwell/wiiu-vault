@@ -1,11 +1,11 @@
 import {
-    LibraryValidationTitle,
-    type Fat32ListResponse,
+    LibraryValidateTitle,
+    type StorageFat32ListResponse,
 } from '../shared/api.js';
 import { type DownloadQueueItem } from '../shared/download.js';
 import { type Fat32Volume } from '../shared/os.js';
 import {
-    SOCKET_COMMAND,
+    TITLE_VERIFY_SOCKET_COMMAND,
     type TitleVerifySocketEvent,
 } from '../shared/socket.js';
 import { formatSize } from '../shared/shared.js';
@@ -32,7 +32,7 @@ import {
     getBaseBadgeState,
     getChildBadgeState,
     type SlotBadgeState,
-} from './library-state.js';
+} from './library.js';
 import { sendAppSocketCommand } from './app-socket.js';
 
 type TitleDetailOptions = {
@@ -42,7 +42,7 @@ type TitleDetailOptions = {
     populateFat32DeviceSelect: (
         select: HTMLSelectElement,
         copyButton: HTMLButtonElement
-    ) => Promise<Fat32ListResponse | null>;
+    ) => Promise<StorageFat32ListResponse | null>;
 };
 
 let selectedFamily: string | null = null;
@@ -234,6 +234,7 @@ function renderDownloadedCopyRow(entry: TitleEntry): HTMLElement {
         entry.copyCount > 1 ? `(${entry.copyCount} copies)` : '';
 
     const verification = options?.titleVerifications.get(entry.titleId) ?? null;
+    console.log(verification);
     const verificationStatus = document.createElement('span');
     verificationStatus.className = 'title-storage-verification-state';
     verificationStatus.textContent =
@@ -279,7 +280,7 @@ function getSelectedDownloadedTitleIds(
 }
 
 function getSelectedFat32Volume(
-    response: Fat32ListResponse | null,
+    response: StorageFat32ListResponse | null,
     select: HTMLSelectElement
 ): Fat32Volume | null {
     return (
@@ -348,7 +349,7 @@ function updateStorageCopyAvailability(
 
 function formatDeleteConfirmationEntry(entry: TitleEntry): string {
     const copyText = entry.copyCount > 1 ? ` (${entry.copyCount} copies)` : '';
-    return `${entry.titleName} v${entry.version} [${formatTitleKind(entry.kind)}] ${entry.titleId}${copyText}`;
+    return `${entry.name} v${entry.version} [${formatTitleKind(entry.kind)}] ${entry.titleId}${copyText}`;
 }
 
 function getKindSortValue(kind: TitleKinds): number {
@@ -469,7 +470,6 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
         .filter((entry) => {
             const verification =
                 detailOptions?.titleVerifications?.get(entry.titleId) ?? null;
-            if (verification === null) return false;
             return !isVerificationFailed(verification);
         })
         .sort((a, b) => getKindSortValue(a.kind) - getKindSortValue(b.kind));
@@ -507,7 +507,7 @@ function renderGroupDetailContent(group: TitleGroup): DocumentFragment {
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
 
-        let fat32Response: Fat32ListResponse | null = null;
+        let fat32Response: StorageFat32ListResponse | null = null;
 
         const updateDownloadedButtons = (): void => {
             const selectedVolume = getSelectedFat32Volume(
@@ -795,7 +795,7 @@ function showDetailSidebar(sidebar: HTMLElement, group: TitleGroup): void {
 function requestTitleVerification(group: TitleGroup): void {
     for (const entry of group.entries) {
         sendAppSocketCommand({
-            type: SOCKET_COMMAND.titleVerifyQueue,
+            type: TITLE_VERIFY_SOCKET_COMMAND.queue,
             titleId: entry.titleId,
         });
     }
@@ -812,20 +812,20 @@ function isDownloadableValidationKind(
 }
 
 function validationToAvailableEntry(
-    title: LibraryValidationTitle
+    title: LibraryValidateTitle
 ): AvailableTitleEntry | null {
     if (
         title.status !== 'failed' ||
         title.titleId === null ||
-        !isDownloadableValidationKind(title.titleKind)
+        !isDownloadableValidationKind(title.kind)
     ) {
         return null;
     }
 
     return {
-        kind: title.titleKind,
+        kind: title.kind,
         titleId: title.titleId.toLowerCase(),
-        versions: title.titleVersion === null ? [] : [title.titleVersion],
+        versions: title.version === null ? [] : [title.version],
         availableOnCdn: true,
     };
 }
@@ -838,7 +838,7 @@ function getTitleFamily(titleId: string): string {
 
 export function mergeFailedValidationsIntoAvailable(
     groups: TitleGroup[],
-    titles: LibraryValidationTitle[]
+    titles: LibraryValidateTitle[]
 ): TitleGroup[] {
     const changedGroups: TitleGroup[] = [];
 

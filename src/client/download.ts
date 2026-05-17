@@ -1,6 +1,7 @@
-import { DOWNLOAD_ACTION, type DownloadQueueItem } from '../shared/download.js';
+import { type DownloadQueueItem } from '../shared/download.js';
 import { formatSize } from '../shared/shared.js';
 import { type TitleGroup, TitleKinds } from '../shared/titles.js';
+import { DOWNLOAD_SOCKET_COMMAND } from '../shared/socket.js';
 import {
     createActionBarCell,
     createActionButton,
@@ -14,7 +15,7 @@ import {
     refreshOpenDetailSidebarForGroup,
     updateRenderedTitleGroup,
 } from './title-detail.js';
-import { syncGroupStatusFromSlots } from './library-state.js';
+import { syncGroupStatusFromSlots } from './library.js';
 import { sendAppSocketCommand } from './app-socket.js';
 
 export type DownloadQueueState =
@@ -204,8 +205,8 @@ function renderDownloadControls(item: DownloadQueueItem): HTMLDivElement {
         detailsCell.classList.add('action-bar-controls');
         detailsCell.title = item.error ?? '';
         detailsCell.append(
-            createActionButton('Retry', DOWNLOAD_ACTION.retry, item.id),
-            createActionButton('Clear', DOWNLOAD_ACTION.clear, item.id)
+            createActionButton('Retry', DOWNLOAD_SOCKET_COMMAND.retry, item.id),
+            createActionButton('Clear', DOWNLOAD_SOCKET_COMMAND.clear, item.id)
         );
         return detailsCell;
     }
@@ -213,7 +214,7 @@ function renderDownloadControls(item: DownloadQueueItem): HTMLDivElement {
     if (item.state === 'queued') {
         detailsCell.classList.add('action-bar-controls');
         detailsCell.append(
-            createActionButton('Clear', DOWNLOAD_ACTION.clear, item.id)
+            createActionButton('Clear', DOWNLOAD_SOCKET_COMMAND.clear, item.id)
         );
         return detailsCell;
     }
@@ -221,7 +222,7 @@ function renderDownloadControls(item: DownloadQueueItem): HTMLDivElement {
     if (item.state === 'complete') {
         detailsCell.classList.add('action-bar-controls');
         detailsCell.append(
-            createActionButton('Clear', DOWNLOAD_ACTION.clear, item.id)
+            createActionButton('Clear', DOWNLOAD_SOCKET_COMMAND.clear, item.id)
         );
         return detailsCell;
     }
@@ -238,7 +239,11 @@ function renderDownloadControls(item: DownloadQueueItem): HTMLDivElement {
 
         detailsCell.append(
             detailsTextElement,
-            createActionButton('Cancel', DOWNLOAD_ACTION.cancel, item.id)
+            createActionButton(
+                'Cancel',
+                DOWNLOAD_SOCKET_COMMAND.cancel,
+                item.id
+            )
         );
         return detailsCell;
     }
@@ -272,28 +277,28 @@ export function queueDownloads(
     }
 
     sendAppSocketCommand({
-        type: 'download.queue',
+        type: DOWNLOAD_SOCKET_COMMAND.queue,
         items: addedItems,
     });
 }
 
 export function retryDownload(itemId: string): void {
     sendAppSocketCommand({
-        type: DOWNLOAD_ACTION.retry,
+        type: DOWNLOAD_SOCKET_COMMAND.retry,
         id: itemId,
     });
 }
 
 export function clearDownload(itemId: string): void {
     sendAppSocketCommand({
-        type: DOWNLOAD_ACTION.clear,
+        type: DOWNLOAD_SOCKET_COMMAND.clear,
         id: itemId,
     });
 }
 
 export function cancelDownload(itemId: string): void {
     sendAppSocketCommand({
-        type: DOWNLOAD_ACTION.cancel,
+        type: DOWNLOAD_SOCKET_COMMAND.cancel,
         id: itemId,
     });
 }
@@ -343,7 +348,7 @@ function markDownloadComplete(
         group.entries.push({
             titleId: item.titleId,
             version: installedVersion,
-            titleName: installedTitleName,
+            name: installedTitleName,
             region: group.region,
             iconUrl: group.iconUrl,
             kind: item.kind,
@@ -365,7 +370,7 @@ function markDownloadComplete(
                 return;
             }
             existingEntry.version = installedVersion;
-            existingEntry.titleName = installedTitleName;
+            existingEntry.name = installedTitleName;
             existingEntry.sizeBytes = installedSizeBytes;
             haystacks.delete(group);
         }

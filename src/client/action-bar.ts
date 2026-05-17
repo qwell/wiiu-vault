@@ -1,20 +1,19 @@
 import {
-    DOWNLOAD_ACTION,
     type DownloadActionBarCommand,
-    isDownloadActionBarCommand,
     type DownloadQueueItem,
 } from '../shared/download.js';
 import {
-    SOCKET_COMMAND,
-    type ValidationStatusEvent,
+    DOWNLOAD_SOCKET_COMMAND,
+    LIBRARY_VALIDATE_SOCKET_COMMAND,
+    STORAGE_COPY_SOCKET_COMMAND,
+    STORAGE_DELETE_SOCKET_COMMAND,
+    type LibraryValidateStatusEvent,
 } from '../shared/socket.js';
 import { type TitleKinds } from '../shared/titles.js';
 import {
     type StorageDeleteItem,
     type StorageActionBarCommand,
     type StorageCopyItem,
-    STORAGE_ACTION,
-    isStorageActionBarCommand,
 } from '../shared/storage.js';
 import {
     formatStorageCopyDetails,
@@ -52,21 +51,36 @@ import {
 } from './download.js';
 import { sendAppSocketCommand } from './app-socket.js';
 import { formatTitleKind } from './title-detail.js';
+import { LibraryActionBarCommand } from './library.js';
+
+export const ACTION_BAR_COMMAND = {
+    downloadQueue: DOWNLOAD_SOCKET_COMMAND.queue,
+    downloadRetry: DOWNLOAD_SOCKET_COMMAND.retry,
+    downloadClear: DOWNLOAD_SOCKET_COMMAND.clear,
+    downloadCancel: DOWNLOAD_SOCKET_COMMAND.cancel,
+    storageCopyRetry: STORAGE_COPY_SOCKET_COMMAND.retry,
+    storageCopyCancel: STORAGE_COPY_SOCKET_COMMAND.cancel,
+    storageCopyClear: STORAGE_COPY_SOCKET_COMMAND.clear,
+    storageDeleteRetry: STORAGE_DELETE_SOCKET_COMMAND.retry,
+    storageDeleteClear: STORAGE_DELETE_SOCKET_COMMAND.clear,
+    libraryValidateCancel: LIBRARY_VALIDATE_SOCKET_COMMAND.cancel,
+    libraryValidateClear: LIBRARY_VALIDATE_SOCKET_COMMAND.clear,
+    libraryValidateFailureClear: LIBRARY_VALIDATE_SOCKET_COMMAND.failureClear,
+    libraryValidateFailureDownload:
+        LIBRARY_VALIDATE_SOCKET_COMMAND.failureDownload,
+} as const;
 
 export type ActionBarCommand =
     | DownloadActionBarCommand
     | StorageActionBarCommand
-    | typeof SOCKET_COMMAND.libraryValidationCancel
-    | 'library.validation.clear'
-    | 'library.validation.failure.clear'
-    | 'library.validation.failure.download';
+    | LibraryActionBarCommand;
 
 type ActionBarOptions = {
     downloads: DownloadQueueItem[];
     storageCopies: StorageCopyItem[];
     storageDeletes: StorageDeleteItem[];
-    libraryValidation: ValidationStatusEvent | null;
-    libraryValidationFailures: ValidationStatusEvent[];
+    libraryValidate: LibraryValidateStatusEvent | null;
+    libraryValidateFailures: LibraryValidateStatusEvent[];
     onCommand: (action: ActionBarCommand, itemId: string) => void;
 };
 
@@ -78,14 +92,35 @@ let actionBarRoot: HTMLElement | null = null;
 let actionBarSignature = '';
 let actionBarOptions: ActionBarOptions | null = null;
 
+function isActionBarCommand<T extends ActionBarCommand>(
+    command: string | null,
+    type?: T | readonly T[] | Record<string, T>
+): command is T {
+    if (!type) {
+        if (command === null) {
+            return false;
+        }
+        return Object.values(ACTION_BAR_COMMAND).includes(
+            command as ActionBarCommand
+        );
+    }
+    if (typeof type === 'object' && !Array.isArray(type)) {
+        return Object.values(type).includes(command as T);
+    }
+    if (Array.isArray(type)) {
+        return type.includes(command);
+    }
+    return type === command;
+}
+
 function isClearableActionBarItem(options: ActionBarOptions): boolean {
     return (
         options.downloads.some((item) => item.state !== 'downloading') ||
         options.storageCopies.some((item) => item.state !== 'copying') ||
         options.storageDeletes.some((item) => item.state !== 'deleting') ||
-        options.libraryValidationFailures.length > 0 ||
-        (options.libraryValidation !== null &&
-            getLibraryValidationActionState(options.libraryValidation) !==
+        options.libraryValidateFailures.length > 0 ||
+        (options.libraryValidate !== null &&
+            getLibraryValidateActionState(options.libraryValidate) !==
                 'validating')
     );
 }
@@ -93,33 +128,32 @@ function isClearableActionBarItem(options: ActionBarOptions): boolean {
 function clearAllActionBarItems(options: ActionBarOptions): void {
     for (const item of options.downloads) {
         if (item.state !== 'downloading') {
-            options.onCommand(DOWNLOAD_ACTION.clear, item.id);
+            options.onCommand(DOWNLOAD_SOCKET_COMMAND.clear, item.id);
         }
     }
 
     for (const item of options.storageCopies) {
         if (item.state !== 'copying') {
-            options.onCommand(STORAGE_ACTION.clearCopy, item.id);
+            options.onCommand(STORAGE_COPY_SOCKET_COMMAND.clear, item.id);
         }
     }
 
     for (const item of options.storageDeletes) {
         if (item.state !== 'deleting') {
-            options.onCommand(STORAGE_ACTION.clearDelete, item.id);
+            options.onCommand(STORAGE_DELETE_SOCKET_COMMAND.clear, item.id);
         }
     }
 
     if (
-        options.libraryValidation !== null &&
-        getLibraryValidationActionState(options.libraryValidation) !==
-            'validating'
+        options.libraryValidate !== null &&
+        getLibraryValidateActionState(options.libraryValidate) !== 'validating'
     ) {
-        setLibraryValidationAction(null);
+        setLibraryValidateAction(null);
     }
 
-    options.libraryValidationFailures.splice(
+    options.libraryValidateFailures.splice(
         0,
-        options.libraryValidationFailures.length
+        options.libraryValidateFailures.length
     );
     updateActionBar();
 }
@@ -171,7 +205,7 @@ export function createActionBarCommandHandler(
 ): (action: ActionBarCommand, itemId: string) => void {
     return (action, itemId) => {
         switch (action) {
-            case DOWNLOAD_ACTION.cancel:
+            case DOWNLOAD_SOCKET_COMMAND.cancel:
                 sendDownloadCommandForMatches(
                     itemId,
                     options.downloads,
@@ -179,7 +213,7 @@ export function createActionBarCommandHandler(
                 );
                 return;
 
-            case DOWNLOAD_ACTION.clear:
+            case DOWNLOAD_SOCKET_COMMAND.clear:
                 sendDownloadCommandForMatches(
                     itemId,
                     options.downloads,
@@ -187,7 +221,7 @@ export function createActionBarCommandHandler(
                 );
                 return;
 
-            case DOWNLOAD_ACTION.retry:
+            case DOWNLOAD_SOCKET_COMMAND.retry:
                 sendDownloadCommandForMatches(
                     itemId,
                     options.downloads,
@@ -195,59 +229,45 @@ export function createActionBarCommandHandler(
                 );
                 return;
 
-            case STORAGE_ACTION.cancelCopy:
+            case STORAGE_COPY_SOCKET_COMMAND.cancel:
                 cancelStorageCopy(itemId);
                 return;
 
-            case STORAGE_ACTION.clearCopy:
+            case STORAGE_COPY_SOCKET_COMMAND.clear:
                 clearStorageCopy(itemId);
                 return;
 
-            case STORAGE_ACTION.retryCopy:
+            case STORAGE_COPY_SOCKET_COMMAND.retry:
                 retryStorageCopy(itemId);
                 return;
 
-            case STORAGE_ACTION.clearDelete:
+            case STORAGE_DELETE_SOCKET_COMMAND.clear:
                 clearStorageDelete(itemId);
                 return;
 
-            case STORAGE_ACTION.retryDelete:
+            case STORAGE_DELETE_SOCKET_COMMAND.retry:
                 retryStorageDelete(itemId);
                 return;
 
-            case SOCKET_COMMAND.libraryValidationCancel:
+            case LIBRARY_VALIDATE_SOCKET_COMMAND.cancel:
                 sendAppSocketCommand({
-                    type: SOCKET_COMMAND.libraryValidationCancel,
+                    type: LIBRARY_VALIDATE_SOCKET_COMMAND.cancel,
                 });
                 return;
 
-            case 'library.validation.clear':
-                setLibraryValidationAction(null);
+            case LIBRARY_VALIDATE_SOCKET_COMMAND.clear:
+                setLibraryValidateAction(null);
                 return;
 
-            case 'library.validation.failure.clear':
-                clearLibraryValidationFailure(itemId);
+            case LIBRARY_VALIDATE_SOCKET_COMMAND.failureClear:
+                clearLibraryValidateFailure(itemId);
                 return;
 
-            case 'library.validation.failure.download':
-                queueLibraryValidationFailureDownload(
-                    options.downloads,
-                    itemId
-                );
+            case LIBRARY_VALIDATE_SOCKET_COMMAND.failureDownload:
+                queueLibraryValidateFailureDownload(options.downloads, itemId);
                 return;
         }
     };
-}
-
-function isActionBarCommand(value: string | null): value is ActionBarCommand {
-    return (
-        isDownloadActionBarCommand(value) ||
-        isStorageActionBarCommand(value) ||
-        value === SOCKET_COMMAND.libraryValidationCancel ||
-        value === 'library.validation.clear' ||
-        value === 'library.validation.failure.clear' ||
-        value === 'library.validation.failure.download'
-    );
 }
 
 function getActionBarSignature(options: ActionBarOptions): string {
@@ -264,59 +284,59 @@ function getActionBarSignature(options: ActionBarOptions): string {
             id: item.id,
             state: item.state,
         })),
-        libraryValidation: options.libraryValidation
+        libraryValidate: options.libraryValidate
             ? {
-                  status: getLibraryValidationActionState(
-                      options.libraryValidation
+                  status: getLibraryValidateActionState(
+                      options.libraryValidate
                   ),
-                  failed: options.libraryValidation.failed ?? null,
-                  total: options.libraryValidation.total ?? null,
-                  error: options.libraryValidation.error ?? null,
+                  failed: options.libraryValidate.failed ?? null,
+                  total: options.libraryValidate.total ?? null,
+                  error: options.libraryValidate.error ?? null,
               }
             : null,
-        libraryValidationFailures: options.libraryValidationFailures.map(
+        libraryValidateFailures: options.libraryValidateFailures.map(
             (item) => ({
                 titleId: item.titleId ?? null,
-                titleName: item.titleName ?? null,
-                titleKind: item.titleKind ?? null,
+                titleName: item.name ?? null,
+                titleKind: item.kind ?? null,
             })
         ),
     });
 }
 
-export function setLibraryValidationAction(
-    event: ValidationStatusEvent | null
+export function setLibraryValidateAction(
+    event: LibraryValidateStatusEvent | null
 ): void {
     if (!actionBarOptions) {
         return;
     }
 
     if (event?.status === 'started') {
-        actionBarOptions.libraryValidationFailures.splice(
+        actionBarOptions.libraryValidateFailures.splice(
             0,
-            actionBarOptions.libraryValidationFailures.length
+            actionBarOptions.libraryValidateFailures.length
         );
     }
 
     if (event?.status === 'validated' && event.result === 'failed') {
-        addLibraryValidationFailure(event);
+        addLibraryValidateFailure(event);
     }
 
-    actionBarOptions.libraryValidation = event;
+    actionBarOptions.libraryValidate = event;
     updateActionBar();
 }
 
-function addLibraryValidationFailure(event: ValidationStatusEvent): void {
-    const key = getLibraryValidationFailureKey(event);
-    const existingIndex = actionBarOptions?.libraryValidationFailures.findIndex(
-        (item) => getLibraryValidationFailureKey(item) === key
+function addLibraryValidateFailure(event: LibraryValidateStatusEvent): void {
+    const key = getLibraryValidateFailureKey(event);
+    const existingIndex = actionBarOptions?.libraryValidateFailures.findIndex(
+        (item) => getLibraryValidateFailureKey(item) === key
     );
     if (existingIndex === undefined) {
         return;
     }
 
     if (existingIndex >= 0) {
-        actionBarOptions?.libraryValidationFailures.splice(
+        actionBarOptions?.libraryValidateFailures.splice(
             existingIndex,
             1,
             event
@@ -324,35 +344,35 @@ function addLibraryValidationFailure(event: ValidationStatusEvent): void {
         return;
     }
 
-    actionBarOptions?.libraryValidationFailures.push(event);
+    actionBarOptions?.libraryValidateFailures.push(event);
 }
 
-function clearLibraryValidationFailure(itemId: string): void {
+function clearLibraryValidateFailure(itemId: string): void {
     if (!actionBarOptions) {
         return;
     }
 
-    const nextFailures = actionBarOptions.libraryValidationFailures.filter(
-        (item) => getLibraryValidationFailureKey(item) !== itemId
+    const nextFailures = actionBarOptions.libraryValidateFailures.filter(
+        (item) => getLibraryValidateFailureKey(item) !== itemId
     );
-    actionBarOptions.libraryValidationFailures.splice(
+    actionBarOptions.libraryValidateFailures.splice(
         0,
-        actionBarOptions.libraryValidationFailures.length,
+        actionBarOptions.libraryValidateFailures.length,
         ...nextFailures
     );
     updateActionBar();
 }
 
-function queueLibraryValidationFailureDownload(
+function queueLibraryValidateFailureDownload(
     downloads: DownloadQueueItem[],
     itemId: string
 ): void {
     const item =
-        actionBarOptions?.libraryValidationFailures.find(
-            (candidate) => getLibraryValidationFailureKey(candidate) === itemId
+        actionBarOptions?.libraryValidateFailures.find(
+            (candidate) => getLibraryValidateFailureKey(candidate) === itemId
         ) ?? null;
 
-    if (!item?.titleId || !item.titleKind) {
+    if (!item?.titleId || !item.kind) {
         return;
     }
 
@@ -360,9 +380,9 @@ function queueLibraryValidationFailureDownload(
         {
             id: crypto.randomUUID(),
             family: item.titleId.toLowerCase().slice(8),
-            groupName: item.titleName ?? item.titleId,
-            kind: item.titleKind as TitleKinds,
-            label: formatTitleKind(item.titleKind),
+            groupName: item.name ?? item.titleId,
+            kind: item.kind as TitleKinds,
+            label: formatTitleKind(item.kind),
             titleId: item.titleId,
             sizeText: null,
             totalBytes: null,
@@ -561,9 +581,9 @@ function updateActionBarRowsInPlace(options: ActionBarOptions): void {
     const validationRow = actionBarRoot.querySelector<HTMLElement>(
         '[data-library-validation]'
     );
-    if (validationRow && options.libraryValidation) {
-        const event = options.libraryValidation;
-        const stateName = getLibraryValidationActionState(event);
+    if (validationRow && options.libraryValidate) {
+        const event = options.libraryValidate;
+        const stateName = getLibraryValidateActionState(event);
         validationRow.className = `action-bar-row action-bar-row-validation action-bar-row-${stateName}`;
         validationRow.dataset.itemState = stateName;
         validationRow.dataset.state = stateName;
@@ -585,7 +605,7 @@ function updateActionBarRowsInPlace(options: ActionBarOptions): void {
         );
 
         if (progress) {
-            progress.textContent = formatLibraryValidationProgress(event);
+            progress.textContent = formatLibraryValidateProgress(event);
         }
 
         const files = validationRow.querySelector<HTMLElement>(
@@ -596,29 +616,29 @@ function updateActionBarRowsInPlace(options: ActionBarOptions): void {
         );
 
         if (files) {
-            files.textContent = formatLibraryValidationFileCount(event);
+            files.textContent = formatLibraryValidateFileCount(event);
         }
 
         if (icon) {
-            icon.textContent = formatLibraryValidationIcon(event);
+            icon.textContent = formatLibraryValidateIcon(event);
         }
 
         if (state) {
-            state.textContent = formatLibraryValidationState(event);
+            state.textContent = formatLibraryValidateState(event);
         }
 
         if (title) {
-            const titleText = formatLibraryValidationTitle(event);
+            const titleText = formatLibraryValidateTitle(event);
             title.textContent = titleText;
             title.title = titleText;
         }
 
         if (size) {
-            size.textContent = formatLibraryValidationSize(event);
+            size.textContent = formatLibraryValidateSize(event);
         }
 
         if (detail) {
-            const detailText = formatLibraryValidationDetails(event);
+            const detailText = formatLibraryValidateDetails(event);
             detail.title = detailText;
             const detailTextElement = detail.querySelector<HTMLElement>(
                 '[data-library-validation-detail-text]'
@@ -633,7 +653,9 @@ function updateActionBarRowsInPlace(options: ActionBarOptions): void {
     }
 }
 
-function formatLibraryValidationProgress(event: ValidationStatusEvent): string {
+function formatLibraryValidateProgress(
+    event: LibraryValidateStatusEvent
+): string {
     if (event.status === 'complete') {
         return '100%';
     }
@@ -651,8 +673,8 @@ function formatLibraryValidationProgress(event: ValidationStatusEvent): string {
     return '0%';
 }
 
-function formatLibraryValidationFileCount(
-    event: ValidationStatusEvent
+function formatLibraryValidateFileCount(
+    event: LibraryValidateStatusEvent
 ): string {
     if (event.current !== undefined && event.total !== undefined) {
         return `${event.current}/${event.total} titles`;
@@ -661,13 +683,13 @@ function formatLibraryValidationFileCount(
     return '';
 }
 
-function formatLibraryValidationIcon(event: ValidationStatusEvent): string {
-    const state = getLibraryValidationActionState(event);
+function formatLibraryValidateIcon(event: LibraryValidateStatusEvent): string {
+    const state = getLibraryValidateActionState(event);
     return state === 'complete' ? '✓' : state === 'failed' ? '!' : '...';
 }
 
-function formatLibraryValidationState(event: ValidationStatusEvent): string {
-    const state = getLibraryValidationActionState(event);
+function formatLibraryValidateState(event: LibraryValidateStatusEvent): string {
+    const state = getLibraryValidateActionState(event);
     return state === 'complete'
         ? 'Complete'
         : state === 'failed'
@@ -675,27 +697,29 @@ function formatLibraryValidationState(event: ValidationStatusEvent): string {
           : 'Validating';
 }
 
-function formatLibraryValidationTitle(event: ValidationStatusEvent): string {
+function formatLibraryValidateTitle(event: LibraryValidateStatusEvent): string {
     if (
         (event.status === 'validating' || event.status === 'validated') &&
-        event.titleName &&
-        event.titleKind &&
+        event.name &&
+        event.kind &&
         event.titleId
     ) {
-        return `${event.titleName} [${formatTitleKind(event.titleKind)}] ${event.titleId}`;
+        return `${event.name} [${formatTitleKind(event.kind)}] ${event.titleId}`;
     }
 
     return 'Library validation';
 }
 
-function formatLibraryValidationSize(event: ValidationStatusEvent): string {
+function formatLibraryValidateSize(event: LibraryValidateStatusEvent): string {
     return event.status === 'validating' && event.sizeText
         ? event.sizeText
         : '-';
 }
 
-function formatLibraryValidationDetails(event: ValidationStatusEvent): string {
-    const state = getLibraryValidationActionState(event);
+function formatLibraryValidateDetails(
+    event: LibraryValidateStatusEvent
+): string {
+    const state = getLibraryValidateActionState(event);
     if (state === 'validating') {
         return 'Checking files...';
     }
@@ -713,32 +737,34 @@ function formatLibraryValidationDetails(event: ValidationStatusEvent): string {
         : 'Failed to validate library.';
 }
 
-function getLibraryValidationFailureKey(event: ValidationStatusEvent): string {
-    return event.titleId ?? event.titleName ?? 'unknown';
+function getLibraryValidateFailureKey(
+    event: LibraryValidateStatusEvent
+): string {
+    return event.titleId ?? event.name ?? 'unknown';
 }
 
-function renderLibraryValidationDetails(
-    event: ValidationStatusEvent
+function renderLibraryValidateDetails(
+    event: LibraryValidateStatusEvent
 ): HTMLElement {
-    const detailsText = formatLibraryValidationDetails(event);
+    const detailsText = formatLibraryValidateDetails(event);
     const details = createActionBarCell('action-bar-details-cell', '');
     details.title = detailsText;
-    details.dataset.libraryValidationDetail = 'true';
+    details.dataset.libraryValidateDetail = 'true';
 
-    if (getLibraryValidationActionState(event) === 'validating') {
+    if (getLibraryValidateActionState(event) === 'validating') {
         details.classList.add('action-bar-controls');
 
         const detailsTextElement = document.createElement('span');
         detailsTextElement.className = 'action-bar-control-text';
         detailsTextElement.title = detailsText;
         detailsTextElement.textContent = detailsText;
-        detailsTextElement.dataset.libraryValidationDetailText = 'true';
+        detailsTextElement.dataset.libraryValidateDetailText = 'true';
 
         details.append(
             detailsTextElement,
             createActionButton(
                 'Cancel',
-                SOCKET_COMMAND.libraryValidationCancel,
+                LIBRARY_VALIDATE_SOCKET_COMMAND.cancel,
                 'library-validation'
             )
         );
@@ -756,15 +782,15 @@ function renderLibraryValidationDetails(
         detailsTextElement,
         createActionButton(
             'Clear',
-            'library.validation.clear',
+            LIBRARY_VALIDATE_SOCKET_COMMAND.clear,
             'library-validation'
         )
     );
     return details;
 }
 
-function renderLibraryValidationFailureDetails(
-    event: ValidationStatusEvent
+function renderLibraryValidateFailureDetails(
+    event: LibraryValidateStatusEvent
 ): HTMLElement {
     const detailsText = event.error ?? 'Validation failed';
     const details = createActionBarCell('action-bar-details-cell', '');
@@ -782,27 +808,27 @@ function renderLibraryValidationFailureDetails(
             ? [
                   createActionButton(
                       'Download',
-                      'library.validation.failure.download',
-                      getLibraryValidationFailureKey(event)
+                      LIBRARY_VALIDATE_SOCKET_COMMAND.failureDownload,
+                      getLibraryValidateFailureKey(event)
                   ),
               ]
             : []),
         createActionButton(
             'Clear',
-            'library.validation.failure.clear',
-            getLibraryValidationFailureKey(event)
+            LIBRARY_VALIDATE_SOCKET_COMMAND.failureClear,
+            getLibraryValidateFailureKey(event)
         )
     );
     return details;
 }
 
-function renderLibraryValidationFailureRow(
-    event: ValidationStatusEvent
+function renderLibraryValidateFailureRow(
+    event: LibraryValidateStatusEvent
 ): HTMLElement {
     const row = document.createElement('div');
     row.className =
         'action-bar-row action-bar-row-validation-failure action-bar-row-failed';
-    row.dataset.libraryValidationFailure = 'true';
+    row.dataset.libraryValidateFailure = 'true';
     row.dataset.itemState = 'failed';
     row.dataset.state = 'failed';
 
@@ -811,17 +837,17 @@ function renderLibraryValidationFailureRow(
     const icon = createActionBarCell('action-bar-icon', '!');
     const state = createActionBarCell('action-bar-state', 'Failed');
     const size = createActionBarCell('action-bar-size', '-');
-    const titleText = formatLibraryValidationTitle(event);
+    const titleText = formatLibraryValidateTitle(event);
     const title = createActionBarCell('action-bar-title', titleText);
     title.title = titleText;
-    const details = renderLibraryValidationFailureDetails(event);
+    const details = renderLibraryValidateFailureDetails(event);
 
     row.append(progress, files, icon, state, size, title, details);
     return row;
 }
 
-function getLibraryValidationActionState(
-    event: ValidationStatusEvent
+function getLibraryValidateActionState(
+    event: LibraryValidateStatusEvent
 ): 'validating' | 'complete' | 'failed' {
     if (event.status === 'failed') {
         return 'failed';
@@ -834,52 +860,52 @@ function getLibraryValidationActionState(
     return 'validating';
 }
 
-function renderLibraryValidationActionRow(
-    event: ValidationStatusEvent
+function renderLibraryValidateActionRow(
+    event: LibraryValidateStatusEvent
 ): HTMLElement {
     const row = document.createElement('div');
-    const stateName = getLibraryValidationActionState(event);
+    const stateName = getLibraryValidateActionState(event);
     row.className = `action-bar-row action-bar-row-validation action-bar-row-${stateName}`;
-    row.dataset.libraryValidation = 'true';
+    row.dataset.libraryValidate = 'true';
     row.dataset.itemState = stateName;
     row.dataset.state = stateName;
 
     const progress = createActionBarCell(
         'action-bar-progress',
-        formatLibraryValidationProgress(event)
+        formatLibraryValidateProgress(event)
     );
-    progress.dataset.libraryValidationProgress = 'true';
+    progress.dataset.libraryValidateProgress = 'true';
 
     const files = createActionBarCell(
         'action-bar-files',
-        formatLibraryValidationFileCount(event)
+        formatLibraryValidateFileCount(event)
     );
-    files.dataset.libraryValidationFiles = 'true';
+    files.dataset.libraryValidateFiles = 'true';
 
     const icon = createActionBarCell(
         'action-bar-icon',
-        formatLibraryValidationIcon(event)
+        formatLibraryValidateIcon(event)
     );
-    icon.dataset.libraryValidationIcon = 'true';
+    icon.dataset.libraryValidateIcon = 'true';
 
     const state = createActionBarCell(
         'action-bar-state',
-        formatLibraryValidationState(event)
+        formatLibraryValidateState(event)
     );
-    state.dataset.libraryValidationState = 'true';
+    state.dataset.libraryValidateState = 'true';
 
     const size = createActionBarCell(
         'action-bar-size',
-        formatLibraryValidationSize(event)
+        formatLibraryValidateSize(event)
     );
-    size.dataset.libraryValidationSize = 'true';
+    size.dataset.libraryValidateSize = 'true';
 
-    const titleText = formatLibraryValidationTitle(event);
+    const titleText = formatLibraryValidateTitle(event);
     const title = createActionBarCell('action-bar-title', titleText);
     title.title = titleText;
-    title.dataset.libraryValidationTitle = 'true';
+    title.dataset.libraryValidateTitle = 'true';
 
-    const details = renderLibraryValidationDetails(event);
+    const details = renderLibraryValidateDetails(event);
 
     row.append(progress, files, icon, state, size, title, details);
     return row;
@@ -894,8 +920,8 @@ export function updateActionBar(): void {
         actionBarOptions.downloads.length === 0 &&
         actionBarOptions.storageCopies.length === 0 &&
         actionBarOptions.storageDeletes.length === 0 &&
-        actionBarOptions.libraryValidation === null &&
-        actionBarOptions.libraryValidationFailures.length === 0;
+        actionBarOptions.libraryValidate === null &&
+        actionBarOptions.libraryValidateFailures.length === 0;
     actionBarRoot.hidden = isEmpty;
 
     if (isEmpty) {
@@ -947,8 +973,8 @@ function rebuildActionBar(options: ActionBarOptions): void {
         return;
     }
 
-    const validationState = options.libraryValidation
-        ? getLibraryValidationActionState(options.libraryValidation)
+    const validationState = options.libraryValidate
+        ? getLibraryValidateActionState(options.libraryValidate)
         : null;
     const activeCount =
         options.downloads.filter((item) => item.state === 'downloading')
@@ -967,7 +993,7 @@ function rebuildActionBar(options: ActionBarOptions): void {
         options.storageCopies.filter((item) => item.state === 'failed').length +
         options.storageDeletes.filter((item) => item.state === 'failed')
             .length +
-        options.libraryValidationFailures.length +
+        options.libraryValidateFailures.length +
         (validationState === 'failed' ? 1 : 0);
     const finishedCount =
         options.downloads.filter((item) => item.state === 'complete').length +
@@ -983,8 +1009,8 @@ function rebuildActionBar(options: ActionBarOptions): void {
         options.downloads.length === 0 &&
         options.storageCopies.length === 0 &&
         options.storageDeletes.length === 0 &&
-        options.libraryValidation === null &&
-        options.libraryValidationFailures.length === 0
+        options.libraryValidate === null &&
+        options.libraryValidateFailures.length === 0
     ) {
         return;
     }
@@ -1024,14 +1050,12 @@ function rebuildActionBar(options: ActionBarOptions): void {
         details.append(renderStorageDeleteActionRow(item));
     }
 
-    if (options.libraryValidation) {
-        details.append(
-            renderLibraryValidationActionRow(options.libraryValidation)
-        );
+    if (options.libraryValidate) {
+        details.append(renderLibraryValidateActionRow(options.libraryValidate));
     }
 
-    for (const item of options.libraryValidationFailures) {
-        details.append(renderLibraryValidationFailureRow(item));
+    for (const item of options.libraryValidateFailures) {
+        details.append(renderLibraryValidateFailureRow(item));
     }
 
     actionBarRoot.append(details);
@@ -1094,7 +1118,7 @@ export function mountActionBar(options: ActionBarOptions): void {
         const actionValue = closestButton.getAttribute('data-action');
         const itemId = closestButton.getAttribute('data-item-id');
 
-        if (!isActionBarCommand(actionValue) || !itemId) {
+        if (!itemId || !isActionBarCommand(actionValue)) {
             return;
         }
 

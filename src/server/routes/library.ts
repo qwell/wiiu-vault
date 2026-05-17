@@ -2,30 +2,37 @@ import { Router } from 'express';
 
 import { sendServerError } from '../routes.js';
 import { broadcastAppSocketEvent } from '../socket.js';
-import { scanWiiUTitleRoots, validateWiiUTitleRoots } from '../wiiu.js';
+import {
+    clearTitleScanCache,
+    scanWiiUTitleRoots,
+    validateWiiUTitleRoots,
+} from '../wiiu.js';
 import {
     type LibraryResponse,
-    type LibraryValidationResponse,
+    type LibraryValidateResponse,
 } from '../../shared/api.js';
 import { getConfig } from '../../shared/config.js';
 import logger from '../../shared/logger.js';
 import { formatLogError } from '../../shared/shared.js';
 import {
-    SOCKET_COMMAND,
-    type LibraryValidationSocketCommand,
-    type ValidationStatusEvent,
+    LIBRARY_VALIDATE_SOCKET_COMMAND,
+    LIBRARY_VALIDATE_SOCKET_EVENT,
+    type LibraryValidateSocketCommand,
+    type LibraryValidateStatusEvent,
 } from '../../shared/socket.js';
 import { setLibraryCacheGroups } from '../../shared/wiiu.js';
 
-let latestLibraryValidationStatus: ValidationStatusEvent | null = null;
-let activeLibraryValidationAbortController: AbortController | null = null;
+let latestLibraryValidateStatus: LibraryValidateStatusEvent | null = null;
+let activeLibraryValidateAbortController: AbortController | null = null;
 
-export function getLatestLibraryValidationStatus(): ValidationStatusEvent | null {
-    return latestLibraryValidationStatus;
+export function getLatestLibraryValidateStatus(): LibraryValidateStatusEvent | null {
+    return latestLibraryValidateStatus;
 }
 
-function broadcastLibraryValidationStatus(event: ValidationStatusEvent): void {
-    latestLibraryValidationStatus = event;
+function broadcastLibraryValidateStatus(
+    event: LibraryValidateStatusEvent
+): void {
+    latestLibraryValidateStatus = event;
     broadcastAppSocketEvent(event);
 }
 
@@ -40,6 +47,7 @@ export function createLibraryRouter(): Router {
             });
 
             setLibraryCacheGroups(groups);
+            clearTitleScanCache();
             const response: LibraryResponse = {
                 groups,
             };
@@ -55,19 +63,19 @@ export function createLibraryRouter(): Router {
 
     router.get('/validate', async (_req, res) => {
         const abortController = new AbortController();
-        activeLibraryValidationAbortController = abortController;
+        activeLibraryValidateAbortController = abortController;
 
         try {
-            broadcastLibraryValidationStatus({
-                type: 'library.validationStatus',
+            broadcastLibraryValidateStatus({
+                type: LIBRARY_VALIDATE_SOCKET_EVENT.status,
                 status: 'started',
             });
 
             const titles = await validateWiiUTitleRoots(
                 getConfig().wiiuRoots,
                 (progress) => {
-                    broadcastLibraryValidationStatus({
-                        type: 'library.validationStatus',
+                    broadcastLibraryValidateStatus({
+                        type: LIBRARY_VALIDATE_SOCKET_EVENT.status,
                         ...progress,
                     });
                 },
@@ -77,14 +85,15 @@ export function createLibraryRouter(): Router {
                 (title) => title.status !== 'ok'
             ).length;
 
-            broadcastLibraryValidationStatus({
-                type: 'library.validationStatus',
+            clearTitleScanCache();
+            broadcastLibraryValidateStatus({
+                type: LIBRARY_VALIDATE_SOCKET_EVENT.status,
                 status: 'complete',
                 total: titles.length,
                 failed,
             });
 
-            const response: LibraryValidationResponse = {
+            const response: LibraryValidateResponse = {
                 status: failed === 0 ? 'ok' : 'failed',
                 total: titles.length,
                 failed,
@@ -94,8 +103,8 @@ export function createLibraryRouter(): Router {
         } catch (error) {
             const message =
                 error instanceof Error ? error.message : String(error);
-            broadcastLibraryValidationStatus({
-                type: 'library.validationStatus',
+            broadcastLibraryValidateStatus({
+                type: LIBRARY_VALIDATE_SOCKET_EVENT.status,
                 status: 'failed',
                 error: message,
             });
@@ -108,8 +117,8 @@ export function createLibraryRouter(): Router {
                 includeDetails: true,
             });
         } finally {
-            if (activeLibraryValidationAbortController === abortController) {
-                activeLibraryValidationAbortController = null;
+            if (activeLibraryValidateAbortController === abortController) {
+                activeLibraryValidateAbortController = null;
             }
         }
     });
@@ -117,12 +126,12 @@ export function createLibraryRouter(): Router {
     return router;
 }
 
-export function handleLibraryValidationSocketCommand(
-    command: LibraryValidationSocketCommand
+export function handleLibraryValidateSocketCommand(
+    command: LibraryValidateSocketCommand
 ): void {
     switch (command.type) {
-        case SOCKET_COMMAND.libraryValidationCancel:
-            activeLibraryValidationAbortController?.abort();
+        case LIBRARY_VALIDATE_SOCKET_COMMAND.cancel:
+            activeLibraryValidateAbortController?.abort();
             return;
     }
 }

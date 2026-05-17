@@ -10,23 +10,24 @@ import { normalizeRegion } from '../src/shared/regions.js';
 import {
     normalizeTitleName,
     RawTitleDatabaseEntry,
+    TitleBase,
 } from '../src/shared/titles.js';
 import { toArray } from '../src/shared/shared.js';
+import { requestJson } from '../src/shared/api.js';
 
 type Icon = {
     titleId: string;
     iconUrl: string;
 };
 
-type TitleAllResponse = {
+type TitleAllResponse = TitleBase & {
     titleId?: string;
-    name?: string | null;
-    region?: string | null;
     productCode?: string | null;
     companyCode?: string | null;
     baseVersions?: number[];
     updates?: number[];
     dlc?: number[];
+    availableOnCdn?: boolean;
 };
 
 type ChildMetadataResponse = {
@@ -166,19 +167,6 @@ async function writeJson(file: string, value: unknown): Promise<void> {
     await fs.writeFile(file, `${JSON.stringify(value, null, 4)}\n`, 'utf8');
 }
 
-async function fetchJson<T>(url: string): Promise<T | null> {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            return null;
-        }
-
-        return (await response.json()) as T;
-    } catch {
-        return null;
-    }
-}
-
 async function fetchBinary(url: string): Promise<Buffer> {
     const response = await fetch(url, {
         headers: {
@@ -278,7 +266,7 @@ async function processTitle(
     titleId: string,
     index: number
 ): Promise<RawTitleDatabaseEntry | null> {
-    const metadata = await fetchJson<TitleAllResponse>(
+    const metadata = await requestJson<TitleAllResponse>(
         formatUrl(titleAllUrl, titleId)
     );
 
@@ -301,12 +289,13 @@ async function processTitle(
         companyCode: metadata.companyCode ?? null,
         iconUrl: null,
         baseVersions: metadata.baseVersions ?? [],
-        updates: metadata.updates ?? [],
-        dlc: metadata.dlc ?? [],
+        updateVersions: metadata.updates ?? [],
+        dlcVersions: metadata.dlc ?? [],
+        availableOnCdn: metadata.availableOnCdn ?? false,
     };
 
     console.log(
-        `[${index + 1}] HIT  ${titleId} base=${versionsText(title.baseVersions)} update=${versionsText(title.updates)} dlc=${versionsText(title.dlc)}`
+        `[${index + 1}] HIT  ${titleId} base=${versionsText(title.baseVersions)} update=${versionsText(title.updateVersions)} dlc=${versionsText(title.dlcVersions)}`
     );
 
     return title;
@@ -329,7 +318,7 @@ async function loadChildVersion(
     urlTemplate: string,
     titleId: string
 ): Promise<number | null> {
-    const metadata = await fetchJson<ChildMetadataResponse>(
+    const metadata = await requestJson<ChildMetadataResponse>(
         formatUrl(urlTemplate, titleId)
     );
 
@@ -354,12 +343,12 @@ async function processExtraTitle(
 
     const updatedTitle: RawTitleDatabaseEntry = {
         ...title,
-        updates: updateVersion === null ? [] : [updateVersion],
-        dlc: dlcVersion === null ? [] : [dlcVersion],
+        updateVersions: updateVersion === null ? [] : [updateVersion],
+        dlcVersions: dlcVersion === null ? [] : [dlcVersion],
     };
 
     console.log(
-        `[${index + 1}] EXTRA ${title.titleId} base=${versionsText(updatedTitle.baseVersions)} update=${versionsText(updatedTitle.updates)} dlc=${versionsText(updatedTitle.dlc)}`
+        `[${index + 1}] EXTRA ${title.titleId} base=${versionsText(updatedTitle.baseVersions)} update=${versionsText(updatedTitle.updateVersions)} dlc=${versionsText(updatedTitle.dlcVersions)}`
     );
 
     return updatedTitle;
@@ -396,12 +385,12 @@ async function loadExtraTitles(
                         : (row['Company Code'] ?? null),
                 iconUrl: null,
                 baseVersions: parseVersions(row.Versions),
-                updates: [],
-                dlc: [],
+                updateVersions: [],
+                dlcVersions: [],
                 availableOnCdn:
                     (row['Available on CDN?'] ?? '').toLowerCase() === 'yes'
-                        ? 'Yes'
-                        : 'No',
+                        ? true
+                        : false,
             };
         })
         .filter(

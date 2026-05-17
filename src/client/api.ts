@@ -1,22 +1,14 @@
 import {
+    requestJson,
     type ConfigResponse,
     type ConfigValidateRootResponse,
-    type Fat32ListResponse,
     type LibraryResponse,
-    type LibraryValidationResponse,
+    type LibraryValidateResponse,
+    type StorageFat32ListResponse,
     type StorageDeleteQueuedResponse,
     type StorageTransferQueuedResponse,
 } from '../shared/api.js';
 import { type AppConfigUpdate } from '../shared/config.js';
-
-async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
-    const response = await fetch(url, init);
-    if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-    }
-
-    return (await response.json()) as T;
-}
 
 export function getLibrary(includeAll: boolean): Promise<LibraryResponse> {
     return requestJson(
@@ -24,11 +16,11 @@ export function getLibrary(includeAll: boolean): Promise<LibraryResponse> {
     );
 }
 
-export function validateLibrary(): Promise<LibraryValidationResponse> {
+export function validateLibrary(): Promise<LibraryValidateResponse> {
     return requestJson('/api/library/validate');
 }
 
-export function listFat32Volumes(): Promise<Fat32ListResponse> {
+export function listFat32Volumes(): Promise<StorageFat32ListResponse> {
     return requestJson('/api/storage/list-fat32');
 }
 

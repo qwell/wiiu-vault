@@ -1,3 +1,7 @@
+import {
+    STORAGE_COPY_SOCKET_COMMAND,
+    STORAGE_DELETE_SOCKET_COMMAND,
+} from './socket.js';
 import { type TitleKinds } from './titles.js';
 
 export type StorageCopyOperation = 'copy' | 'move';
@@ -34,22 +38,15 @@ export type StorageDeleteItem = {
 };
 
 export type StorageActionBarCommand =
-    (typeof STORAGE_ACTION)[keyof typeof STORAGE_ACTION];
-
-export const STORAGE_ACTION = {
-    cancelCopy: 'storage.copy.cancel',
-    clearCopy: 'storage.copy.clear',
-    retryCopy: 'storage.copy.retry',
-    clearDelete: 'storage.delete.clear',
-    retryDelete: 'storage.delete.retry',
-} as const;
+    | (typeof STORAGE_COPY_SOCKET_COMMAND)[keyof typeof STORAGE_COPY_SOCKET_COMMAND]
+    | (typeof STORAGE_DELETE_SOCKET_COMMAND)[keyof typeof STORAGE_DELETE_SOCKET_COMMAND];
 
 export const STORAGE_ACTION_BAR_COMMAND_TYPES = [
-    STORAGE_ACTION.cancelCopy,
-    STORAGE_ACTION.clearCopy,
-    STORAGE_ACTION.retryCopy,
-    STORAGE_ACTION.clearDelete,
-    STORAGE_ACTION.retryDelete,
+    STORAGE_COPY_SOCKET_COMMAND.cancel,
+    STORAGE_COPY_SOCKET_COMMAND.clear,
+    STORAGE_COPY_SOCKET_COMMAND.retry,
+    STORAGE_DELETE_SOCKET_COMMAND.clear,
+    STORAGE_DELETE_SOCKET_COMMAND.retry,
 ] as const satisfies readonly StorageActionBarCommand[];
 
 export type StorageDeleteQueueItem = StorageDeleteItem & {

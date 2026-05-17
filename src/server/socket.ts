@@ -1,15 +1,14 @@
 import { type Server } from 'node:http';
 import { WebSocket, WebSocketServer, type RawData } from 'ws';
 import {
-    type AppSocketCommand,
-    type AppSocketEvent,
-    SOCKET_COMMAND,
-    isDownloadSocketCommand,
-    isIdSocketCommandType,
-    isLibraryValidationSocketCommand,
-    isStorageCopySocketCommand,
-    isStorageDeleteSocketCommand,
-    isTitleVerifySocketCommand,
+    isSocketCommand,
+    type SocketCommand,
+    type SocketEvent,
+    DOWNLOAD_SOCKET_COMMAND,
+    LIBRARY_VALIDATE_SOCKET_COMMAND,
+    STORAGE_COPY_SOCKET_COMMAND,
+    STORAGE_DELETE_SOCKET_COMMAND,
+    TITLE_VERIFY_SOCKET_COMMAND,
 } from '../shared/socket.js';
 import { type DownloadQueueItem } from '../shared/download.js';
 import logger from '../shared/logger.js';
@@ -18,19 +17,19 @@ import {
     handleStorageDeleteSocketCommand,
 } from './routes/storage.js';
 import { handleDownloadSocketCommand } from './routes/download.js';
-import { handleLibraryValidationSocketCommand } from './routes/library.js';
+import { handleLibraryValidateSocketCommand } from './routes/library.js';
 import { handleTitleVerifySocketCommand } from './routes/title.js';
 
 type AppSocketOptions = {
     server: Server;
     path: string;
-    getConnectedEvent: () => AppSocketEvent;
-    onCommand: (command: AppSocketCommand) => void;
+    getConnectedEvent: () => SocketEvent;
+    onCommand: (command: SocketCommand) => void;
 };
 
 export type AppSocket = {
     server: WebSocketServer;
-    broadcast: (event: AppSocketEvent) => void;
+    broadcast: (event: SocketEvent) => void;
 };
 
 let activeAppSocket: AppSocket | null = null;
@@ -46,7 +45,7 @@ export function createAppSocket({
         path,
     });
 
-    function broadcast(event: AppSocketEvent): void {
+    function broadcast(event: SocketEvent): void {
         for (const client of socketServer.clients) {
             sendAppSocketEvent(client, event);
         }
@@ -111,7 +110,7 @@ function getSocketCommandType(commandText: string): string {
 
 export function sendAppSocketEvent(
     socket: WebSocket,
-    event: AppSocketEvent
+    event: SocketEvent
 ): void {
     if (socket.readyState !== WebSocket.OPEN) {
         return;
@@ -120,70 +119,28 @@ export function sendAppSocketEvent(
     socket.send(JSON.stringify(event));
 }
 
-export function handleAppSocketCommand(command: AppSocketCommand): void {
-    if (isDownloadSocketCommand(command)) {
+export function handleAppSocketCommand(command: SocketCommand): void {
+    if (isSocketCommand(command, DOWNLOAD_SOCKET_COMMAND)) {
         handleDownloadSocketCommand(command);
         return;
-    }
-
-    if (isStorageCopySocketCommand(command)) {
+    } else if (isSocketCommand(command, STORAGE_COPY_SOCKET_COMMAND)) {
         handleStorageCopySocketCommand(command);
         return;
-    }
-
-    if (isStorageDeleteSocketCommand(command)) {
+    } else if (isSocketCommand(command, STORAGE_DELETE_SOCKET_COMMAND)) {
         handleStorageDeleteSocketCommand(command);
         return;
-    }
-
-    if (isLibraryValidationSocketCommand(command)) {
-        handleLibraryValidationSocketCommand(command);
+    } else if (isSocketCommand(command, LIBRARY_VALIDATE_SOCKET_COMMAND)) {
+        handleLibraryValidateSocketCommand(command);
+        return;
+    } else if (isSocketCommand(command, TITLE_VERIFY_SOCKET_COMMAND)) {
+        handleTitleVerifySocketCommand(command);
         return;
     }
 
-    if (isTitleVerifySocketCommand(command)) {
-        handleTitleVerifySocketCommand(command);
-    }
+    return;
 }
 
-export function broadcastAppSocketEvent(event: AppSocketEvent): void {
-    activeAppSocket?.broadcast(event);
-}
-
-function socketDataToText(data: RawData): string {
-    return Buffer.isBuffer(data)
-        ? data.toString('utf8')
-        : Buffer.from(data as ArrayBuffer).toString('utf8');
-}
-
-function formatSocketCommandArgs(command: AppSocketCommand): string {
-    return JSON.stringify(
-        Object.fromEntries(
-            Object.entries(command).filter(([key]) => key !== 'type')
-        )
-    );
-}
-
-function isDownloadQueueItem(value: unknown): value is DownloadQueueItem {
-    if (!value || typeof value !== 'object') {
-        return false;
-    }
-
-    const item = value as Record<string, unknown>;
-
-    return (
-        typeof item.id === 'string' &&
-        typeof item.family === 'string' &&
-        typeof item.groupName === 'string' &&
-        typeof item.label === 'string' &&
-        typeof item.titleId === 'string' &&
-        typeof item.kind === 'string' &&
-        (typeof item.sizeText === 'string' || item.sizeText === null) &&
-        (typeof item.totalBytes === 'number' || item.totalBytes === null)
-    );
-}
-
-function parseSocketCommand(data: RawData): AppSocketCommand | null {
+function parseSocketCommand(data: RawData): SocketCommand | null {
     let parsed: unknown;
 
     try {
@@ -196,41 +153,74 @@ function parseSocketCommand(data: RawData): AppSocketCommand | null {
         return null;
     }
 
-    const command = parsed as { type?: unknown };
+    const command = parsed as SocketCommand;
 
-    if (command.type === SOCKET_COMMAND.downloadQueue) {
+    if (isSocketCommand(command, DOWNLOAD_SOCKET_COMMAND.queue)) {
         const items = (command as { items?: unknown }).items;
 
         if (!Array.isArray(items) || !items.every(isDownloadQueueItem)) {
             return null;
         }
 
-        return parsed as AppSocketCommand;
-    }
-
-    if (isIdSocketCommandType(command.type)) {
+        return command;
+    } else if (isSocketCommand(command, DOWNLOAD_SOCKET_COMMAND)) {
         const id = (command as { id?: unknown }).id;
 
         if (typeof id !== 'string' || id.length === 0) {
             return null;
         }
 
-        return parsed as AppSocketCommand;
-    }
-
-    if (command.type === SOCKET_COMMAND.libraryValidationCancel) {
-        return parsed as AppSocketCommand;
-    }
-
-    if (command.type === SOCKET_COMMAND.titleVerifyQueue) {
+        return command;
+    } else if (
+        isSocketCommand(command, LIBRARY_VALIDATE_SOCKET_COMMAND.cancel)
+    ) {
+        return command;
+    } else if (isSocketCommand(command, TITLE_VERIFY_SOCKET_COMMAND.queue)) {
         const titleId = (command as { titleId?: unknown }).titleId;
 
         if (typeof titleId !== 'string' || !/^[0-9a-f]{16}$/i.test(titleId)) {
             return null;
         }
 
-        return parsed as AppSocketCommand;
+        return command;
     }
 
     return null;
+}
+
+export function broadcastAppSocketEvent(event: SocketEvent): void {
+    activeAppSocket?.broadcast(event);
+}
+
+function socketDataToText(data: RawData): string {
+    return Buffer.isBuffer(data)
+        ? data.toString('utf8')
+        : Buffer.from(data as ArrayBuffer).toString('utf8');
+}
+
+function formatSocketCommandArgs(command: SocketCommand): string {
+    return JSON.stringify(
+        Object.fromEntries(
+            Object.entries(command).filter(([key]) => key !== 'type')
+        )
+    );
+}
+
+function isDownloadQueueItem(value: unknown): value is DownloadQueueItem {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+
+    const item = value as Record<string, DownloadQueueItem>;
+
+    return (
+        typeof item.id === 'string' &&
+        typeof item.family === 'string' &&
+        typeof item.groupName === 'string' &&
+        typeof item.label === 'string' &&
+        typeof item.titleId === 'string' &&
+        typeof item.kind === 'string' &&
+        (typeof item.sizeText === 'string' || item.sizeText === null) &&
+        (typeof item.totalBytes === 'number' || item.totalBytes === null)
+    );
 }

@@ -2,11 +2,12 @@ import { type DownloadQueueItem } from '../../shared/download.js';
 import logger from '../../shared/logger.js';
 import { formatLogError } from '../../shared/shared.js';
 import {
-    SOCKET_COMMAND,
-    type DownloadSocketCommand,
+    DOWNLOAD_SOCKET_COMMAND,
+    DOWNLOAD_SOCKET_EVENT,
+    DownloadSocketCommand,
 } from '../../shared/socket.js';
 import { broadcastAppSocketEvent } from '../socket.js';
-import { downloadTitle } from './title.js';
+import { clearTitleVerificationResult, downloadTitle } from './title.js';
 
 let downloadQueue: DownloadQueueItem[] = [];
 
@@ -17,7 +18,7 @@ const cancelledDownloadIds = new Set<string>();
 
 function broadcastDownloadQueue(): void {
     broadcastAppSocketEvent({
-        type: 'download.queueChanged',
+        type: DOWNLOAD_SOCKET_EVENT.changed,
         items: downloadQueue,
     });
 }
@@ -133,6 +134,7 @@ async function processDownloadQueue(): Promise<void> {
             `download completed: ${nextItem.groupName} ${nextItem.label} ${nextItem.titleId}`
         );
 
+        clearTitleVerificationResult(nextItem.titleId);
         broadcastDownloadQueue();
     } catch (error) {
         if (
@@ -189,7 +191,7 @@ export function handleDownloadSocketCommand(
     command: DownloadSocketCommand
 ): void {
     switch (command.type) {
-        case SOCKET_COMMAND.downloadQueue: {
+        case DOWNLOAD_SOCKET_COMMAND.queue: {
             logger.log(
                 'server',
                 `download queue requested: ${command.items
@@ -258,7 +260,7 @@ export function handleDownloadSocketCommand(
             return;
         }
 
-        case SOCKET_COMMAND.downloadRetry: {
+        case DOWNLOAD_SOCKET_COMMAND.retry: {
             const item = downloadQueue.find(
                 (candidate) => candidate.id === command.id
             );
@@ -290,7 +292,7 @@ export function handleDownloadSocketCommand(
             return;
         }
 
-        case SOCKET_COMMAND.downloadClear: {
+        case DOWNLOAD_SOCKET_COMMAND.clear: {
             const item = downloadQueue.find(
                 (candidate) => candidate.id === command.id
             );
@@ -336,7 +338,7 @@ export function handleDownloadSocketCommand(
             return;
         }
 
-        case SOCKET_COMMAND.downloadCancel: {
+        case DOWNLOAD_SOCKET_COMMAND.cancel: {
             const item = downloadQueue.find(
                 (candidate) => candidate.id === command.id
             );

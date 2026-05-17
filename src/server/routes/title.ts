@@ -25,12 +25,15 @@ import logger from '../../shared/logger.js';
 import { resolveReadablePath } from '../../shared/os.js';
 import { formatLogError } from '../../shared/shared.js';
 import {
-    SOCKET_COMMAND,
+    TITLE_VERIFY_SOCKET_COMMAND,
+    TITLE_VERIFY_SOCKET_EVENT,
+    TitleVerifySocketEvent,
     type TitleVerifyCopyResult,
     type TitleVerifySocketCommand,
 } from '../../shared/socket.js';
 
 const activeTitleVerifications = new Set<string>();
+const titleVerificationResults = new Map<string, TitleVerifySocketEvent>();
 
 export async function downloadTitle(
     titleId: string,
@@ -82,12 +85,12 @@ export function createTitleRouter(): Router {
                     ? Buffer.from(metadata.titleKey).toString('hex')
                     : null,
                 titleKeyPassword: metadata.titleKeyPassword,
-                updates:
+                updateVersions:
                     updateMetadata.exists &&
                     updateMetadata.titleVersion !== null
                         ? [updateMetadata.titleVersion]
                         : [],
-                dlc:
+                dlcVersions:
                     dlcMetadata.exists && dlcMetadata.titleVersion !== null
                         ? [dlcMetadata.titleVersion]
                         : [],
@@ -132,7 +135,7 @@ export function handleTitleVerifySocketCommand(
     command: TitleVerifySocketCommand
 ): void {
     switch (command.type) {
-        case SOCKET_COMMAND.titleVerifyQueue:
+        case TITLE_VERIFY_SOCKET_COMMAND.queue:
             void verifyTitleCopies(command.titleId);
             return;
     }
@@ -144,9 +147,15 @@ async function verifyTitleCopies(titleId: string): Promise<void> {
         return;
     }
 
+    const cached = titleVerificationResults.get(normalizedTitleId);
+    if (cached) {
+        broadcastAppSocketEvent(cached);
+        return;
+    }
+
     activeTitleVerifications.add(normalizedTitleId);
     broadcastAppSocketEvent({
-        type: 'title.verify.changed',
+        type: TITLE_VERIFY_SOCKET_EVENT.changed,
         titleId: normalizedTitleId,
         status: 'verifying',
         copies: [],
@@ -181,12 +190,16 @@ async function verifyTitleCopies(titleId: string): Promise<void> {
             });
         }
 
-        broadcastAppSocketEvent({
-            type: 'title.verify.changed',
+        const event: TitleVerifySocketEvent = {
+            type: TITLE_VERIFY_SOCKET_EVENT.changed,
             titleId: normalizedTitleId,
             status: 'complete',
             copies,
-        });
+        };
+
+        titleVerificationResults.set(normalizedTitleId, event);
+
+        broadcastAppSocketEvent(event);
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         logger.warn(
@@ -194,7 +207,7 @@ async function verifyTitleCopies(titleId: string): Promise<void> {
             `Failed to verify title ${normalizedTitleId}: ${formatLogError(error)}`
         );
         broadcastAppSocketEvent({
-            type: 'title.verify.changed',
+            type: TITLE_VERIFY_SOCKET_EVENT.changed,
             titleId: normalizedTitleId,
             status: 'failed',
             copies: [],
@@ -203,4 +216,8 @@ async function verifyTitleCopies(titleId: string): Promise<void> {
     } finally {
         activeTitleVerifications.delete(normalizedTitleId);
     }
+}
+
+export function clearTitleVerificationResult(titleId: string): void {
+    titleVerificationResults.delete(titleId.toLowerCase());
 }

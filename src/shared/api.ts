@@ -15,7 +15,7 @@ export type ApiErrorResponse = {
 export type ConfigResponse = AppConfigResponse;
 export type ConfigValidateRootResponse = AppConfigValidateRootResponse;
 
-export type Fat32ListResponse = {
+export type StorageFat32ListResponse = {
     runtimeOs: RuntimeOs;
     volumes: Fat32Volume[];
 };
@@ -24,24 +24,24 @@ export type LibraryResponse = {
     groups: TitleGroup[];
 };
 
-export type LibraryValidationTitle = {
+export type LibraryValidateTitle = {
     root: string | null;
     directory: string | null;
-    titleName: string;
+    name: string;
     titleId: string | null;
-    titleVersion: number | null;
-    titleKind: TitleKinds;
+    version: number | null;
+    kind: TitleKinds;
     sizeText: string | null;
     status: 'ok' | 'failed';
     error: string | null;
     verification: unknown[];
 };
 
-export type LibraryValidationResponse = {
+export type LibraryValidateResponse = {
     status: 'ok' | 'failed';
     total: number;
     failed: number;
-    titles: LibraryValidationTitle[];
+    titles: LibraryValidateTitle[];
 };
 
 export type StorageTransferQueuedResponse = {
@@ -74,8 +74,8 @@ export type TitleResponse = {
     baseVersions: number[];
     titleKey: string | null;
     titleKeyPassword: string | null;
-    updates: number[];
-    dlc: number[];
+    updateVersions: number[];
+    dlcVersions: number[];
 };
 
 export type TitleDownloadResponse = {
@@ -84,3 +84,15 @@ export type TitleDownloadResponse = {
     outputDir: string;
     sizeBytes: number;
 };
+
+export async function requestJson<T>(
+    url: string,
+    init?: RequestInit
+): Promise<T> {
+    const response = await fetch(url, init);
+    if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    return (await response.json()) as T;
+}
