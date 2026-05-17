@@ -578,41 +578,41 @@ function updateActionBarRowsInPlace(options: ActionBarOptions): void {
         }
     }
 
-    const validationRow = actionBarRoot.querySelector<HTMLElement>(
-        '[data-library-validation]'
+    const validateRow = actionBarRoot.querySelector<HTMLElement>(
+        '[data-library-validate]'
     );
-    if (validationRow && options.libraryValidate) {
+    if (validateRow && options.libraryValidate) {
         const event = options.libraryValidate;
         const stateName = getLibraryValidateActionState(event);
-        validationRow.className = `action-bar-row action-bar-row-validation action-bar-row-${stateName}`;
-        validationRow.dataset.itemState = stateName;
-        validationRow.dataset.state = stateName;
+        validateRow.className = `action-bar-row action-bar-row-validate action-bar-row-${stateName}`;
+        validateRow.dataset.itemState = stateName;
+        validateRow.dataset.state = stateName;
 
-        const progress = validationRow.querySelector<HTMLElement>(
-            '[data-library-validation-progress]'
+        const progress = validateRow.querySelector<HTMLElement>(
+            '[data-library-validate-progress]'
         );
-        const icon = validationRow.querySelector<HTMLElement>(
-            '[data-library-validation-icon]'
+        const icon = validateRow.querySelector<HTMLElement>(
+            '[data-library-validate-icon]'
         );
-        const state = validationRow.querySelector<HTMLElement>(
-            '[data-library-validation-state]'
+        const state = validateRow.querySelector<HTMLElement>(
+            '[data-library-validate-state]'
         );
-        const title = validationRow.querySelector<HTMLElement>(
-            '[data-library-validation-title]'
+        const title = validateRow.querySelector<HTMLElement>(
+            '[data-library-validate-title]'
         );
-        const detail = validationRow.querySelector<HTMLElement>(
-            '[data-library-validation-detail]'
+        const detail = validateRow.querySelector<HTMLElement>(
+            '[data-library-validate-detail]'
         );
 
         if (progress) {
             progress.textContent = formatLibraryValidateProgress(event);
         }
 
-        const files = validationRow.querySelector<HTMLElement>(
-            '[data-library-validation-files]'
+        const files = validateRow.querySelector<HTMLElement>(
+            '[data-library-validate-files]'
         );
-        const size = validationRow.querySelector<HTMLElement>(
-            '[data-library-validation-size]'
+        const size = validateRow.querySelector<HTMLElement>(
+            '[data-library-validate-size]'
         );
 
         if (files) {
@@ -641,7 +641,7 @@ function updateActionBarRowsInPlace(options: ActionBarOptions): void {
             const detailText = formatLibraryValidateDetails(event);
             detail.title = detailText;
             const detailTextElement = detail.querySelector<HTMLElement>(
-                '[data-library-validation-detail-text]'
+                '[data-library-validate-detail-text]'
             );
             if (detailTextElement) {
                 detailTextElement.textContent = detailText;
@@ -704,7 +704,7 @@ function formatLibraryValidateTitle(event: LibraryValidateStatusEvent): string {
         event.kind &&
         event.titleId
     ) {
-        return `${event.name} [${formatTitleKind(event.kind)}] ${event.titleId}`;
+        return `${event.name} [${formatTitleKind(event.kind)}]`;
     }
 
     return 'Library validation';
@@ -765,7 +765,7 @@ function renderLibraryValidateDetails(
             createActionButton(
                 'Cancel',
                 LIBRARY_VALIDATE_SOCKET_COMMAND.cancel,
-                'library-validation'
+                'library-validate'
             )
         );
         return details;
@@ -783,7 +783,7 @@ function renderLibraryValidateDetails(
         createActionButton(
             'Clear',
             LIBRARY_VALIDATE_SOCKET_COMMAND.clear,
-            'library-validation'
+            'library-validate'
         )
     );
     return details;
@@ -827,7 +827,7 @@ function renderLibraryValidateFailureRow(
 ): HTMLElement {
     const row = document.createElement('div');
     row.className =
-        'action-bar-row action-bar-row-validation-failure action-bar-row-failed';
+        'action-bar-row action-bar-row-validate-failure action-bar-row-failed';
     row.dataset.libraryValidateFailure = 'true';
     row.dataset.itemState = 'failed';
     row.dataset.state = 'failed';
@@ -865,7 +865,7 @@ function renderLibraryValidateActionRow(
 ): HTMLElement {
     const row = document.createElement('div');
     const stateName = getLibraryValidateActionState(event);
-    row.className = `action-bar-row action-bar-row-validation action-bar-row-${stateName}`;
+    row.className = `action-bar-row action-bar-row-validate action-bar-row-${stateName}`;
     row.dataset.libraryValidate = 'true';
     row.dataset.itemState = stateName;
     row.dataset.state = stateName;
@@ -973,7 +973,7 @@ function rebuildActionBar(options: ActionBarOptions): void {
         return;
     }
 
-    const validationState = options.libraryValidate
+    const validateState = options.libraryValidate
         ? getLibraryValidateActionState(options.libraryValidate)
         : null;
     const activeCount =
@@ -983,7 +983,7 @@ function rebuildActionBar(options: ActionBarOptions): void {
             .length +
         options.storageDeletes.filter((item) => item.state === 'deleting')
             .length +
-        (validationState === 'validating' ? 1 : 0);
+        (validateState === 'validating' ? 1 : 0);
     const queuedCount =
         options.downloads.filter((item) => item.state === 'queued').length +
         options.storageCopies.filter((item) => item.state === 'queued').length +
@@ -994,14 +994,14 @@ function rebuildActionBar(options: ActionBarOptions): void {
         options.storageDeletes.filter((item) => item.state === 'failed')
             .length +
         options.libraryValidateFailures.length +
-        (validationState === 'failed' ? 1 : 0);
+        (validateState === 'failed' ? 1 : 0);
     const finishedCount =
         options.downloads.filter((item) => item.state === 'complete').length +
         options.storageCopies.filter((item) => item.state === 'complete')
             .length +
         options.storageDeletes.filter((item) => item.state === 'complete')
             .length +
-        (validationState === 'complete' ? 1 : 0);
+        (validateState === 'complete' ? 1 : 0);
 
     actionBarRoot.replaceChildren();
 

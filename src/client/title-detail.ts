@@ -200,11 +200,18 @@ function formatTitleVerificationStatus(
         case 'failed':
             return 'Check failed';
         case 'complete': {
-            const failedCount = event.copies.reduce(
-                (sum, copy) => sum + (copy.status === 'failed' ? 1 : 0),
+            const failedFiles = event.copies.reduce(
+                (sum, copy) => sum + copy.failedCount,
                 0
             );
-            return failedCount > 0 ? `${failedCount} failed` : 'Verified';
+            const totalFiles = event.copies.reduce(
+                (sum, copy) => sum + copy.totalCount,
+                0
+            );
+
+            return failedFiles > 0
+                ? `${failedFiles}/${totalFiles} failed`
+                : `${totalFiles}/${totalFiles} verified`;
         }
     }
 }
