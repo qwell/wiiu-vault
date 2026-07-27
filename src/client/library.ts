@@ -1,17 +1,19 @@
 import { type LibraryVerifyTitle } from '../shared/api.js';
 import {
     type LibraryConvertItem,
+    type LibraryOrganizeItem,
+    type LibraryScanItem,
     type LibraryVerifyEvent,
     type LibraryVerifyFailure,
     type LibraryVerifyProgress,
     type TitleValidationSocketEvent,
     LIBRARY_CONVERT_SOCKET_COMMAND,
-    LIBRARY_RENAME_SOCKET_COMMAND,
+    LIBRARY_ORGANIZE_SOCKET_COMMAND,
+    LIBRARY_SCAN_SOCKET_COMMAND,
     LIBRARY_VERIFY_SOCKET_COMMAND,
 } from '../shared/socket.js';
 import { type DownloadQueueItem } from '../shared/download.js';
 import {
-    type ActionState,
     formatActionFileCount,
     formatActionProgress,
     formatActionState,
@@ -45,88 +47,189 @@ export const SLOT_BADGE_STATE_LABELS: Record<SlotBadgeState, string> = {
     unknown: 'Unknown',
 };
 
-export type LibraryRenameAction = {
-    id: string;
-    state: ActionState;
-    total: number;
-    renamed: number;
-    unchanged: number;
-    message: string;
-    error: string | null;
-    canCancel: boolean;
-};
+function formatLibraryScanTitle(item: LibraryScanItem): string {
+    switch (item.state) {
+        case 'queued':
+            return 'Library scan queued';
+        case 'in-progress':
+            return `Scanning library: ${item.current} of ${item.total} platforms finished`;
+        case 'complete':
+            return `Scanned ${item.total} platforms`;
+        case 'failed':
+            return `Failed to scan library: ${item.error ?? 'Unknown error'}`;
+    }
+}
 
-export function getLibraryRenameActionBarEntries(items: LibraryRenameAction[]) {
-    return items.map((item) => ({
-        key: `library-rename:${item.id}`,
-        id: item.id,
-        state: item.state,
-        clearCommand: LIBRARY_RENAME_SOCKET_COMMAND.clear,
-        cells: [
-            {
-                className: 'action-bar-progress',
-                text: item.state === 'complete' ? 'Done' : '-',
-            },
-            {
-                className: 'action-bar-files',
-                text: `${item.renamed} / ${item.total} items`,
-            },
-            {
-                className: 'action-bar-icon',
-                text: formatActionStateIcon(item.state),
-            },
-            {
-                className: 'action-bar-state',
-                text: formatActionState(item.state, {
-                    'in-progress': 'Renaming',
-                }),
-            },
-            {
-                className: 'action-bar-size',
-                text: '',
-            },
-            {
-                className: 'action-bar-title',
-                text: 'Rename library',
-            },
-        ],
-        details: {
-            text:
-                item.error ??
-                (item.state === 'cancelled' ||
-                (item.state === 'in-progress' && !item.canCancel)
-                    ? item.message
-                    : undefined),
-            buttons: [
-                ...(item.state === 'in-progress' && item.canCancel
-                    ? [
-                          {
-                              text: 'Cancel',
-                              command: LIBRARY_RENAME_SOCKET_COMMAND.cancel,
-                          },
-                      ]
-                    : []),
-                ...(item.state === 'failed' || item.state === 'cancelled'
-                    ? [
-                          {
-                              text: 'Retry',
-                              command: LIBRARY_RENAME_SOCKET_COMMAND.retry,
-                          },
-                      ]
-                    : []),
-                ...(item.state === 'complete' ||
-                item.state === 'failed' ||
-                item.state === 'cancelled'
-                    ? [
-                          {
-                              text: 'Clear',
-                              command: LIBRARY_RENAME_SOCKET_COMMAND.clear,
-                          },
-                      ]
-                    : []),
+export function getLibraryScanActionBarEntries(items: LibraryScanItem[]) {
+    return items.map((item) => {
+        const title = formatLibraryScanTitle(item);
+        return {
+            key: `library-scan:${item.id}`,
+            id: item.id,
+            state: item.state,
+            clearCommand: LIBRARY_SCAN_SOCKET_COMMAND.clear,
+            cells: [
+                {
+                    className: 'action-bar-progress',
+                    text: formatActionProgress(
+                        item.state,
+                        item.total > 0
+                            ? (item.current / item.total) * 100
+                            : null
+                    ),
+                },
+                {
+                    className: 'action-bar-files',
+                    text:
+                        item.titleCount === null
+                            ? '-'
+                            : `${item.titleCount} ${item.titleCount === 1 ? 'title' : 'titles'}`,
+                },
+                {
+                    className: 'action-bar-icon',
+                    text: formatActionStateIcon(item.state),
+                },
+                {
+                    className: 'action-bar-state',
+                    text: formatActionState(item.state, {
+                        'in-progress': 'Scanning',
+                    }),
+                },
+                {
+                    className: 'action-bar-size',
+                    text: '',
+                },
+                {
+                    className: 'action-bar-title',
+                    text: title,
+                    title,
+                },
             ],
-        },
-    }));
+            details: {
+                buttons: [
+                    ...(item.state !== 'queued' && item.state !== 'in-progress'
+                        ? [
+                              {
+                                  text: 'Clear',
+                                  command: LIBRARY_SCAN_SOCKET_COMMAND.clear,
+                              },
+                          ]
+                        : []),
+                ],
+            },
+        };
+    });
+}
+
+export function handleLibraryScanActionBarCommand(
+    action: string,
+    itemId: string
+): boolean {
+    if (action === LIBRARY_SCAN_SOCKET_COMMAND.clear) {
+        sendAppSocketCommand({
+            type: LIBRARY_SCAN_SOCKET_COMMAND.clear,
+            id: itemId,
+        });
+        return true;
+    }
+    return false;
+}
+
+function formatLibraryOrganizeTitle(item: LibraryOrganizeItem): string {
+    switch (item.state) {
+        case 'queued':
+            return 'Library organization queued';
+        case 'in-progress':
+            return `Organizing library: ${item.completedPlatforms} of ${item.totalPlatforms} platforms finished`;
+        case 'complete':
+            return `Organized ${item.organizedTitles === 1 ? 'title' : 'titles'}`;
+        case 'failed':
+            return `Failed to organize library: ${item.error ?? 'Unknown error'}`;
+        case 'cancelled':
+            return `Cancelled library organization: ${item.organizedTitles} ${item.organizedTitles === 1 ? 'title' : 'titles'} organized`;
+    }
+}
+
+export function getLibraryOrganizeActionBarEntries(
+    items: LibraryOrganizeItem[]
+) {
+    return items.map((item) => {
+        const title = formatLibraryOrganizeTitle(item);
+        return {
+            key: `library-organize:${item.id}`,
+            id: item.id,
+            state: item.state,
+            clearCommand: LIBRARY_ORGANIZE_SOCKET_COMMAND.clear,
+            cells: [
+                {
+                    className: 'action-bar-progress',
+                    text: formatActionProgress(
+                        item.state,
+                        item.totalPlatforms > 0
+                            ? (item.completedPlatforms / item.totalPlatforms) *
+                                  100
+                            : null
+                    ),
+                },
+                {
+                    className: 'action-bar-files',
+                    text: `${item.organizedTitles} / ${item.totalTitles} titles`,
+                },
+                {
+                    className: 'action-bar-icon',
+                    text: formatActionStateIcon(item.state),
+                },
+                {
+                    className: 'action-bar-state',
+                    text: formatActionState(item.state, {
+                        'in-progress': 'Organizing',
+                    }),
+                },
+                {
+                    className: 'action-bar-size',
+                    text: '',
+                },
+                {
+                    className: 'action-bar-title',
+                    text: title,
+                    title,
+                },
+            ],
+            details: {
+                buttons: [
+                    ...(item.state === 'queued' || item.state === 'in-progress'
+                        ? [
+                              {
+                                  text: 'Cancel',
+                                  command:
+                                      LIBRARY_ORGANIZE_SOCKET_COMMAND.cancel,
+                              },
+                          ]
+                        : []),
+                    ...(item.state === 'failed' || item.state === 'cancelled'
+                        ? [
+                              {
+                                  text: 'Retry',
+                                  command:
+                                      LIBRARY_ORGANIZE_SOCKET_COMMAND.retry,
+                              },
+                          ]
+                        : []),
+                    ...(item.state === 'complete' ||
+                    item.state === 'failed' ||
+                    item.state === 'cancelled'
+                        ? [
+                              {
+                                  text: 'Clear',
+                                  command:
+                                      LIBRARY_ORGANIZE_SOCKET_COMMAND.clear,
+                              },
+                          ]
+                        : []),
+                ],
+            },
+        };
+    });
 }
 
 type RemoveTitlesFromLibraryOptions = {
@@ -436,6 +539,14 @@ function formatLibraryVerifyProgress(item: LibraryVerifyEvent): string {
 }
 
 function formatLibraryVerifyFileCount(item: LibraryVerifyEvent): string {
+    if (item.state === 'cancelled') {
+        return `${item.current} / ${item.total} entries`;
+    }
+
+    if (item.state === 'complete') {
+        return `${item.total} entries`;
+    }
+
     if (isLibraryVerifyTitleEvent(item)) {
         const current =
             item.state === 'in-progress' &&
@@ -474,6 +585,10 @@ function formatLibraryVerifyTitle(item: LibraryVerifyEvent): string {
 }
 
 function formatLibraryVerifySize(item: LibraryVerifyEvent): string {
+    if (item.state === 'complete' || item.state === 'cancelled') {
+        return 'Title verification';
+    }
+
     return isLibraryVerifyProgress(item)
         ? formatSize(item.currentFileSizeBytes ?? null)
         : '';
@@ -484,10 +599,6 @@ function formatLibraryVerifyDetails(item: LibraryVerifyEvent): string {
         return item.currentFileName
             ? item.currentFileName
             : 'Checking files...';
-    }
-
-    if (item.state === 'complete') {
-        return `${item.total} entries`;
     }
 
     return '';
@@ -772,6 +883,19 @@ export function syncLibraryVerifyActions(
     items: LibraryVerifyEvent[],
     event: LibraryVerifyEvent | null
 ): void {
+    if (event?.state === 'cleared') {
+        const index = items.findIndex((item) =>
+            event.id === 'main'
+                ? !isLibraryVerifyFailure(item)
+                : isLibraryVerifyFailure(item) &&
+                  getLibraryVerifyFailureKey(item) === event.id
+        );
+        if (index >= 0) {
+            items.splice(index, 1);
+        }
+        return;
+    }
+
     if (event?.state === 'in-progress' && 'reset' in event && event.reset) {
         items.splice(0);
     }
@@ -802,48 +926,34 @@ export function syncLibraryVerifyActions(
     }
 }
 
-export function handleLibraryActionBarCommand(
+export function handleLibraryOrganizeActionBarCommand(
+    action: string,
+    itemId: string
+): boolean {
+    switch (action) {
+        case LIBRARY_ORGANIZE_SOCKET_COMMAND.cancel:
+        case LIBRARY_ORGANIZE_SOCKET_COMMAND.retry:
+        case LIBRARY_ORGANIZE_SOCKET_COMMAND.clear:
+            sendAppSocketCommand({ type: action, id: itemId });
+            return true;
+        default:
+            return false;
+    }
+}
+
+export function handleLibraryVerifyActionBarCommand(
     action: string,
     itemId: string,
     verifications: LibraryVerifyEvent[],
-    renames: LibraryRenameAction[],
-    cancelRename: () => void,
-    retryRename: () => void,
     queueVerificationDownloads: (items: DownloadQueueItem[]) => boolean
 ): boolean {
     switch (action) {
-        case LIBRARY_RENAME_SOCKET_COMMAND.cancel:
-            cancelRename();
-            return true;
-
-        case LIBRARY_RENAME_SOCKET_COMMAND.retry:
-            retryRename();
-            return true;
-
-        case LIBRARY_RENAME_SOCKET_COMMAND.clear: {
-            const index = renames.findIndex((item) => item.id === itemId);
-            if (index >= 0) {
-                renames.splice(index, 1);
-            }
-            return true;
-        }
-
-        // Verify
-        case LIBRARY_VERIFY_SOCKET_COMMAND.clear: {
-            const index = verifications.findIndex(
-                (item) => getLibraryVerifyId(item) === itemId
-            );
-
-            if (index >= 0) {
-                verifications.splice(index, 1);
-            }
+        case LIBRARY_VERIFY_SOCKET_COMMAND.clear:
             sendAppSocketCommand({
                 type: LIBRARY_VERIFY_SOCKET_COMMAND.clear,
                 id: itemId,
             });
-
             return true;
-        }
 
         case LIBRARY_VERIFY_SOCKET_COMMAND.cancel:
             sendAppSocketCommand({
@@ -889,10 +999,6 @@ export function handleLibraryActionBarCommand(
                 },
             ]);
             if (queued) {
-                const index = verifications.indexOf(item);
-                if (index >= 0) {
-                    verifications.splice(index, 1);
-                }
                 sendAppSocketCommand({
                     type: LIBRARY_VERIFY_SOCKET_COMMAND.clear,
                     id: itemId,
@@ -902,7 +1008,16 @@ export function handleLibraryActionBarCommand(
             return true;
         }
 
-        // Convert
+        default:
+            return false;
+    }
+}
+
+export function handleLibraryConvertActionBarCommand(
+    action: string,
+    itemId: string
+): boolean {
+    switch (action) {
         case LIBRARY_CONVERT_SOCKET_COMMAND.cancel:
         case LIBRARY_CONVERT_SOCKET_COMMAND.clear:
         case LIBRARY_CONVERT_SOCKET_COMMAND.retry:

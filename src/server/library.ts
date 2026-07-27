@@ -379,7 +379,7 @@ export function getAllTitleScanCacheEntries(): Array<{
     );
 }
 
-export function renameTitleScanCacheSourcePath(
+export function replaceTitleScanCacheSourcePath(
     sourcePath: string,
     destinationPath: string
 ): void {

@@ -181,7 +181,9 @@ yarn generate:titles
 
 ## API
 
-- `GET /api/library`: Scan the configured library.
+- `GET /api/library`: Queue a library scan, or return the active scan without starting another.
+- `GET /api/library/organize`: Preview canonical library organization and conflicts.
+- `POST /api/library/organize`: Queue canonical library organization, or return the active organization without starting another.
 - `GET /api/library/verify`: Fully verify library file integrity and report progress.
 - `GET /api/library/convert?titleId=...`: Queue WUD/WUX conversion for a title.
 - `GET /api/media/:type/:platform/:productCode`: Read or cache title icon/cover media.
@@ -195,16 +197,18 @@ yarn generate:titles
 
 ## WebSocket API
 
-The browser connects to `/api/socket`. On connection the server sends an `app.connected` event with the current state (downloads, storage copies, storage deletes, library verification events, WUD/WUX conversions, and title validation results).
+The browser connects to `/api/socket`. On connection the server sends an `app.connected` event with the current state (downloads, storage copies, storage deletes, library scans, library organization, library verification events, WUD/WUX conversions, and title validation results).
 
 Server events:
 
-- `app.connected`: Initial app state payload (`downloads`, `storageCopies`, `storageDeletes`, `libraryVerifyEvents`, `libraryConversions`, `titleValidations`).
-- `download.queueChanged`: Current download queue updates.
-- `storage.copyChanged`: Current storage copy/move queue updates.
+- `app.connected`: Initial app state payload (`serverId`, `downloads`, `storageCopies`, `storageDeletes`, `libraryScans`, `libraryOrganizeItems`, `libraryVerifyEvents`, `libraryConversions`, `titleValidations`).
+- `download.queue.changed`: Current download queue updates.
+- `storage.copy.changed`: Current storage copy/move queue updates.
 - `storage.delete.changed`: Current storage delete queue updates.
-- `library.verifyChanged`: Full library verification progress and status updates.
-- `library.convertChanged`: Current WUD/WUX conversion queue.
+- `library.scan.changed`: Library scan progress, status, and terminal groups.
+- `library.organize.changed`: Canonical library organization progress and status.
+- `library.verify.changed`: Full library verification progress, clear, and status updates; cancelled runs include completed and total entry counts.
+- `library.convert.changed`: Current WUD/WUX conversion queue.
 - `title.validate.changed`: Size-only title validation progress and results.
 
 Client commands:
@@ -219,6 +223,10 @@ Client commands:
 - `storage.delete.retry`: Retry a storage delete operation (payload: id).
 - `storage.delete.clear`: Clear a storage delete entry (payload: id).
 - `storage.delete.cancel`: Cancel a storage delete operation (payload: id).
+- `library.scan.clear`: Clear a terminal library scan (payload: id).
+- `library.organize.cancel`: Cancel an active library organization (payload: id).
+- `library.organize.clear`: Clear a terminal library organization (payload: id).
+- `library.organize.retry`: Retry a failed or cancelled library organization (payload: id).
 - `library.verify.cancel`: Cancel an in-progress full library verification.
 - `library.verify.clear`: Clear a failed verification item (payload: id).
 - `library.verify.download`: Queue downloads for verification failures.

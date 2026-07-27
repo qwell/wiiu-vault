@@ -38,7 +38,7 @@ type TitlesOptions = {
     downloads: DownloadQueueItem[];
     onRefresh: (options?: { clearScanCache?: boolean }) => void | Promise<void>;
     onVerify: () => void | Promise<void>;
-    onRename: () => void | Promise<void>;
+    onOrganize: () => void | Promise<void>;
     onOpenSettings: () => void;
     renderDownloadMarkers: () => void;
     buildDetailSidebar: () => HTMLElement;
@@ -74,7 +74,7 @@ let controlState: TitlesControlState = {
 };
 let loading = false;
 let verifying = false;
-let renaming = false;
+let organizing = false;
 let titlesGrid: HTMLDivElement | null = null;
 let titlesIndex: HTMLElement | null = null;
 let titlesSidebar: HTMLElement | null = null;
@@ -87,7 +87,7 @@ let searchInput: HTMLInputElement | null = null;
 let showAllInput: HTMLInputElement | null = null;
 let refreshButton: HTMLButtonElement | null = null;
 let verifyButton: HTMLButtonElement | null = null;
-let renameButton: HTMLButtonElement | null = null;
+let organizeButton: HTMLButtonElement | null = null;
 let virtualRenderFrame: number | null = null;
 let virtualWindowState: VirtualTitleWindowState | null = null;
 let titlesResizeObserver: ResizeObserver | null = null;
@@ -172,11 +172,11 @@ export function compareTitleGroups(a: TitleGroup, b: TitleGroup): number {
 export function setTitlesStatus(next: {
     loading?: boolean;
     verifying?: boolean;
-    renaming?: boolean;
+    organizing?: boolean;
 }): void {
     loading = next.loading ?? loading;
     verifying = next.verifying ?? verifying;
-    renaming = next.renaming ?? renaming;
+    organizing = next.organizing ?? organizing;
     if (loadingLine) {
         loadingLine.textContent = loading ? 'Loading...' : '';
     }
@@ -755,6 +755,19 @@ function renderGroups(
     updateTitleIndex();
 
     grid.replaceChildren();
+    if (groups.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'library-empty';
+        const title = document.createElement('strong');
+        title.textContent = 'No titles found';
+        const help = document.createElement('span');
+        help.textContent =
+            'Check your library folders in Settings, then refresh the library.';
+        empty.append(title, help);
+        grid.append(empty);
+        return;
+    }
+
     const spacer = document.createElement('div');
     spacer.className = 'title-virtual-spacer';
     const viewport = document.createElement('div');
@@ -1126,9 +1139,9 @@ function buildControls(
         'Verify library',
         'check-double'
     );
-    renameButton = iconButton(
-        'library-field-rename',
-        'Rename all ROM directories and files',
+    organizeButton = iconButton(
+        'library-field-organize',
+        'Organize all ROM directories and files',
         'file-signature'
     );
     const settings = iconButton(
@@ -1147,7 +1160,7 @@ function buildControls(
         buildViewControl(grid),
         refreshButton,
         verifyButton,
-        renameButton,
+        organizeButton,
         settings
     );
 
@@ -1181,7 +1194,7 @@ function buildControls(
         (event) => void options?.onRefresh({ clearScanCache: event.shiftKey })
     );
     verifyButton.addEventListener('click', () => void options?.onVerify());
-    renameButton.addEventListener('click', () => void options?.onRename());
+    organizeButton.addEventListener('click', () => void options?.onOrganize());
     settings.addEventListener('click', () => options?.onOpenSettings());
 
     return root;
@@ -1253,22 +1266,22 @@ function updateTitlesControls(): void {
 function updateTitleActionButtons(): void {
     updateRefreshButtonState();
     updateVerificationButtonState();
-    updateRenameButtonState();
+    updateOrganizeButtonState();
 }
 
-function updateRenameButtonState(): void {
-    const icon = renameButton?.querySelector<HTMLElement>('i');
-    if (!renameButton || !icon) {
+function updateOrganizeButtonState(): void {
+    const icon = organizeButton?.querySelector<HTMLElement>('i');
+    if (!organizeButton || !icon) {
         return;
     }
-    renameButton.title = renaming
-        ? 'Renaming ROM directories and files'
-        : 'Rename all ROM directories and files';
-    renameButton.setAttribute('aria-label', renameButton.title);
-    renameButton.setAttribute('aria-busy', String(renaming));
-    renameButton.disabled =
-        loading || verifying || renaming || currentGroups.length === 0;
-    icon.className = renaming
+    organizeButton.title = organizing
+        ? 'Organizing ROM directories and files'
+        : 'Organize all ROM directories and files';
+    organizeButton.setAttribute('aria-label', organizeButton.title);
+    organizeButton.setAttribute('aria-busy', String(organizing));
+    organizeButton.disabled =
+        loading || verifying || organizing || currentGroups.length === 0;
+    icon.className = organizing
         ? 'fa-solid fa-spinner fa-spin'
         : 'fa-solid fa-pencil';
 }

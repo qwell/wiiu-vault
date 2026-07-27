@@ -1,21 +1,25 @@
 import {
-    getLibrary,
     listFat32Volumes,
+    queueLibraryScan,
     queueLibraryConvert,
+    queueLibraryOrganize,
     queueStorageCopy,
-    previewLibraryRenames,
-    renameLibrary,
+    previewLibraryOrganization,
     verifyLibrary,
 } from './api.js';
 import { type StorageFat32ListResponse } from '../shared/api.js';
 import {
     type LibraryConvertItem,
+    type LibraryScanItem,
+    type LibraryOrganizeItem,
     type SocketEvent,
     type TitleValidationSocketEvent,
     type LibraryVerifyEvent,
     APP_SOCKET_EVENT,
     DOWNLOAD_SOCKET_EVENT,
     LIBRARY_CONVERT_SOCKET_EVENT,
+    LIBRARY_SCAN_SOCKET_EVENT,
+    LIBRARY_ORGANIZE_SOCKET_EVENT,
     LIBRARY_VERIFY_SOCKET_EVENT,
     STORAGE_COPY_SOCKET_EVENT,
     STORAGE_DELETE_SOCKET_EVENT,
@@ -40,7 +44,6 @@ import {
     createAvailableEntry,
     isTitleValidationUnavailable,
     mergeFailedVerificationsIntoAvailable,
-    type LibraryRenameAction,
     removeTitlesFromLibrary,
     syncLibraryVerifyActions,
     syncGroupStatusFromSlots,
@@ -72,11 +75,13 @@ const SOCKET_RECONNECT_MS = 2000;
 let fat32Devices: StorageFat32ListResponse | null = null;
 const libraryVerifications: LibraryVerifyEvent[] = [];
 const libraryConversions: LibraryConvertItem[] = [];
-const libraryRenames: LibraryRenameAction[] = [];
-let activeLibraryRenameAbortController: AbortController | null = null;
+const libraryOrganizeItems: LibraryOrganizeItem[] = [];
+const libraryScans: LibraryScanItem[] = [];
 let verifyingLibrary = false;
 let libraryLoading = false;
-let activeLibraryRequestId = 0;
+let libraryScanRequestPending = false;
+let libraryOrganizeRequestPending = false;
+let connectedServerId: string | null = null;
 let allLibraryGroups: TitleGroup[] = [];
 const downloadQueue: DownloadQueueItem[] = [];
 const storageCopies: StorageCopyItem[] = [];
@@ -230,46 +235,21 @@ function populateFat32DeviceSelect(
 }
 
 async function loadLibrary(
-    options: { clearScanCache?: boolean } = {},
-    showLoading = true
+    options: { clearScanCache?: boolean } = {}
 ): Promise<void> {
-    const requestId = ++activeLibraryRequestId;
-
+    libraryScanRequestPending = true;
     libraryLoading = true;
-    if (showLoading) {
-        setTitlesStatus({ loading: true });
-    }
+    setTitlesStatus({ loading: true });
     resetUiDetailSidebars();
 
     try {
-        const data = await getLibrary(options);
-
-        if (requestId !== activeLibraryRequestId) {
-            return;
-        }
-
-        for (const group of data.groups) {
-            group.entries.sort((a, b) => (b.version ?? 0) - (a.version ?? 0));
-            syncGroupStatusFromSlots(group);
-        }
-
-        allLibraryGroups = [...data.groups].sort(compareTitleGroups);
-        renderTitles(allLibraryGroups);
+        await queueLibraryScan(options);
     } catch (error) {
-        if (requestId !== activeLibraryRequestId) {
-            return;
-        }
-
         console.error(error);
-
+        libraryScanRequestPending = false;
+        libraryLoading = false;
+        setTitlesStatus({ loading: false });
         renderTitlesError('Failed to load library.');
-    } finally {
-        if (requestId === activeLibraryRequestId) {
-            libraryLoading = false;
-            if (showLoading) {
-                setTitlesStatus({ loading: false });
-            }
-        }
     }
 }
 
@@ -324,77 +304,38 @@ async function refreshLibrary(
     await Promise.all([loadLibrary(options), refreshFat32Devices()]);
 }
 
-async function renameLibraryContent(confirmRename = true): Promise<void> {
-    setTitlesStatus({ renaming: true });
+async function organizeLibraryContent(): Promise<void> {
+    let queued = false;
+    libraryOrganizeRequestPending = true;
+    setTitlesStatus({ organizing: true });
     try {
-        const preview = await previewLibraryRenames();
+        const preview = await previewLibraryOrganization();
         if (preview.conflicts.length > 0) {
             window.alert(
-                `Rename blocked by ${preview.conflicts.length} existing destination(s):\n\n${preview.conflicts.join('\n')}`
+                `Organize blocked by ${preview.conflicts.length} existing destination(s):\n\n${preview.conflicts.join('\n')}`
             );
             return;
         }
-        if (preview.renames === 0) {
-            libraryRenames.splice(0, libraryRenames.length, {
-                id: 'library-rename',
-                state: 'complete',
-                total: 0,
-                renamed: 0,
-                unchanged: preview.unchanged,
-                message: '',
-                error: null,
-                canCancel: false,
-            });
-            refreshActionBar();
-            return;
-        }
         if (
-            confirmRename &&
+            preview.titlesToOrganize > 0 &&
             !window.confirm(
-                `Rename ${preview.renames} filesystem item(s)? ${preview.unchanged} already match the standard layout. Existing destinations will never be overwritten.`
+                `Organize ${preview.titlesToOrganize} ${preview.titlesToOrganize === 1 ? 'title' : 'titles'}? ${preview.unchangedTitles} already match the standard layout. Existing destinations will never be overwritten.`
             )
         ) {
             return;
         }
-        const action: LibraryRenameAction = {
-            id: 'library-rename',
-            state: 'in-progress',
-            total: preview.renames,
-            renamed: 0,
-            unchanged: preview.unchanged,
-            message: 'Renaming library...',
-            error: null,
-            canCancel: true,
-        };
-        libraryRenames.splice(0, libraryRenames.length, action);
-        refreshActionBar();
-        const abortController = new AbortController();
-        activeLibraryRenameAbortController = abortController;
-        const result = await renameLibrary(abortController.signal);
-        action.renamed = result.renamed;
-        action.unchanged = result.unchanged;
-        action.canCancel = false;
-        action.state = 'complete';
-        action.message = `${result.renamed} renamed; ${result.unchanged} already matched.`;
-        refreshActionBar();
+        await queueLibraryOrganize();
+        queued = true;
     } catch (error) {
         console.error(error);
-        const action = libraryRenames[0];
-        if (action) {
-            const cancelled =
-                activeLibraryRenameAbortController?.signal.aborted;
-            action.state = cancelled ? 'cancelled' : 'failed';
-            action.message = cancelled ? 'Rename cancelled.' : action.message;
-            action.error = cancelled ? null : formatLogError(error);
-            refreshActionBar();
-        } else {
-            window.alert(
-                `Could not preview the library rename: ${formatLogError(error)}`
-            );
-        }
+        window.alert(
+            `Could not queue library organization: ${formatLogError(error)}`
+        );
     } finally {
-        activeLibraryRenameAbortController = null;
-        setTitlesStatus({ renaming: false });
+        if (!queued) {
+            libraryOrganizeRequestPending = false;
+            setTitlesStatus({ organizing: false });
+        }
     }
 }
 
@@ -413,10 +354,6 @@ function hideServerGoneModal(): void {
     serverStatusModal?.setAttribute('hidden', '');
 }
 
-async function loadInitialData(): Promise<void> {
-    await refreshLibrary();
-}
-
 function reconcileRemovedTitles(titleIds: string[]): void {
     removeTitlesFromLibrary(titleIds, {
         groups: getCurrentTitleGroups(),
@@ -432,6 +369,48 @@ function syncLibraryConversions(items: LibraryConvertItem[]): void {
     libraryConversions.splice(0, libraryConversions.length, ...items);
     refreshActionBar();
     reconcileCompletedLibraryConversions(previousItems, items);
+}
+
+function applyLibraryGroups(groups: TitleGroup[]): void {
+    for (const group of groups) {
+        group.entries.sort((a, b) => (b.version ?? 0) - (a.version ?? 0));
+        syncGroupStatusFromSlots(group);
+    }
+
+    allLibraryGroups = [...groups].sort(compareTitleGroups);
+    renderTitles(allLibraryGroups);
+}
+
+function syncLibraryScans(items: LibraryScanItem[]): void {
+    libraryScans.splice(0, libraryScans.length, ...items);
+    const scan = items.at(-1);
+    if (scan) {
+        libraryScanRequestPending = false;
+    }
+    libraryLoading =
+        libraryScanRequestPending ||
+        scan?.state === 'queued' ||
+        scan?.state === 'in-progress';
+    setTitlesStatus({ loading: libraryLoading });
+
+    if (scan?.state === 'complete' && scan.groups) {
+        applyLibraryGroups(scan.groups);
+    } else if (scan?.state === 'failed') {
+        renderTitlesError('Failed to load library.');
+    }
+    refreshActionBar();
+}
+
+function syncLibraryOrganizeItems(items: LibraryOrganizeItem[]): void {
+    libraryOrganizeItems.splice(0, libraryOrganizeItems.length, ...items);
+    if (items.length > 0) {
+        libraryOrganizeRequestPending = false;
+    }
+    const active = items.some(
+        (item) => item.state === 'queued' || item.state === 'in-progress'
+    );
+    setTitlesStatus({ organizing: libraryOrganizeRequestPending || active });
+    refreshActionBar();
 }
 
 function handleTitleValidation(event: TitleValidationSocketEvent): void {
@@ -498,7 +477,9 @@ function handleAppEvent(event: SocketEvent): void {
     hideServerGoneModal();
 
     switch (event.type) {
-        case APP_SOCKET_EVENT.connected:
+        case APP_SOCKET_EVENT.connected: {
+            const serverChanged = connectedServerId !== event.serverId;
+            connectedServerId = event.serverId;
             syncDownloadQueue(
                 downloadQueue,
                 event.downloads,
@@ -516,6 +497,15 @@ function handleAppEvent(event: SocketEvent): void {
             for (const verification of event.libraryVerifyEvents) {
                 syncLibraryVerifyActions(libraryVerifications, verification);
             }
+            syncLibraryScans(event.libraryScans);
+            syncLibraryOrganizeItems(event.libraryOrganizeItems);
+            if (serverChanged) {
+                if (event.libraryScans.length === 0) {
+                    void refreshLibrary();
+                } else {
+                    void refreshFat32Devices();
+                }
+            }
             titleValidations.clear();
             for (const validation of event.titleValidations) {
                 handleTitleValidation(validation);
@@ -523,6 +513,7 @@ function handleAppEvent(event: SocketEvent): void {
             syncLibraryConversions(event.libraryConversions);
             refreshActionsAndSelectedSidebar();
             return;
+        }
 
         case DOWNLOAD_SOCKET_EVENT.changed:
             syncDownloadQueue(
@@ -556,6 +547,14 @@ function handleAppEvent(event: SocketEvent): void {
             refreshActionBar();
             return;
 
+        case LIBRARY_SCAN_SOCKET_EVENT.changed:
+            syncLibraryScans(event.items);
+            return;
+
+        case LIBRARY_ORGANIZE_SOCKET_EVENT.changed:
+            syncLibraryOrganizeItems(event.items);
+            return;
+
         case LIBRARY_CONVERT_SOCKET_EVENT.changed:
             syncLibraryConversions(event.items);
             refreshActionsAndSelectedSidebar();
@@ -580,13 +579,12 @@ setupUi({
     storageDeletes,
     libraryVerifications,
     libraryConversions,
-    libraryRenames,
+    libraryOrganizeItems,
+    libraryScans,
     titleValidations,
     onRefreshLibrary: refreshLibrary,
     onVerifyLibrary: verifyLibraryContent,
-    onRenameLibrary: renameLibraryContent,
-    onCancelLibraryRename: () => activeLibraryRenameAbortController?.abort(),
-    onRetryLibraryRename: () => void renameLibraryContent(false),
+    onOrganizeLibrary: organizeLibraryContent,
     queueStorageCopy,
     queueLibraryConvert,
     requestTitleValidation(titleId, name, platform) {
@@ -601,5 +599,3 @@ setupUi({
 });
 
 setupVersion();
-
-void loadInitialData();

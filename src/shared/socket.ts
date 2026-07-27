@@ -5,7 +5,7 @@ import {
 import { type ActionState } from './action.js';
 
 import { type StorageCopyItem, type StorageDeleteItem } from './storage.js';
-import { TitleKinds, type TitlePlatform } from './titles.js';
+import { TitleKinds, type TitleGroup, type TitlePlatform } from './titles.js';
 
 export const SOCKET_COMMAND = {
     downloadQueue: 'download.queue',
@@ -21,22 +21,25 @@ export const SOCKET_COMMAND = {
     libraryVerifyCancel: 'library.verify.cancel',
     libraryVerifyClear: 'library.verify.clear',
     libraryVerifyDownload: 'library.verify.download',
+    libraryScanClear: 'library.scan.clear',
     libraryConvertCancel: 'library.convert.cancel',
     libraryConvertClear: 'library.convert.clear',
     libraryConvertRetry: 'library.convert.retry',
-    libraryRenameCancel: 'library.rename.cancel',
-    libraryRenameClear: 'library.rename.clear',
-    libraryRenameRetry: 'library.rename.retry',
+    libraryOrganizeCancel: 'library.organize.cancel',
+    libraryOrganizeClear: 'library.organize.clear',
+    libraryOrganizeRetry: 'library.organize.retry',
     titleValidateQueue: 'title.validate.queue',
 } as const;
 
 export const SOCKET_EVENT = {
     appConnected: 'app.connected',
-    downloadQueueChanged: 'download.queueChanged',
-    storageCopyChanged: 'storage.copyChanged',
+    downloadQueueChanged: 'download.queue.changed',
+    storageCopyChanged: 'storage.copy.changed',
     storageDeleteChanged: 'storage.delete.changed',
-    libraryVerifyChanged: 'library.verifyChanged',
-    libraryConvertChanged: 'library.convertChanged',
+    libraryVerifyChanged: 'library.verify.changed',
+    libraryScanChanged: 'library.scan.changed',
+    libraryOrganizeChanged: 'library.organize.changed',
+    libraryConvertChanged: 'library.convert.changed',
     titleValidateChanged: 'title.validate.changed',
 } as const;
 
@@ -65,10 +68,14 @@ export const LIBRARY_VERIFY_SOCKET_COMMAND = {
     download: SOCKET_COMMAND.libraryVerifyDownload,
 } as const;
 
-export const LIBRARY_RENAME_SOCKET_COMMAND = {
-    cancel: SOCKET_COMMAND.libraryRenameCancel,
-    clear: SOCKET_COMMAND.libraryRenameClear,
-    retry: SOCKET_COMMAND.libraryRenameRetry,
+export const LIBRARY_SCAN_SOCKET_COMMAND = {
+    clear: SOCKET_COMMAND.libraryScanClear,
+} as const;
+
+export const LIBRARY_ORGANIZE_SOCKET_COMMAND = {
+    cancel: SOCKET_COMMAND.libraryOrganizeCancel,
+    clear: SOCKET_COMMAND.libraryOrganizeClear,
+    retry: SOCKET_COMMAND.libraryOrganizeRetry,
 } as const;
 
 export const TITLE_VALIDATE_SOCKET_COMMAND = {
@@ -93,6 +100,14 @@ export const STORAGE_DELETE_SOCKET_EVENT = {
 
 export const LIBRARY_VERIFY_SOCKET_EVENT = {
     changed: SOCKET_EVENT.libraryVerifyChanged,
+} as const;
+
+export const LIBRARY_SCAN_SOCKET_EVENT = {
+    changed: SOCKET_EVENT.libraryScanChanged,
+} as const;
+
+export const LIBRARY_ORGANIZE_SOCKET_EVENT = {
+    changed: SOCKET_EVENT.libraryOrganizeChanged,
 } as const;
 
 export const LIBRARY_CONVERT_SOCKET_EVENT = {
@@ -181,6 +196,20 @@ export type LibraryConvertSocketCommand =
           id: string;
       };
 
+export type LibraryOrganizeSocketCommand =
+    | {
+          type: typeof LIBRARY_ORGANIZE_SOCKET_COMMAND.cancel;
+          id: string;
+      }
+    | {
+          type: typeof LIBRARY_ORGANIZE_SOCKET_COMMAND.clear;
+          id: string;
+      }
+    | {
+          type: typeof LIBRARY_ORGANIZE_SOCKET_COMMAND.retry;
+          id: string;
+      };
+
 export type TitleValidationSocketCommand = {
     type: typeof TITLE_VALIDATE_SOCKET_COMMAND.queue;
     id: string;
@@ -193,17 +222,62 @@ export type SocketCommand =
     | StorageCopySocketCommand
     | StorageDeleteSocketCommand
     | LibraryVerifySocketCommand
+    | LibraryScanSocketCommand
+    | LibraryOrganizeSocketCommand
     | LibraryConvertSocketCommand
     | TitleValidationSocketCommand;
 
 export type AppConnectedEvent = {
     type: typeof APP_SOCKET_EVENT.connected;
+    serverId: string;
     downloads: DownloadQueueItem[];
     storageCopies: StorageCopyItem[];
     storageDeletes: StorageDeleteItem[];
     libraryVerifyEvents: LibraryVerifyEvent[];
+    libraryScans: LibraryScanItem[];
+    libraryOrganizeItems: LibraryOrganizeItem[];
     libraryConversions: LibraryConvertItem[];
     titleValidations: TitleValidationSocketEvent[];
+};
+
+export type LibraryScanSocketCommand = {
+    type: typeof LIBRARY_SCAN_SOCKET_COMMAND.clear;
+    id: string;
+};
+
+export type LibraryScanItem = {
+    id: string;
+    state: Extract<
+        ActionState,
+        'queued' | 'in-progress' | 'complete' | 'failed'
+    >;
+    current: number;
+    total: number;
+    titleCount: number | null;
+    groups: TitleGroup[] | null;
+    error: string | null;
+};
+
+export type LibraryScanSocketEvent = {
+    type: typeof LIBRARY_SCAN_SOCKET_EVENT.changed;
+    items: LibraryScanItem[];
+};
+
+export type LibraryOrganizeItem = {
+    id: string;
+    state: ActionState;
+    totalPlatforms: number;
+    completedPlatforms: number;
+    totalTitles: number;
+    organizedTitles: number;
+    unchangedTitles: number;
+    message: string;
+    error: string | null;
+};
+
+export type LibraryOrganizeSocketEvent = {
+    type: typeof LIBRARY_ORGANIZE_SOCKET_EVENT.changed;
+    items: LibraryOrganizeItem[];
 };
 
 export type DownloadSocketEvent = {
@@ -267,6 +341,13 @@ export type LibraryVerifyEvent =
     | {
           type: typeof SOCKET_EVENT.libraryVerifyChanged;
           state: 'cancelled';
+          current: number;
+          total: number;
+      }
+    | {
+          type: typeof SOCKET_EVENT.libraryVerifyChanged;
+          state: 'cleared';
+          id: string;
       };
 
 export type LibraryConvertItem = {
@@ -322,6 +403,8 @@ export type SocketEvent =
     | StorageCopySocketEvent
     | StorageDeleteSocketEvent
     | LibraryVerifyEvent
+    | LibraryScanSocketEvent
+    | LibraryOrganizeSocketEvent
     | LibraryConvertSocketEvent
     | TitleValidationSocketEvent;
 

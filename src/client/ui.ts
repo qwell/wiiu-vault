@@ -2,6 +2,8 @@ import { type StorageFat32ListResponse } from '../shared/api.js';
 import { type DownloadQueueItem } from '../shared/download.js';
 import {
     type LibraryConvertItem,
+    type LibraryOrganizeItem,
+    type LibraryScanItem,
     type LibraryVerifyEvent,
     type TitleValidationSocketEvent,
 } from '../shared/socket.js';
@@ -26,12 +28,15 @@ import {
 } from './download.js';
 import {
     getLibraryConvertActionBarEntries,
-    getLibraryRenameActionBarEntries,
+    getLibraryOrganizeActionBarEntries,
+    getLibraryScanActionBarEntries,
     getLibraryVerifyActionBarEntries,
-    handleLibraryActionBarCommand,
+    handleLibraryConvertActionBarCommand,
+    handleLibraryOrganizeActionBarCommand,
+    handleLibraryScanActionBarCommand,
+    handleLibraryVerifyActionBarCommand,
     renderLibrarySidebarWud,
     isTitleValidationUnavailable,
-    type LibraryRenameAction,
 } from './library.js';
 import {
     closeSettingsSidebar,
@@ -69,13 +74,12 @@ type UiOptions = {
     storageDeletes: StorageDeleteItem[];
     libraryVerifications: LibraryVerifyEvent[];
     libraryConversions: LibraryConvertItem[];
-    libraryRenames: LibraryRenameAction[];
+    libraryOrganizeItems: LibraryOrganizeItem[];
+    libraryScans: LibraryScanItem[];
     titleValidations: Map<string, TitleValidationSocketEvent>;
     onRefreshLibrary: () => void | Promise<void>;
     onVerifyLibrary: () => void | Promise<void>;
-    onRenameLibrary: () => void | Promise<void>;
-    onCancelLibraryRename: () => void;
-    onRetryLibraryRename: () => void;
+    onOrganizeLibrary: () => void | Promise<void>;
     queueStorageCopy: (
         titleId: string,
         destination: string,
@@ -143,9 +147,13 @@ function setupActionBar(options: UiOptions): void {
                 options.downloads
             ),
             ...getLibraryConvertActionBarEntries(options.libraryConversions),
-            ...getLibraryRenameActionBarEntries(options.libraryRenames),
+            ...getLibraryOrganizeActionBarEntries(options.libraryOrganizeItems),
+            ...getLibraryScanActionBarEntries(options.libraryScans),
         ],
         onCommand(action, itemId) {
+            if (handleLibraryScanActionBarCommand(action, itemId)) {
+                return;
+            }
             if (
                 handleDownloadActionBarCommand(
                     action,
@@ -161,16 +169,23 @@ function setupActionBar(options: UiOptions): void {
             if (handleStorageDeleteActionBarCommand(action, itemId)) {
                 return;
             }
-            handleLibraryActionBarCommand(
-                action,
-                itemId,
-                options.libraryVerifications,
-                options.libraryRenames,
-                options.onCancelLibraryRename,
-                options.onRetryLibraryRename,
-                (items) => queueDownloads(options.downloads, items).length > 0
-            );
-            updateActionBar();
+            if (handleLibraryOrganizeActionBarCommand(action, itemId)) {
+                return;
+            }
+            if (
+                handleLibraryVerifyActionBarCommand(
+                    action,
+                    itemId,
+                    options.libraryVerifications,
+                    (items) =>
+                        queueDownloads(options.downloads, items).length > 0
+                )
+            ) {
+                return;
+            }
+            if (handleLibraryConvertActionBarCommand(action, itemId)) {
+                return;
+            }
         },
     });
 }
@@ -241,7 +256,7 @@ function setupTitlesUi(options: UiOptions): void {
         downloads: options.downloads,
         onRefresh: options.onRefreshLibrary,
         onVerify: options.onVerifyLibrary,
-        onRename: options.onRenameLibrary,
+        onOrganize: options.onOrganizeLibrary,
         onOpenSettings: openSettingsSidebar,
         renderDownloadMarkers: () => renderDownloadMarkers(options.downloads),
         buildDetailSidebar,

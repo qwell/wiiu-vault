@@ -1,6 +1,7 @@
 import express from 'express';
 import open from 'open';
 import { createServer } from 'node:http';
+import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 
 import { getAppRoot } from './paths.js';
@@ -13,6 +14,8 @@ import {
     APP_SOCKET_EVENT,
     DOWNLOAD_SOCKET_COMMAND,
     LIBRARY_CONVERT_SOCKET_COMMAND,
+    LIBRARY_SCAN_SOCKET_COMMAND,
+    LIBRARY_ORGANIZE_SOCKET_COMMAND,
     LIBRARY_VERIFY_SOCKET_COMMAND,
     STORAGE_COPY_SOCKET_COMMAND,
     STORAGE_DELETE_SOCKET_COMMAND,
@@ -32,14 +35,20 @@ import {
 } from './actions/storage.js';
 import {
     getLibraryConversions,
+    getLibraryScans,
+    getLibraryOrganizeItems,
     getLibraryVerifyEvents,
     handleLibraryConvertSocketCommand,
+    handleLibraryScanSocketCommand,
+    handleLibraryOrganizeSocketCommand,
     handleLibraryVerifySocketCommand,
 } from './actions/library.js';
 import {
     getTitleValidationResults,
     handleTitleValidationSocketCommand,
 } from './actions/titles.js';
+
+const serverId = randomUUID();
 import {
     getDownloadQueue,
     handleDownloadSocketCommand,
@@ -71,6 +80,14 @@ function handleAppSocketCommand(command: SocketCommand): void {
     }
     if (isSocketCommand(command, LIBRARY_CONVERT_SOCKET_COMMAND)) {
         handleLibraryConvertSocketCommand(command);
+        return;
+    }
+    if (isSocketCommand(command, LIBRARY_SCAN_SOCKET_COMMAND)) {
+        handleLibraryScanSocketCommand(command);
+        return;
+    }
+    if (isSocketCommand(command, LIBRARY_ORGANIZE_SOCKET_COMMAND)) {
+        handleLibraryOrganizeSocketCommand(command);
         return;
     }
     if (isSocketCommand(command, TITLE_VALIDATE_SOCKET_COMMAND)) {
@@ -119,11 +136,14 @@ createAppSocket({
     path: '/api/socket',
     getConnectedEvent: () => ({
         type: APP_SOCKET_EVENT.connected,
+        serverId,
         downloads: getDownloadQueue(),
         storageCopies: getStorageCopies(),
         storageDeletes: getStorageDeletes(),
         libraryVerifyEvents: getLibraryVerifyEvents(),
         libraryConversions: getLibraryConversions(),
+        libraryScans: getLibraryScans(),
+        libraryOrganizeItems: getLibraryOrganizeItems(),
         titleValidations: getTitleValidationResults(),
     }),
     onCommand: handleAppSocketCommand,

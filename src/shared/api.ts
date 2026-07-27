@@ -4,12 +4,12 @@ import {
 } from './config.js';
 import { type Fat32Volume, type RuntimeOs } from './os/types.js';
 import { type StorageCopyItem, type StorageDeleteItem } from './storage.js';
-import { type LibraryConvertItem } from './socket.js';
 import {
-    type TitleGroup,
-    type TitleKinds,
-    type TitlePlatform,
-} from './titles.js';
+    type LibraryConvertItem,
+    type LibraryOrganizeItem,
+    type LibraryScanItem,
+} from './socket.js';
+import { type TitleKinds, type TitlePlatform } from './titles.js';
 import { HttpError } from './download.js';
 import { isObject } from './utils.js';
 
@@ -27,19 +27,19 @@ export type StorageFat32ListResponse = {
     volumes: Fat32Volume[];
 };
 
-export type LibraryResponse = {
-    groups: TitleGroup[];
+export type LibraryScanQueuedResponse = {
+    scanId: string;
+    item: LibraryScanItem;
 };
 
-export type LibraryRenameResponse = {
-    renamed: number;
-    unchanged: number;
-    conflicts: string[];
+export type LibraryOrganizeQueuedResponse = {
+    organizeId: string;
+    item: LibraryOrganizeItem;
 };
 
-export type LibraryRenamePreviewResponse = {
-    renames: number;
-    unchanged: number;
+export type LibraryOrganizePreviewResponse = {
+    titlesToOrganize: number;
+    unchangedTitles: number;
     conflicts: string[];
 };
 

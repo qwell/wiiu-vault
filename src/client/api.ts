@@ -2,9 +2,9 @@ import {
     requestJson,
     type ConfigResponse,
     type ConfigValidateRootResponse,
-    type LibraryResponse,
-    type LibraryRenameResponse,
-    type LibraryRenamePreviewResponse,
+    type LibraryScanQueuedResponse,
+    type LibraryOrganizeQueuedResponse,
+    type LibraryOrganizePreviewResponse,
     type LibraryConvertQueuedResponse,
     type LibraryVerifyResponse,
     type StorageFat32ListResponse,
@@ -14,9 +14,9 @@ import {
 import { type AppConfigUpdate } from '../shared/config.js';
 import { type TitlePlatform } from '../shared/titles.js';
 
-export function getLibrary(
+export function queueLibraryScan(
     options: { clearScanCache?: boolean } = {}
-): Promise<LibraryResponse> {
+): Promise<LibraryScanQueuedResponse> {
     const params = new URLSearchParams();
     if (options.clearScanCache) {
         params.set('clearScanCache', '1');
@@ -29,14 +29,12 @@ export function verifyLibrary(): Promise<LibraryVerifyResponse> {
     return requestJson('/api/library/verify');
 }
 
-export function renameLibrary(
-    signal?: AbortSignal
-): Promise<LibraryRenameResponse> {
-    return requestJson('/api/library/rename', { method: 'POST', signal });
+export function queueLibraryOrganize(): Promise<LibraryOrganizeQueuedResponse> {
+    return requestJson('/api/library/organize', { method: 'POST' });
 }
 
-export function previewLibraryRenames(): Promise<LibraryRenamePreviewResponse> {
-    return requestJson('/api/library/rename');
+export function previewLibraryOrganization(): Promise<LibraryOrganizePreviewResponse> {
+    return requestJson('/api/library/organize');
 }
 
 export function queueLibraryConvert(

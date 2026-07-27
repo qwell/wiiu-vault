@@ -387,7 +387,7 @@ select {
     grid-row: 2;
 }
 
-.library-field-rename {
+.library-field-organize {
     grid-column: 10;
     grid-row: 2;
 }
@@ -399,7 +399,7 @@ select {
 
 .library-field-refresh,
 .library-field-verify,
-.library-field-rename,
+.library-field-organize,
 .library-field-settings {
     width: 22px;
     height: 22px;
@@ -425,7 +425,7 @@ select {
 
 .library-field-refresh:disabled,
 .library-field-verify:disabled,
-.library-field-rename:disabled,
+.library-field-organize:disabled,
 .library-field-settings:disabled {
     opacity: 0.45;
     cursor: not-allowed;
@@ -434,7 +434,7 @@ select {
 
 .library-field-refresh[aria-busy='true'],
 .library-field-verify[aria-busy='true'],
-.library-field-rename[aria-busy='true'] {
+.library-field-organize[aria-busy='true'] {
     opacity: 1;
     cursor: wait;
     pointer-events: auto;
@@ -1302,6 +1302,21 @@ footer > div:last-child {
 
 .action-bar-row-cancelled .action-bar-icon {
     color: var(--unknown);
+}
+
+.library-empty {
+    display: grid;
+    place-content: center;
+    gap: 8px;
+    min-height: 240px;
+    padding: 32px;
+    color: var(--border-muted);
+    text-align: center;
+}
+
+.library-empty strong {
+    color: var(--fg);
+    font-size: 1.2rem;
 }
 
 .action-bar-details-cell {

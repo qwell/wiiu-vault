@@ -6,6 +6,8 @@ import {
     type SocketEvent,
     DOWNLOAD_SOCKET_COMMAND,
     LIBRARY_CONVERT_SOCKET_COMMAND,
+    LIBRARY_ORGANIZE_SOCKET_COMMAND,
+    LIBRARY_SCAN_SOCKET_COMMAND,
     LIBRARY_VERIFY_SOCKET_COMMAND,
     STORAGE_COPY_SOCKET_COMMAND,
     STORAGE_DELETE_SOCKET_COMMAND,
@@ -182,6 +184,15 @@ function parseSocketCommand(data: RawData): SocketCommand | null {
     } else if (isSocketCommand(command, LIBRARY_VERIFY_SOCKET_COMMAND)) {
         return command;
     } else if (isSocketCommand(command, LIBRARY_CONVERT_SOCKET_COMMAND)) {
+        if (!hasId()) {
+            return null;
+        }
+
+        return command;
+    } else if (
+        isSocketCommand(command, LIBRARY_SCAN_SOCKET_COMMAND) ||
+        isSocketCommand(command, LIBRARY_ORGANIZE_SOCKET_COMMAND)
+    ) {
         if (!hasId()) {
             return null;
         }

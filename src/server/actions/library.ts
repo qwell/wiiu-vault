@@ -8,7 +8,8 @@ import {
     getAllTitleScanCacheEntries,
     logTitleVerificationCompleted,
     logTitleVerificationStarted,
-    renameTitleScanCacheSourcePath,
+    replaceTitleScanCacheSourcePath,
+    setLibraryCacheGroups,
     type PreparedTitleVerification,
     type LibraryCacheTitleEntry,
 } from '../library.js';
@@ -16,27 +17,35 @@ import {
     findMissingExpectedWiiUVerifications,
     findWudImagePaths,
     prepareWiiUTitleVerifications,
+    scanWiiUTitleRoots,
     verifyPreparedWiiUTitle,
 } from '../platforms/wiiu.js';
 import {
     prepareGameCubeTitleVerifications,
+    scanGameCubeTitleRoots,
     verifyPreparedGameCubeTitle,
 } from '../platforms/gamecube.js';
 import {
     prepareWiiTitleVerifications,
+    scanWiiTitleRoots,
     verifyPreparedWiiTitle,
 } from '../platforms/wii.js';
 import {
     prepareThreeDSTitleVerifications,
+    scanThreeDSTitleRoots,
     verifyPreparedThreeDSTitle,
 } from '../platforms/3ds.js';
 import { convertWudImages } from '../platforms/wiiu.js';
-import { markTitleCopiesValidating, revalidateTitleCopies } from './titles.js';
+import {
+    abortAndClearTitleValidations,
+    markTitleCopiesValidating,
+    revalidateTitleCopies,
+} from './titles.js';
+import { cacheGameTdbMediaForGroups } from '../gametdb.js';
 import {
     type LibraryVerifyProgress,
     type LibraryVerifyResponse,
-    type LibraryRenameResponse,
-    type LibraryRenamePreviewResponse,
+    type LibraryOrganizePreviewResponse,
 } from '../../shared/api.js';
 import { getConfig } from '../routes/config.js';
 import logger from '../../shared/logger.js';
@@ -45,97 +54,120 @@ import { formatLogError, safeDirectoryName } from '../../shared/utils.js';
 import { isFileNotFoundError } from '../../shared/file.js';
 import {
     getTitlePlatformKey,
+    TITLE_PLATFORM_IDS,
     TitleKinds,
+    type TitleGroup,
     type TitleIdentity,
 } from '../../shared/titles.js';
 import {
     LIBRARY_CONVERT_SOCKET_COMMAND,
     LIBRARY_CONVERT_SOCKET_EVENT,
+    LIBRARY_SCAN_SOCKET_COMMAND,
+    LIBRARY_SCAN_SOCKET_EVENT,
+    LIBRARY_ORGANIZE_SOCKET_COMMAND,
+    LIBRARY_ORGANIZE_SOCKET_EVENT,
     LIBRARY_VERIFY_SOCKET_COMMAND,
     LIBRARY_VERIFY_SOCKET_EVENT,
     type LibraryConvertSocketCommand,
     type LibraryConvertItem,
+    type LibraryScanItem,
+    type LibraryScanSocketCommand,
+    type LibraryOrganizeItem,
+    type LibraryOrganizeSocketCommand,
     type LibraryVerifySocketCommand,
     type LibraryVerifyEvent,
 } from '../../shared/socket.js';
 
-type LibraryRenamePlan = {
+type LibraryOrganizePlan = {
     root: string;
     source: string;
     destination: string;
+    platform: TitleIdentity['platform'];
+    titleKey: string;
 };
-type PreparedLibraryRenames = {
-    pending: LibraryRenamePlan[];
-    unchanged: number;
+type PreparedLibraryOrganization = {
+    pending: LibraryOrganizePlan[];
+    pendingTitleKeys: Set<string>;
+    unchangedTitles: number;
     conflicts: string[];
 };
 
-function planLibraryEntryRename(
+function planLibraryEntryOrganize(
     root: string,
     entry: LibraryCacheTitleEntry
-): LibraryRenamePlan[] {
+): LibraryOrganizePlan[] {
     const name = safeDirectoryName(entry.name);
     const extension = path.extname(entry.sourcePath).toLowerCase();
+    const titleKey = `${entry.platform}\0${entry.sourcePath}`;
+    const plan = (
+        source: string,
+        destination: string
+    ): LibraryOrganizePlan => ({
+        root,
+        source,
+        destination,
+        platform: entry.platform,
+        titleKey,
+    });
 
     switch (entry.platform) {
         case '3ds': {
-            const id = safeDirectoryName(entry.productCode ?? entry.titleId);
+            const id = safeDirectoryName(entry.titleId);
+            const label = `${name} [${id}]`;
             return [
-                {
-                    root,
-                    source: entry.sourcePath,
-                    destination: path.join(root, `${name} [${id}]${extension}`),
-                },
+                plan(
+                    entry.sourcePath,
+                    path.join(root, label, `${label}${extension}`)
+                ),
             ];
         }
         case 'gamecube':
             return [
-                {
-                    root,
-                    source: entry.sourcePath,
-                    destination: path.join(
+                plan(
+                    entry.sourcePath,
+                    path.join(
                         root,
                         `${name} [${entry.titleId}]`,
                         `game${extension}`
-                    ),
-                },
+                    )
+                ),
             ];
         case 'wii': {
             const sources = [
                 entry.sourcePath,
                 ...(entry.extraSourcePaths ?? []),
             ];
-            return sources.map((source, index) => ({
-                root,
-                source,
-                destination: path.join(
-                    root,
-                    `${name} [${entry.titleId}]`,
-                    `${entry.titleId}${index === 0 ? extension : path.extname(source).toLowerCase()}`
-                ),
-            }));
+            return sources.map((source, index) =>
+                plan(
+                    source,
+                    path.join(
+                        root,
+                        `${name} [${entry.titleId}]`,
+                        `${entry.titleId}${index === 0 ? extension : path.extname(source).toLowerCase()}`
+                    )
+                )
+            );
         }
         case 'wiiu':
             return [
-                {
-                    root,
-                    source: entry.sourcePath,
-                    destination: path.join(
+                plan(
+                    entry.sourcePath,
+                    path.join(
                         root,
                         `${name}${entry.kind === TitleKinds.Base ? '' : ` [${entry.kind}]`} [${entry.titleId}]`
-                    ),
-                },
+                    )
+                ),
             ];
     }
 }
 
-function formatLibraryRenamePath(plan: LibraryRenamePlan): string {
+function formatLibraryOrganizePath(plan: LibraryOrganizePlan): string {
     const relative = path.relative(plan.root, plan.destination);
     return path.posix.join('<romroot>', ...relative.split(path.sep));
 }
 
 async function removeEmptyLibrarySourceParents(
-    plans: LibraryRenamePlan[]
+    plans: LibraryOrganizePlan[]
 ): Promise<void> {
     const roots = getAllTitleScanCacheEntries().map(({ root }) =>
         path.resolve(root)
@@ -157,16 +189,16 @@ async function removeEmptyLibrarySourceParents(
     }
 }
 
-async function prepareLibraryRenames(): Promise<PreparedLibraryRenames> {
+async function prepareLibraryOrganization(): Promise<PreparedLibraryOrganization> {
     const plans = getAllTitleScanCacheEntries().flatMap(({ root, entry }) =>
-        planLibraryEntryRename(root, entry)
+        planLibraryEntryOrganize(root, entry)
     );
-    const unchanged = plans.filter(
-        (plan) => path.resolve(plan.source) === path.resolve(plan.destination)
-    ).length;
     const pending = plans.filter(
         (plan) => path.resolve(plan.source) !== path.resolve(plan.destination)
     );
+    const allTitleKeys = new Set(plans.map((plan) => plan.titleKey));
+    const pendingTitleKeys = new Set(pending.map((plan) => plan.titleKey));
+    const unchangedTitles = allTitleKeys.size - pendingTitleKeys.size;
     const destinations = new Set<string>();
     const conflicts: string[] = [];
 
@@ -182,47 +214,94 @@ async function prepareLibraryRenames(): Promise<PreparedLibraryRenames> {
             }
         }
         if (destinations.has(destination) || destinationExists) {
-            conflicts.push(formatLibraryRenamePath(plan));
+            conflicts.push(formatLibraryOrganizePath(plan));
         }
         destinations.add(destination);
     }
     if (conflicts.length > 0) {
-        return { pending, unchanged, conflicts };
+        return { pending, pendingTitleKeys, unchangedTitles, conflicts };
     }
 
-    return { pending, unchanged, conflicts: [] };
+    return { pending, pendingTitleKeys, unchangedTitles, conflicts: [] };
 }
 
-export async function previewLibraryRenames(): Promise<LibraryRenamePreviewResponse> {
-    const prepared = await prepareLibraryRenames();
+export async function previewLibraryOrganization(): Promise<LibraryOrganizePreviewResponse> {
+    const prepared = await prepareLibraryOrganization();
     return {
-        renames: prepared.pending.length,
-        unchanged: prepared.unchanged,
+        titlesToOrganize: prepared.pendingTitleKeys.size,
+        unchangedTitles: prepared.unchangedTitles,
         conflicts: prepared.conflicts,
     };
 }
 
-export async function renameLibraryTitles(
-    signal?: AbortSignal
-): Promise<LibraryRenameResponse> {
-    const { pending, unchanged, conflicts } = await prepareLibraryRenames();
+export async function organizeLibraryTitles(
+    signal?: AbortSignal,
+    onProgress?: (progress: {
+        totalPlatforms: number;
+        completedPlatforms: number;
+        totalTitles: number;
+        organizedTitles: number;
+        unchangedTitles: number;
+    }) => void
+): Promise<{
+    organizedTitles: number;
+    unchangedTitles: number;
+    conflicts: string[];
+}> {
+    const { pending, pendingTitleKeys, unchangedTitles, conflicts } =
+        await prepareLibraryOrganization();
+    const remainingByPlatform = new Map(
+        TITLE_PLATFORM_IDS.map((platform) => [
+            platform,
+            pending.filter((plan) => plan.platform === platform).length,
+        ])
+    );
+    const remainingByTitle = new Map(
+        [...pendingTitleKeys].map((titleKey) => [
+            titleKey,
+            pending.filter((plan) => plan.titleKey === titleKey).length,
+        ])
+    );
+    let completedPlatforms = [...remainingByPlatform.values()].filter(
+        (remaining) => remaining === 0
+    ).length;
+    let organizedTitles = 0;
+    const reportProgress = () =>
+        onProgress?.({
+            totalPlatforms: TITLE_PLATFORM_IDS.length,
+            completedPlatforms,
+            totalTitles: pendingTitleKeys.size,
+            organizedTitles,
+            unchangedTitles,
+        });
+    reportProgress();
     if (conflicts.length > 0) {
-        return { renamed: 0, unchanged, conflicts };
+        return { organizedTitles: 0, unchangedTitles, conflicts };
     }
 
-    let renamed = 0;
     for (const plan of pending) {
         signal?.throwIfAborted();
 
         await mkdir(path.dirname(plan.destination), { recursive: true });
         await rename(plan.source, plan.destination);
-        renameTitleScanCacheSourcePath(plan.source, plan.destination);
+        replaceTitleScanCacheSourcePath(plan.source, plan.destination);
 
-        renamed += 1;
+        const remainingTitle = (remainingByTitle.get(plan.titleKey) ?? 1) - 1;
+        remainingByTitle.set(plan.titleKey, remainingTitle);
+        if (remainingTitle === 0) {
+            organizedTitles += 1;
+        }
+        const remainingPlatform =
+            (remainingByPlatform.get(plan.platform) ?? 1) - 1;
+        remainingByPlatform.set(plan.platform, remainingPlatform);
+        if (remainingPlatform === 0) {
+            completedPlatforms += 1;
+        }
+        reportProgress();
     }
     await removeEmptyLibrarySourceParents(pending);
 
-    return { renamed, unchanged, conflicts: [] };
+    return { organizedTitles, unchangedTitles, conflicts: [] };
 }
 
 let latestLibraryVerifyEvent: LibraryVerifyEvent | null = null;
@@ -242,6 +321,9 @@ let libraryConversions: LibraryConvertItem[] = [];
 let activeLibraryConvertId: string | null = null;
 let activeLibraryConvertAbortController: AbortController | null = null;
 let activeLibraryConvertSourcePaths = new Map<string, Set<string>>();
+let libraryScans: LibraryScanItem[] = [];
+let libraryOrganizeItems: LibraryOrganizeItem[] = [];
+let activeLibraryOrganizeAbortController: AbortController | null = null;
 
 export function getLibraryVerifyEvents(): LibraryVerifyEvent[] {
     return [
@@ -252,6 +334,241 @@ export function getLibraryVerifyEvents(): LibraryVerifyEvent[] {
 
 export function getLibraryConversions(): LibraryConvertItem[] {
     return libraryConversions;
+}
+
+export function getLibraryScans(): LibraryScanItem[] {
+    return libraryScans;
+}
+
+export function getLibraryOrganizeItems(): LibraryOrganizeItem[] {
+    return libraryOrganizeItems;
+}
+
+function broadcastLibraryOrganizeItems(): void {
+    broadcastAppSocketEvent({
+        type: LIBRARY_ORGANIZE_SOCKET_EVENT.changed,
+        items: libraryOrganizeItems,
+    });
+}
+
+export function queueLibraryOrganize(): LibraryOrganizeItem {
+    const active = libraryOrganizeItems.find(
+        (item) => item.state === 'queued' || item.state === 'in-progress'
+    );
+    if (active) {
+        return active;
+    }
+
+    const item: LibraryOrganizeItem = {
+        id: randomUUID(),
+        state: 'queued',
+        totalPlatforms: TITLE_PLATFORM_IDS.length,
+        completedPlatforms: 0,
+        totalTitles: 0,
+        organizedTitles: 0,
+        unchangedTitles: 0,
+        message: 'Organize queued.',
+        error: null,
+    };
+    libraryOrganizeItems = [item];
+    broadcastLibraryOrganizeItems();
+    void processLibraryOrganize(item);
+    return item;
+}
+
+async function processLibraryOrganize(
+    item: LibraryOrganizeItem
+): Promise<void> {
+    if (activeLibraryOrganizeAbortController) {
+        return;
+    }
+    const abortController = new AbortController();
+    activeLibraryOrganizeAbortController = abortController;
+    item.state = 'in-progress';
+    item.message = 'Preparing library organization...';
+    item.error = null;
+    broadcastLibraryOrganizeItems();
+
+    try {
+        const result = await organizeLibraryTitles(
+            abortController.signal,
+            (progress) => {
+                item.totalPlatforms = progress.totalPlatforms;
+                item.completedPlatforms = progress.completedPlatforms;
+                item.totalTitles = progress.totalTitles;
+                item.organizedTitles = progress.organizedTitles;
+                item.unchangedTitles = progress.unchangedTitles;
+                item.message = 'Organizing library...';
+                broadcastLibraryOrganizeItems();
+            }
+        );
+        if (result.conflicts.length > 0) {
+            item.state = 'failed';
+            item.error = `Organize blocked by ${result.conflicts.length} existing destination(s):\n${result.conflicts.join('\n')}`;
+            item.message = 'Organize blocked.';
+        } else {
+            item.state = 'complete';
+            item.completedPlatforms = item.totalPlatforms;
+            item.organizedTitles = result.organizedTitles;
+            item.unchangedTitles = result.unchangedTitles;
+            item.message = `${result.organizedTitles} organized; ${result.unchangedTitles} already matched.`;
+        }
+    } catch (error) {
+        if (abortController.signal.aborted) {
+            item.state = 'cancelled';
+            item.message = 'Organize cancelled.';
+            item.error = null;
+        } else {
+            item.state = 'failed';
+            item.error = formatLogError(error);
+        }
+    } finally {
+        activeLibraryOrganizeAbortController = null;
+        broadcastLibraryOrganizeItems();
+    }
+}
+
+export function handleLibraryOrganizeSocketCommand(
+    command: LibraryOrganizeSocketCommand
+): void {
+    const item = libraryOrganizeItems.find(
+        (candidate) => candidate.id === command.id
+    );
+    if (!item) {
+        return;
+    }
+
+    switch (command.type) {
+        case LIBRARY_ORGANIZE_SOCKET_COMMAND.cancel:
+            if (item.state === 'queued' || item.state === 'in-progress') {
+                activeLibraryOrganizeAbortController?.abort();
+            }
+            return;
+        case LIBRARY_ORGANIZE_SOCKET_COMMAND.clear:
+            if (isTerminalActionState(item.state)) {
+                libraryOrganizeItems = libraryOrganizeItems.filter(
+                    (candidate) => candidate.id !== item.id
+                );
+                broadcastLibraryOrganizeItems();
+            }
+            return;
+        case LIBRARY_ORGANIZE_SOCKET_COMMAND.retry:
+            if (item.state === 'failed' || item.state === 'cancelled') {
+                item.state = 'queued';
+                item.totalPlatforms = TITLE_PLATFORM_IDS.length;
+                item.completedPlatforms = 0;
+                item.totalTitles = 0;
+                item.organizedTitles = 0;
+                item.unchangedTitles = 0;
+                item.message = 'Organize queued.';
+                item.error = null;
+                broadcastLibraryOrganizeItems();
+                void processLibraryOrganize(item);
+            }
+    }
+}
+
+function broadcastLibraryScans(): void {
+    broadcastAppSocketEvent({
+        type: LIBRARY_SCAN_SOCKET_EVENT.changed,
+        items: libraryScans,
+    });
+}
+
+export function queueLibraryScan(clearScanCache = false): LibraryScanItem {
+    const active = libraryScans.find(
+        (item) => item.state === 'queued' || item.state === 'in-progress'
+    );
+    if (active) {
+        return active;
+    }
+
+    const item: LibraryScanItem = {
+        id: randomUUID(),
+        state: 'queued',
+        current: 0,
+        total: 4,
+        titleCount: null,
+        groups: null,
+        error: null,
+    };
+    libraryScans = [item];
+    broadcastLibraryScans();
+    void processLibraryScan(item, clearScanCache);
+    return item;
+}
+
+async function processLibraryScan(
+    item: LibraryScanItem,
+    clearScanCache: boolean
+): Promise<void> {
+    item.state = 'in-progress';
+    broadcastLibraryScans();
+
+    try {
+        if (clearScanCache) {
+            clearTitleScanCache();
+            logger.log('server', 'library scan cache cleared');
+        }
+        try {
+            abortAndClearTitleValidations();
+        } catch (error) {
+            logger.warn(
+                'server',
+                `Failed to clear title verification cache: ${formatLogError(error)}`
+            );
+        }
+        const config = getConfig();
+        const scan = async (operation: Promise<TitleGroup[]>) => {
+            const groups = await operation;
+            item.current += 1;
+            broadcastLibraryScans();
+            return groups;
+        };
+        const [threeDSGroups, gameCubeGroups, wiiuGroups, wiiGroups] =
+            await Promise.all([
+                scan(scanThreeDSTitleRoots(config['3dsRoots'])),
+                scan(scanGameCubeTitleRoots(config.gamecubeRoots)),
+                scan(scanWiiUTitleRoots(config.wiiuRoots)),
+                scan(scanWiiTitleRoots(config.wiiRoots)),
+            ]);
+        const groups = [
+            ...threeDSGroups,
+            ...gameCubeGroups,
+            ...wiiuGroups,
+            ...wiiGroups,
+        ].sort((a, b) => a.name.localeCompare(b.name));
+        setLibraryCacheGroups(groups);
+        item.state = 'complete';
+        item.titleCount = groups.length;
+        item.groups = groups;
+        broadcastLibraryScans();
+        cacheGameTdbMediaForGroups(groups);
+        logger.log(
+            'server',
+            `library scan complete: ${groups.length} title group(s)`
+        );
+    } catch (error) {
+        item.state = 'failed';
+        item.error = formatLogError(error);
+        broadcastLibraryScans();
+        logger.warn('server', `Failed to scan library: ${item.error}`);
+    }
+}
+
+export function handleLibraryScanSocketCommand(
+    command: LibraryScanSocketCommand
+): void {
+    if (command.type !== LIBRARY_SCAN_SOCKET_COMMAND.clear) {
+        return;
+    }
+    libraryScans = libraryScans.filter(
+        (item) =>
+            item.id !== command.id ||
+            item.state === 'queued' ||
+            item.state === 'in-progress'
+    );
+    broadcastLibraryScans();
 }
 
 function broadcastLibraryVerifyEvent(event: LibraryVerifyEvent): void {
@@ -283,6 +600,16 @@ function clearScheduledLibraryVerifyEvent(): void {
         libraryVerifyEventTimer = null;
     }
     pendingLibraryVerifyEvent = null;
+}
+
+function getLibraryVerifyProgressCounts(): {
+    current: number;
+    total: number;
+} {
+    const event = pendingLibraryVerifyEvent ?? latestLibraryVerifyEvent;
+    return event?.state === 'in-progress' && 'titleId' in event
+        ? { current: event.current, total: event.total }
+        : { current: 0, total: 0 };
 }
 
 function handleLibraryVerifyProgress(progress: LibraryVerifyProgress): void {
@@ -393,9 +720,11 @@ export async function verifyLibrary(): Promise<LibraryVerifyResponse> {
         };
     } catch (error) {
         if (abortController.signal.aborted) {
+            const progress = getLibraryVerifyProgressCounts();
             broadcastLibraryVerifyEvent({
                 type: LIBRARY_VERIFY_SOCKET_EVENT.changed,
                 state: 'cancelled',
+                ...progress,
             });
             return { status: 'cancelled', total: 0, failed: 0, titles: [] };
         }
@@ -452,9 +781,11 @@ async function runStandaloneLibraryTitleVerification(
         );
     } catch (error) {
         if (abortController.signal.aborted) {
+            const progress = getLibraryVerifyProgressCounts();
             broadcastLibraryVerifyEvent({
                 type: LIBRARY_VERIFY_SOCKET_EVENT.changed,
                 state: 'cancelled',
+                ...progress,
             });
             return;
         }
@@ -855,7 +1186,21 @@ export function handleLibraryVerifySocketCommand(
             activeLibraryVerifyAbortController?.abort();
             return;
         case LIBRARY_VERIFY_SOCKET_COMMAND.clear:
-            libraryVerifyFailures.delete(command.id);
+            if (command.id === 'main') {
+                if (
+                    latestLibraryVerifyEvent?.state !== 'in-progress' &&
+                    latestLibraryVerifyEvent?.state !== undefined
+                ) {
+                    latestLibraryVerifyEvent = null;
+                }
+            } else {
+                libraryVerifyFailures.delete(command.id);
+            }
+            broadcastAppSocketEvent({
+                type: LIBRARY_VERIFY_SOCKET_EVENT.changed,
+                state: 'cleared',
+                id: command.id,
+            });
             return;
     }
 }
