@@ -4,7 +4,10 @@ import path from 'node:path';
 
 import { readOptionalFile } from '../shared/file.js';
 import logger from '../shared/logger.js';
+import { TitlePlatform } from '../shared/titles.js';
 import { formatLogError } from '../shared/utils.js';
+import { readP12ClientCertificate } from './decryption.js';
+import { downloadBytes, type DownloadOptions } from './download.js';
 import { getUserAppRoot } from './paths.js';
 
 export type ThreeDSKeys = {
@@ -17,38 +20,49 @@ export type ThreeDSKeys = {
     commonKeyYs: Array<string | null>;
 };
 
-export type WiiUKeys = string;
-export type WudKeys = string;
-
-type KeysByPlatform = {
-    '3ds': ThreeDSKeys;
-    wiiu: WiiUKeys;
-    wud: WudKeys | null;
+export type WiiUCommonKey = string;
+export type WudKey = string;
+export type ThreeDSClientCertificateOptions = DownloadOptions & {
+    cert: string;
+    key: string;
 };
 
-type LoadKeysArguments<Platform extends keyof KeysByPlatform> =
-    Platform extends 'wud' ? [imagePath: string] : [];
-
 type CachedKeysOptions<Keys> = {
-    platform: string;
-    cacheFilename: string;
-    encodedUrls: readonly string[];
+    platform: '3ds' | 'wiiu';
+    cacheFilename: keyof typeof DOWNLOAD_URLS;
     parse: (raw: Buffer, source: string) => Keys;
 };
 
 const KEYS_DOWNLOAD_TIMEOUT_MS = 30_000;
 const KEYS_MAX_SIZE = 1024 * 1024;
+const THREE_DS_CLIENT_CERT_CACHE_FILENAME = 'ctr-common-1.p12';
+const THREE_DS_CLIENT_CERT_PASSWORD = 'alpine';
 const THREE_DS_KEYS_CACHE_FILENAME = 'aes_keys.txt';
-const THREE_DS_KEYS_URLS = [
-    'aHR0cHM6Ly9naXRodWIuY29tL0FiZGVzcy9yZXRyb2Jpb3MvcmF3L3JlZnMvaGVhZHMvbWFpbi9iaW9zL05pbnRlbmRvLzNEUy9hZXNfa2V5cy50eHQ=',
-    'aHR0cHM6Ly93ZWIuYXJjaGl2ZS5vcmcvMjAyNjA3MDcyMTA2MDcvZ2l0aHViLmNvbS9BYmRlc3MvcmV0cm9iaW9zL3JlZnMvaGVhZHMvbWFpbi9iaW9zL05pbnRlbmRvLzNEUy9hZXNfa2V5cy50eHQ=',
-    'aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3L3ZSeThjNkpQ',
-] as const;
 const WII_U_KEYS_CACHE_FILENAME = 'common.key';
-const WII_U_KEYS_URLS = [
-    'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS9FbXJhbkFobTNkL2JkN2E3OTFkMDI5NzVkNzE4NmQwYzA1NTRmM2NmNmVhL3Jhdy8xYzM4MzM1ZjJhNzFhYjQyNDVkMjM3NjE4YzRmYWZlNjcwZWUzZTgyL3dpaXVjb21tb29ua2V5LnR4dA==',
-    'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS9xd2VsbC80NWJhN2QyZjMwNWRlNzJhODFkYjlkNzUxOTA4MTE3YS9yYXcvMWMzODMzNWYyYTcxYWI0MjQ1ZDIzNzYxOGM0ZmFmZTY3MGVlM2U4Mi93aWl1Y29tbW9ua2V5LnR4dA==',
-] as const;
+const COMMON_KEYS = {
+    wii: ['6+QqIl6Fk+RI2cVFc4Gq9w=='],
+    'wii-korea': ['Y7grtPRhTi4T8v77ukybfg=='],
+} as const;
+const DOWNLOAD_URLS = {
+    [THREE_DS_CLIENT_CERT_CACHE_FILENAME]: [
+        'aHR0cHM6Ly9naXRodWIuY29tL2xhcnNlbnYvTmludGVuZG9DZXJ0cy9yYXcvcmVmcy9oZWFkcy9tYXN0ZXIvY3RyLWNvbW1vbi0xLnAxMg==',
+        'aHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20vcXdlbGwvNDViYTdkMmYzMDVkZTcyYTgxZGI5ZDc1MTkwODExN2EvcmF3L2I5NjY4ZTE0ZDY3YzQ3YTQzOTNiZmQ0NjRmMjE5YzExYTRlZDE3YjEvY3RyLWNvbW1vbi0xLnAxMg==',
+        'aHR0cHM6Ly93ZWIuYXJjaGl2ZS5vcmcvd2ViLzIwMjYwNzA3MjA0MTM5aWZfL2h0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9sYXJzZW52L05pbnRlbmRvQ2VydHMvcmVmcy9oZWFkcy9tYXN0ZXIvY3RyLWNvbW1vbi0xLnAxMg==',
+        'aHR0cHM6Ly93ZWIuYXJjaGl2ZS5vcmcvd2ViLzIwMjYwNzMxMjAxNzM0aWZfL2h0dHBzOi8vZ2lzdC5naXRodWJ1c2VyY29udGVudC5jb20vcXdlbGwvNDViYTdkMmYzMDVkZTcyYTgxZGI5ZDc1MTkwODExN2EvcmF3L2I5NjY4ZTE0ZDY3YzQ3YTQzOTNiZmQ0NjRmMjE5YzExYTRlZDE3YjEvY3RyLWNvbW1vbi0xLnAxMg==',
+    ],
+    [THREE_DS_KEYS_CACHE_FILENAME]: [
+        'aHR0cHM6Ly9naXRodWIuY29tL0FiZGVzcy9yZXRyb2Jpb3MvcmF3L3JlZnMvaGVhZHMvbWFpbi9iaW9zL05pbnRlbmRvLzNEUy9hZXNfa2V5cy50eHQ=',
+        'aHR0cHM6Ly93ZWIuYXJjaGl2ZS5vcmcvd2ViLzIwMjYwNzA3MjEwNjA3aWZfL2h0dHBzOi8vZ2l0aHViLmNvbS9BYmRlc3MvcmV0cm9iaW9zL3JlZnMvaGVhZHMvbWFpbi9iaW9zL05pbnRlbmRvLzNEUy9hZXNfa2V5cy50eHQ=',
+        'aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3L3ZSeThjNkpQ',
+        'aHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20vcXdlbGwvNDViYTdkMmYzMDVkZTcyYTgxZGI5ZDc1MTkwODExN2EvcmF3L2I5NjY4ZTE0ZDY3YzQ3YTQzOTNiZmQ0NjRmMjE5YzExYTRlZDE3YjEvYWVzX2tleXMudHh0',
+        'aHR0cHM6Ly93ZWIuYXJjaGl2ZS5vcmcvd2ViLzIwMjYwNzMxMTg0MTAyaWZfL2h0dHBzOi8vZ2lzdC5naXRodWJ1c2VyY29udGVudC5jb20vcXdlbGwvNDViYTdkMmYzMDVkZTcyYTgxZGI5ZDc1MTkwODExN2EvcmF3L2I5NjY4ZTE0ZDY3YzQ3YTQzOTNiZmQ0NjRmMjE5YzExYTRlZDE3YjEvYWVzX2tleXMudHh0',
+    ],
+    [WII_U_KEYS_CACHE_FILENAME]: [
+        'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS9FbXJhbkFobTNkL2JkN2E3OTFkMDI5NzVkNzE4NmQwYzA1NTRmM2NmNmVhL3Jhdy8xYzM4MzM1ZjJhNzFhYjQyNDVkMjM3NjE4YzRmYWZlNjcwZWUzZTgyL3dpaXVjb21tb29ua2V5LnR4dA==',
+        'aHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20vcXdlbGwvNDViYTdkMmYzMDVkZTcyYTgxZGI5ZDc1MTkwODExN2EvcmF3L2I5NjY4ZTE0ZDY3YzQ3YTQzOTNiZmQ0NjRmMjE5YzExYTRlZDE3YjEvY29tbW9uLmtleQ==',
+        'aHR0cHM6Ly93ZWIuYXJjaGl2ZS5vcmcvd2ViLzIwMjYwNzMxMjAxMTEzaWZfL2h0dHBzOi8vZ2lzdC5naXRodWJ1c2VyY29udGVudC5jb20vcXdlbGwvNDViYTdkMmYzMDVkZTcyYTgxZGI5ZDc1MTkwODExN2EvcmF3L2I5NjY4ZTE0ZDY3YzQ3YTQzOTNiZmQ0NjRmMjE5YzExYTRlZDE3YjEvY29tbW9uLmtleQ==',
+    ],
+} as const;
 const THREE_DS_AES_KEY_NAMES = {
     generatorConstant: ['generatorConstant', 'generator'],
     slot0x18KeyX: ['slot0x18KeyX'],
@@ -60,55 +74,67 @@ const THREE_DS_AES_KEY_NAMES = {
 
 const keysPromises = new Map<string, Promise<unknown>>();
 
-export function loadKeys<Platform extends keyof KeysByPlatform>(
-    platform: Platform,
-    ...args: LoadKeysArguments<Platform>
-): Promise<KeysByPlatform[Platform]> {
-    switch (platform) {
-        case '3ds':
-            return memoizeKeys('3ds', loadThreeDSKeys) as Promise<
-                KeysByPlatform[Platform]
-            >;
-        case 'wiiu':
-            return memoizeKeys('wiiu', loadWiiUKeys) as Promise<
-                KeysByPlatform[Platform]
-            >;
-        case 'wud': {
-            const [inputPath] = args as [string];
-            const imagePath = path.resolve(inputPath);
-            return memoizeKeys(
-                `wud:${imagePath}`,
-                () => loadWudKeys(imagePath),
-                (keys) => keys !== null
-            ) as Promise<KeysByPlatform[Platform]>;
-        }
-    }
+export function loadThreeDSClientCertificateOptions(): Promise<ThreeDSClientCertificateOptions> {
+    return memoizeKeys('3ds-client-certificate', () =>
+        loadCachedKeys({
+            platform: '3ds',
+            cacheFilename: THREE_DS_CLIENT_CERT_CACHE_FILENAME,
+            parse: parseThreeDSClientCertificate,
+        })
+    );
 }
 
-async function loadThreeDSKeys(): Promise<ThreeDSKeys> {
-    return loadCachedKeys({
-        platform: '3DS',
-        cacheFilename: THREE_DS_KEYS_CACHE_FILENAME,
-        encodedUrls: THREE_DS_KEYS_URLS,
-        parse: parseThreeDSKeys,
-    });
+export function loadThreeDSKeys(): Promise<ThreeDSKeys> {
+    return memoizeKeys('3ds', () =>
+        loadCachedKeys({
+            platform: '3ds',
+            cacheFilename: THREE_DS_KEYS_CACHE_FILENAME,
+            parse: parseThreeDSKeys,
+        })
+    );
 }
 
-async function loadWiiUKeys(): Promise<WiiUKeys> {
-    return loadCachedKeys({
-        platform: 'Wii U',
-        cacheFilename: WII_U_KEYS_CACHE_FILENAME,
-        encodedUrls: WII_U_KEYS_URLS,
-        parse: parseWiiUKeys,
-    });
+export function loadWiiUCommonKey(): Promise<WiiUCommonKey> {
+    return memoizeKeys('wiiu', () =>
+        loadCachedKeys({
+            platform: 'wiiu',
+            cacheFilename: WII_U_KEYS_CACHE_FILENAME,
+            parse: parseWiiUCommonKey,
+        })
+    );
 }
 
-async function loadWudKeys(imagePath: string): Promise<WudKeys | null> {
+export function loadWiiCommonKeys(): Buffer[] {
+    return [COMMON_KEYS.wii[0], COMMON_KEYS['wii-korea'][0]].map((key) =>
+        Buffer.from(key, 'base64')
+    );
+}
+
+export function loadWudKey(inputPath: string): Promise<WudKey | null> {
+    const imagePath = path.resolve(inputPath);
+    return memoizeKeys(
+        `wud:${imagePath}`,
+        () => readWudKey(imagePath),
+        (key) => key !== null
+    );
+}
+
+function parseThreeDSClientCertificate(
+    p12: Buffer
+): ThreeDSClientCertificateOptions {
+    const { cert, key } = readP12ClientCertificate(
+        p12,
+        THREE_DS_CLIENT_CERT_PASSWORD
+    );
+    return { cert, key, allowSelfSignedCertificate: true };
+}
+
+async function readWudKey(imagePath: string): Promise<WudKey | null> {
     const candidates = getWudKeyCandidates(imagePath);
     for (const candidate of candidates) {
         const raw = await readOptionalFile(candidate);
         if (raw) {
-            const key = parseWudKeys(raw);
+            const key = parseWudKey(raw);
             if (key) {
                 return key;
             }
@@ -158,7 +184,7 @@ function parseThreeDSKeys(raw: Buffer): ThreeDSKeys {
     };
 }
 
-function parseWiiUKeys(raw: Buffer): WiiUKeys {
+function parseWiiUCommonKey(raw: Buffer): WiiUCommonKey {
     if (raw.length === 16) {
         return Buffer.from(raw).toString('hex');
     }
@@ -173,7 +199,7 @@ function parseWiiUKeys(raw: Buffer): WiiUKeys {
     return Buffer.from(keyBytes).toString('hex');
 }
 
-function parseWudKeys(raw: Buffer): WudKeys | null {
+function parseWudKey(raw: Buffer): WudKey | null {
     if (raw.length === 16) {
         return Buffer.from(raw).toString('hex');
     }
@@ -215,9 +241,9 @@ function memoizeKeys<Keys>(
 async function loadCachedKeys<Keys>({
     platform,
     cacheFilename,
-    encodedUrls,
     parse,
 }: CachedKeysOptions<Keys>): Promise<Keys> {
+    const platformName = TitlePlatform[platform];
     const cacheRoot = getUserAppRoot();
     const cachePath = path.join(cacheRoot, cacheFilename);
     const errors: string[] = [];
@@ -230,29 +256,47 @@ async function loadCachedKeys<Keys>({
         }
     }
 
-    for (const [index, encodedUrl] of encodedUrls.entries()) {
-        const url = Buffer.from(encodedUrl, 'base64').toString('utf8');
+    for (const [index, downloadUrl] of getKeyUrls(cacheFilename).entries()) {
         try {
-            const response = await fetch(url, {
-                signal: AbortSignal.timeout(KEYS_DOWNLOAD_TIMEOUT_MS),
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+            const downloadedFile = await downloadBytes(
+                downloadUrl,
+                cacheFilename,
+                {
+                    signal: AbortSignal.timeout(KEYS_DOWNLOAD_TIMEOUT_MS),
+                    logDownload: false,
+                }
+            );
+            if (
+                downloadedFile.length === 0 ||
+                downloadedFile.length > KEYS_MAX_SIZE
+            ) {
+                throw new Error(
+                    `invalid response size ${downloadedFile.length}`
+                );
             }
-            const body = Buffer.from(await response.arrayBuffer());
-            if (body.length === 0 || body.length > KEYS_MAX_SIZE) {
-                throw new Error(`invalid response size ${body.length}`);
-            }
-            const keys = parse(body, url);
-            await writeKeyFile(cacheRoot, cachePath, body);
-            logger.log('metadata', `Saved ${platform} keys to ${cachePath}`);
+            const keys = parse(downloadedFile, downloadUrl);
+            await writeKeyFile(cacheRoot, cachePath, downloadedFile);
+            logger.log(
+                'metadata',
+                `Saved ${platformName} ${cacheFilename} to ${cachePath}`
+            );
             return keys;
         } catch (error) {
             errors.push(`source ${index + 1}: ${formatLogError(error)}`);
         }
     }
 
-    throw new Error(`Failed to load ${platform} keys: ${errors.join('; ')}`);
+    throw new Error(
+        `Failed to load ${platformName} ${cacheFilename}: ${errors.join('; ')}`
+    );
+}
+
+export function getKeyUrls(
+    cacheFilename: keyof typeof DOWNLOAD_URLS
+): string[] {
+    return DOWNLOAD_URLS[cacheFilename].map((url) =>
+        Buffer.from(url, 'base64').toString('utf8')
+    );
 }
 
 async function writeKeyFile(

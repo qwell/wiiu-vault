@@ -1,3 +1,4 @@
+import { isErrorType } from './error.js';
 import {
     identifyTitle,
     normalizeTitleName,
@@ -57,23 +58,15 @@ export async function mapConcurrent<T, U>(
 }
 
 export function formatLogError(error: unknown): string {
-    if (!(error instanceof Error)) {
+    if (!isErrorType(error, Error)) {
         return String(error);
     }
 
-    const cause = 'cause' in error ? error.cause : undefined;
-    if (cause === undefined) {
-        return error.message;
+    if ('cause' in error && error.cause !== undefined) {
+        return `${error.message}; cause: ${formatLogError(error.cause)}`;
     }
 
-    return `${error.message}; cause: ${formatLogError(cause)}`;
-}
-
-export function isTimeoutError(error: unknown): boolean {
-    return (
-        error instanceof Error &&
-        (error.name === 'AbortError' || error.name === 'TimeoutError')
-    );
+    return error.message;
 }
 
 export function formatSize(sizeBytes: number | null): string {

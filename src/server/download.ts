@@ -15,6 +15,8 @@ export type DownloadOptions = {
     pfx?: Buffer;
     passphrase?: string;
     allowSelfSignedCertificate?: boolean;
+    logDownload?: boolean;
+    headers?: Record<string, string>;
 };
 
 export async function downloadBytes(
@@ -22,17 +24,21 @@ export async function downloadBytes(
     label = 'file',
     options: DownloadOptions = {}
 ): Promise<Buffer> {
-    logger.log('download', `downloading ${label}: ${url}`);
+    if (options.logDownload !== false) {
+        logger.log('download', `downloading ${label}: ${url}`);
+    }
     const response = await fetchDownload(url, options);
     if (!response.ok) {
         throw new HttpError(url, response.status);
     }
 
     const bytes = Buffer.from(await response.arrayBuffer());
-    logger.log(
-        'download',
-        `downloaded ${label}: ${url} (${bytes.length.toString()} bytes)`
-    );
+    if (options.logDownload !== false) {
+        logger.log(
+            'download',
+            `downloaded ${label}: ${url} (${bytes.length.toString()} bytes)`
+        );
+    }
     return bytes;
 }
 
@@ -42,7 +48,9 @@ export async function downloadFile(
     label = 'file',
     options: DownloadOptions = {}
 ): Promise<void> {
-    logger.log('download', `downloading ${label}: ${url}`);
+    if (options.logDownload !== false) {
+        logger.log('download', `downloading ${label}: ${url}`);
+    }
     const response = await fetchDownload(url, options);
     if (!response.ok) {
         throw new HttpError(url, response.status);
@@ -64,36 +72,46 @@ export async function downloadFile(
         throw error;
     }
 
-    const { size } = await stat(targetFile);
-    logger.log(
-        'download',
-        `downloaded ${label}: ${url} (${size.toString()} bytes)`
-    );
+    if (options.logDownload !== false) {
+        const { size } = await stat(targetFile);
+        logger.log(
+            'download',
+            `downloaded ${label}: ${url} (${size.toString()} bytes)`
+        );
+    }
 }
 
 async function fetchDownload(
     url: string,
     options: DownloadOptions
 ): Promise<Response> {
-    return options.cert || options.pfx
-        ? fetchWithClientCertificate(url, options)
-        : fetch(url, { signal: options.signal });
+    return options.cert ||
+        options.pfx ||
+        options.allowSelfSignedCertificate === true
+        ? fetchWithHttpsOptions(url, options)
+        : fetch(url, {
+              signal: options.signal,
+              headers: options.headers,
+          });
 }
 
-async function fetchWithClientCertificate(
+async function fetchWithHttpsOptions(
     url: string,
     options: DownloadOptions
 ): Promise<Response> {
     const parsed = new URL(url);
     if (parsed.protocol !== 'https:') {
-        return fetch(url, { signal: options.signal });
+        return fetch(url, {
+            signal: options.signal,
+            headers: options.headers,
+        });
     }
 
-    const { body, status } = await new Promise<{
-        body: Buffer;
-        status: number;
-    }>((resolve, reject) => {
-        const chunks: Buffer[] = [];
+    if (options.signal?.aborted) {
+        throw createAbortError(options.signal);
+    }
+
+    return new Promise<Response>((resolve, reject) => {
         const request = https.get(
             parsed,
             {
@@ -102,29 +120,63 @@ async function fetchWithClientCertificate(
                 key: options.key,
                 pfx: options.pfx,
                 passphrase: options.passphrase,
+                headers: options.headers,
             },
             (response) => {
-                response.on('data', (chunk: Buffer) => {
-                    chunks.push(chunk);
-                });
-                response.on('end', () => {
-                    resolve({
-                        body: Buffer.concat(chunks),
-                        status: response.statusCode ?? 0,
-                    });
-                });
+                const status = response.statusCode;
+                if (status === undefined) {
+                    response.destroy();
+                    reject(
+                        new Error(
+                            `Response had no status while downloading ${url}`
+                        )
+                    );
+                    return;
+                }
+
+                const body =
+                    request.method === 'HEAD' ||
+                    [204, 205, 304].includes(status)
+                        ? null
+                        : (Readable.toWeb(
+                              response
+                          ) as ReadableStream<Uint8Array>);
+                resolve(
+                    new Response(body, {
+                        headers: Object.fromEntries(
+                            Object.entries(response.headers).flatMap(
+                                ([name, value]) =>
+                                    value === undefined
+                                        ? []
+                                        : [[name, toHeaderValue(value)]]
+                            )
+                        ),
+                        status,
+                        statusText: response.statusMessage,
+                    })
+                );
             }
         );
 
-        options.signal?.addEventListener(
-            'abort',
-            () => {
-                request.destroy(new Error('Aborted'));
-            },
-            { once: true }
-        );
+        const abort = (): void => {
+            request.destroy(createAbortError(options.signal));
+        };
+        options.signal?.addEventListener('abort', abort, { once: true });
+        request.once('close', () => {
+            options.signal?.removeEventListener('abort', abort);
+        });
         request.on('error', reject);
     });
+}
 
-    return new Response(body, { status });
+function toHeaderValue(value: string | string[]): string {
+    return Array.isArray(value) ? value.join(', ') : value;
+}
+
+function createAbortError(signal?: AbortSignal): Error {
+    const error = new Error('Aborted', {
+        cause: signal?.reason as unknown,
+    });
+    error.name = 'AbortError';
+    return error;
 }

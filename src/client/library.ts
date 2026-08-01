@@ -560,11 +560,22 @@ function formatLibraryVerifyFileCount(item: LibraryVerifyEvent): string {
     return '';
 }
 
-function formatLibraryVerifyIcon(item: LibraryVerifyEvent): string {
+type DisplayedLibraryVerifyEvent = Exclude<
+    LibraryVerifyEvent,
+    { state: 'cleared' }
+>;
+
+function isDisplayedLibraryVerifyEvent(
+    item: LibraryVerifyEvent
+): item is DisplayedLibraryVerifyEvent {
+    return item.state !== 'cleared';
+}
+
+function formatLibraryVerifyIcon(item: DisplayedLibraryVerifyEvent): string {
     return formatActionStateIcon(item.state);
 }
 
-function formatLibraryVerifyState(item: LibraryVerifyEvent): string {
+function formatLibraryVerifyState(item: DisplayedLibraryVerifyEvent): string {
     return formatActionState(item.state, {
         'in-progress': 'Verifying',
         complete: 'Verified',
@@ -741,7 +752,7 @@ export function getLibraryVerifyActionBarEntries(
     items: LibraryVerifyEvent[],
     downloads: DownloadQueueItem[]
 ) {
-    return items.map((item) => {
+    return items.filter(isDisplayedLibraryVerifyEvent).map((item) => {
         const id = getLibraryVerifyId(item);
         let downloadDisabled = false;
         if (isLibraryVerifyFailure(item)) {

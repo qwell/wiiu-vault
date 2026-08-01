@@ -39,6 +39,18 @@ const SMDH_LARGE_ICON_SIZE = 48;
 const SMDH_RGB565_BYTES_PER_PIXEL = 2;
 export const SMDH_TITLE_ENGLISH_INDEX = 1;
 
+const SMDH_TITLE_INDEX_BY_REGION: Partial<Record<RegionNames, number>> = {
+    [Region.JPN]: 0,
+    [Region.FRA]: 2,
+    [Region.GER]: 3,
+    [Region.ITA]: 4,
+    [Region.SPA]: 5,
+    [Region.CHN]: 6,
+    [Region.KOR]: 7,
+    [Region.RUS]: 10,
+    [Region.TWN]: 11,
+};
+
 const SMDH_REGION_BITS: Array<[number, RegionNames]> = [
     [0x01, Region.JPN],
     [0x02, Region.USA],
@@ -52,6 +64,22 @@ const SMDH_REGION_BITS: Array<[number, RegionNames]> = [
 export function readSmdhMetadata(smdh: Buffer): SmdhMetadata | null {
     const result = inspectSmdhMetadata(smdh);
     return result.ok ? result.metadata : null;
+}
+
+export function getPreferredSmdhTitle(
+    titles: Array<SmdhTitle | null>,
+    region: RegionNames | ''
+): SmdhTitle | null {
+    const regionalIndex = region
+        ? SMDH_TITLE_INDEX_BY_REGION[region]
+        : undefined;
+
+    return (
+        titles[SMDH_TITLE_ENGLISH_INDEX] ??
+        (regionalIndex === undefined ? null : titles[regionalIndex]) ??
+        titles.find((title) => title !== null) ??
+        null
+    );
 }
 
 export function readSmdhLargeIconPng(smdh: Buffer): Buffer | null {

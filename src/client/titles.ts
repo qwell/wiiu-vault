@@ -249,8 +249,14 @@ function formatRegion(region: string | null): {
 
 function formatTooltip(group: TitleGroup): string {
     const entry = getEntry(group, TitleKinds.Base);
+    const baseTitleId =
+        group.availableEntries.find(
+            (available) => available.kind === TitleKinds.Base
+        )?.titleId ??
+        entry?.titleId ??
+        getTitleId(group.platform, group.family, TitleKinds.Base);
     const lines = [
-        `Title: ${getTitleId(group.platform, group.family, TitleKinds.Base)}`,
+        `Title: ${baseTitleId}`,
         `Product Code: ${group.productCode ?? '-'}`,
     ];
 

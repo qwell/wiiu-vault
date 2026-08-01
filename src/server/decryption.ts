@@ -4,12 +4,18 @@ import {
     createHash,
     pbkdf2Sync,
 } from 'node:crypto';
+import forge from 'node-forge';
 
 export type TitleKey = Buffer;
 
 export type GeneratedTitleKey = {
     password: string;
     titleKey: TitleKey;
+};
+
+export type ClientCertificate = {
+    cert: string;
+    key: string;
 };
 
 const AES_BLOCK_SIZE = 16;
@@ -160,6 +166,37 @@ export function findGeneratedTitleKey(
     }
 
     return null;
+}
+
+// -- Certificates --
+
+export function readP12ClientCertificate(
+    p12: Buffer,
+    password: string
+): ClientCertificate {
+    const asn1 = forge.asn1.fromDer(p12.toString('binary'));
+    const parsed = forge.pkcs12.pkcs12FromAsn1(asn1, false, password);
+    const keyBag = getP12Bag(parsed, forge.pki.oids.pkcs8ShroudedKeyBag);
+    const certBag = getP12Bag(parsed, forge.pki.oids.certBag);
+
+    if (!keyBag?.key) {
+        throw new Error('P12 is missing a private key');
+    }
+    if (!certBag?.cert) {
+        throw new Error('P12 is missing a certificate');
+    }
+
+    return {
+        cert: forge.pki.certificateToPem(certBag.cert),
+        key: forge.pki.privateKeyToPem(keyBag.key),
+    };
+}
+
+function getP12Bag(
+    p12: forge.pkcs12.Pkcs12Pfx,
+    bagType: string
+): forge.pkcs12.Bag | null {
+    return p12.getBags({ bagType })[bagType]?.[0] ?? null;
 }
 
 // -- Internal --

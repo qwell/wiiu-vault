@@ -177,7 +177,20 @@ yarn release
 yarn generate:titles
 ```
 
-`yarn generate:titles` only needs to be run when refreshing the checked-in title databases, updating title source files, rebuilding GameTDB data, or supplementing icons, and is only necessary in very specific cases. By default it reads cached NUS scan results from `titles/3ds/nus.json` and `titles/wiiu/nus.json`; pass `--refresh-nus` to refresh those files. If a NUS cache file is missing, the generator scans automatically. The ROM Rack server must already be running when a NUS scan is needed because the generator calls the local metadata endpoints.
+`yarn generate:titles` is only needed when refreshing the checked-in title data. By default it reads `titles/3ds/nus.json` and `titles/wiiu/nus.json`, rebuilds `titles/titles.json`, and supplements `titles/icons.json`. It downloads Nintendo metadata directly; the ROM Rack server does not need to be running.
+
+Generation options:
+
+- `--refresh-catalog`: Refresh Nintendo Samurai/Ninja catalog membership while preserving cached CDN metadata.
+- `--refresh-metadata`: Recheck cached NUS metadata and CDN availability.
+- `--refresh-versions`: Rebuild historical NUS version information.
+- `--refresh-tdb`: Download current Wii, Wii U, and 3DS GameTDB XML files.
+- `--refresh-all`: Enable all four refresh operations above.
+- `--extract-icons`: Extract title icons while refreshing metadata; requires `--refresh-metadata`.
+- `--scan-generated-ranges`: Probe the configured generated title-ID ranges; requires both `--refresh-catalog` and `--refresh-metadata`.
+- `--limit N`: Limit Samurai catalog sampling during a catalog refresh; cannot be combined with `--refresh-versions`.
+
+Combine `--refresh-catalog` and `--refresh-metadata` to discover catalog titles and validate their NUS availability in the same run.
 
 ## API
 
@@ -241,10 +254,9 @@ Files in `titles/`:
 
 - `titles.json`: Generated primary title database.
 - `icons.json`: Generated title icon URLs.
-- `exclude.json`: Title IDs skipped by generation.
 
-- `wiiu/nus.json`: Cached Wii U NUS scan results.
-- `3ds/nus.json`: Cached 3DS NUS scan results.
+- `wiiu/nus.json`: Cached Wii U catalog, localized metadata, CDN availability, and version data.
+- `3ds/nus.json`: Cached 3DS catalog, localized metadata, CDN availability, and version data.
 
 - `wii/tdb.xml`: Source Wii TDB XML from [GameTDB](https://www.gametdb.com/wiitdb.zip), used for Wii and GameCube supplemental title data and UI details.
 - `wiiu/tdb.xml`: Source Wii U TDB XML from [GameTDB](https://www.gametdb.com/wiiutdb.zip), used by the UI for title details.

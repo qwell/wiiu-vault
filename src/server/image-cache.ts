@@ -5,6 +5,7 @@ import path from 'node:path';
 
 import { type TitleMediaType, type TitlePlatform } from '../shared/titles.js';
 import { getUserAppRoot } from './paths.js';
+import { toError } from '../shared/error.js';
 
 export type CachedImage = {
     body: Buffer;
@@ -66,10 +67,6 @@ async function readBodyWithLimit(
 
 function isRedirectStatus(status: number): boolean {
     return status >= 300 && status < 400;
-}
-
-function toError(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
 }
 
 function readNodeResponseWithLimit(
@@ -148,7 +145,8 @@ function fetchImageInsecure(
                         )
                     );
                 } catch (error) {
-                    reject(toError(error));
+                    const e = toError(error);
+                    reject(e);
                 }
                 return;
             }
@@ -174,7 +172,8 @@ function fetchImageInsecure(
                     : (contentTypeHeader ?? 'application/octet-stream');
                 resolve({ body, contentType });
             } catch (error) {
-                reject(toError(error));
+                const e = toError(error);
+                reject(e);
             }
         }
 

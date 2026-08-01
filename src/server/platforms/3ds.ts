@@ -4,11 +4,7 @@ import path from 'node:path';
 
 import { normalizeRegion } from '../../shared/regions.js';
 import logger from '../../shared/logger.js';
-import {
-    formatLogError,
-    formatSize,
-    getPreferredValue,
-} from '../../shared/utils.js';
+import { formatLogError, formatSize } from '../../shared/utils.js';
 import {
     type LibraryVerifyProgress,
     type LibraryVerifyTitle,
@@ -91,11 +87,11 @@ import {
     NCCH_HEADER_SIZE,
     readNcchHeader,
 } from '../formats/ncch.js';
-import { loadKeys, type ThreeDSKeys } from '../keys.js';
+import { loadThreeDSKeys, type ThreeDSKeys } from '../keys.js';
 import {
+    getPreferredSmdhTitle,
     inspectSmdhMetadata,
     readSmdhLargeIconPng,
-    SMDH_TITLE_ENGLISH_INDEX,
 } from '../formats/smdh.js';
 
 type ThreeDSTdbGame = GameTdbGame & {
@@ -119,7 +115,7 @@ function readThreeDSCiaTmd(buffer: Buffer): Tmd | null {
 
 async function loadOptionalThreeDSKeys(): Promise<ThreeDSKeys | null> {
     try {
-        return await loadKeys('3ds');
+        return await loadThreeDSKeys();
     } catch (error) {
         logger.warn(
             '3ds',
@@ -544,10 +540,10 @@ async function readNcchLocalMetadata({
 
     const smdhResult = inspectSmdhMetadata(iconResult.file);
     if (smdhResult.ok) {
-        const title = getPreferredValue(
-            smdhResult.metadata.titles,
-            SMDH_TITLE_ENGLISH_INDEX
-        );
+        const region =
+            normalizeRegion(null, productCode) ||
+            normalizeRegion(smdhResult.metadata.region, null);
+        const title = getPreferredSmdhTitle(smdhResult.metadata.titles, region);
         metadata.name =
             title?.longDescription || title?.shortDescription || null;
         metadata.publisher = title?.publisher || null;

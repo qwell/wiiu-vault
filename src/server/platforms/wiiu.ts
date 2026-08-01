@@ -100,7 +100,7 @@ import {
     type WudPartitionReference,
     type WuxInfo,
 } from '../formats/wud.js';
-import { loadKeys } from '../keys.js';
+import { loadWiiUCommonKey, loadWudKey } from '../keys.js';
 import { findReadablePath } from '../../shared/os.js';
 import {
     getGameTdbLocales,
@@ -381,11 +381,11 @@ async function scanWudTitleEntries(roots: string[]): Promise<WudTitleEntry[]> {
         return [];
     }
 
-    const commonKey = Buffer.from(await loadKeys('wiiu'), 'hex');
+    const commonKey = Buffer.from(await loadWiiUCommonKey(), 'hex');
     const entries: WudTitleEntry[] = [];
     for (const imagePath of imagePaths) {
         try {
-            const discKeyHex = await loadKeys('wud', imagePath);
+            const discKeyHex = await loadWudKey(imagePath);
             if (!discKeyHex) {
                 continue;
             }
@@ -1295,7 +1295,7 @@ export async function readWupMeta(
     const ticket = await readWupTik(dirPath);
     const titleId = getTitleIdHex(tmd.header.titleId);
     const { titleKey, decryptedFst } = resolveTitleKey({
-        commonKey: Buffer.from(await loadKeys('wiiu'), 'hex'),
+        commonKey: Buffer.from(await loadWiiUCommonKey(), 'hex'),
         encryptedFst,
         normalizedTitleId: titleId,
         ticket,
@@ -1324,7 +1324,7 @@ export async function generateWupTitleFiles(
     const baseUrl = WII_U_NUS_BASE_URL;
     const { titleId: downloadableTitleId, kind } =
         getDownloadableTitle(titleId);
-    const commonKey = Buffer.from(await loadKeys('wiiu'), 'hex');
+    const commonKey = Buffer.from(await loadWiiUCommonKey(), 'hex');
     throwIfAborted(options.signal);
     const tmdBytes = await downloadTmd(baseUrl, downloadableTitleId, {
         signal: options.signal,
@@ -1621,7 +1621,7 @@ export async function verifyWupTitleFiles(
     try {
         titleKey = decryptTitleKey(
             ticket.encryptedKey,
-            Buffer.from(await loadKeys('wiiu'), 'hex'),
+            Buffer.from(await loadWiiUCommonKey(), 'hex'),
             ticket.titleId
         );
         throwIfAborted(signal);
@@ -1884,7 +1884,7 @@ export async function convertWudImages(
 ): Promise<LibraryWudConvertResult> {
     const requestedTitleId = titleId;
     const requestedFamily = identifyTitle(requestedTitleId)?.family ?? null;
-    const commonKey = Buffer.from(await loadKeys('wiiu'), 'hex');
+    const commonKey = Buffer.from(await loadWiiUCommonKey(), 'hex');
     const converted: ConvertedWudImage[] = [];
     logger.log(
         'wii',
@@ -1895,7 +1895,7 @@ export async function convertWudImages(
         throwIfAborted(options.signal);
         try {
             logger.log('wii', `reading ${imagePath}`);
-            const discKeyHex = await loadKeys('wud', imagePath);
+            const discKeyHex = await loadWudKey(imagePath);
             if (!discKeyHex) {
                 logger.warn('wii', `skipping ${imagePath}: no usable disc key`);
                 continue;

@@ -14,7 +14,8 @@ import {
     type TitleGroup,
     type TitlePlatform,
 } from '../shared/titles.js';
-import { formatLogError, isTimeoutError } from '../shared/utils.js';
+import { formatLogError } from '../shared/utils.js';
+import { isTimeoutError } from '../shared/error.js';
 import {
     decompressZipEntry,
     readZipCentralDirectory,

@@ -1,6 +1,3 @@
-import path from 'path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import forge from 'node-forge';
 import {
     createTitleKeyIv,
     decryptContentWithBigIntIv,
@@ -36,8 +33,9 @@ import {
 } from './formats/meta.js';
 import { inspectNcch } from './formats/ncch.js';
 import {
+    getPreferredSmdhTitle,
     inspectSmdhMetadata,
-    SMDH_TITLE_ENGLISH_INDEX,
+    readSmdhLargeIconPng,
 } from './formats/smdh.js';
 import { readTmdFromBuffer, type Tmd, type TmdContent } from './formats/tmd.js';
 import {
@@ -48,8 +46,11 @@ import {
     type GeneratedTikInput,
     type Tik,
 } from './formats/tik.js';
-import { getUserAppRoot } from './paths.js';
-import { loadKeys } from './keys.js';
+import {
+    loadThreeDSClientCertificateOptions,
+    loadThreeDSKeys,
+    loadWiiUCommonKey,
+} from './keys.js';
 import {
     identifyWiiUTitle,
     replaceTitleKind,
@@ -57,9 +58,8 @@ import {
 } from '../shared/titles.js';
 import logger from '../shared/logger.js';
 import { isHttpErrorStatus } from '../shared/download.js';
-import { isFileNotFoundError } from '../shared/file.js';
 import { normalizeRegion } from '../shared/regions.js';
-import { formatLogError, getPreferredValue } from '../shared/utils.js';
+import { formatLogError } from '../shared/utils.js';
 
 export { type DownloadOptions } from './download.js';
 
@@ -92,10 +92,12 @@ export async function downloadOptionalTicket(
         return await downloadTicket(baseUrl, titleId, options);
     } catch (error) {
         options?.signal?.throwIfAborted();
-        logger.warn(
-            'download',
-            `optional ticket unavailable for ${titleId}: ${formatLogError(error)}`
-        );
+        if (options?.logDownload !== false) {
+            logger.warn(
+                'download',
+                `optional ticket unavailable for ${titleId}: ${formatLogError(error)}`
+            );
+        }
         return null;
     }
 }
@@ -103,9 +105,14 @@ export async function downloadOptionalTicket(
 export async function downloadTmd(
     baseUrl: string,
     titleId: string,
-    options?: DownloadOptions
+    options?: DownloadOptions,
+    version?: number
 ): Promise<Buffer> {
-    return downloadBytes(getTmdUrl(baseUrl, titleId), 'tmd', options);
+    return downloadBytes(
+        getTmdUrl(baseUrl, titleId, version),
+        version === undefined ? 'tmd' : `tmd.${version.toString()}`,
+        options
+    );
 }
 
 export async function downloadContent(
@@ -168,8 +175,16 @@ export function getTicketUrl(baseUrl: string, titleId: string): string {
     return buildDownloadUrl(baseUrl, titleId, TIK_TITLE_FILE_CDN);
 }
 
-export function getTmdUrl(baseUrl: string, titleId: string): string {
-    return buildDownloadUrl(baseUrl, titleId, 'tmd');
+export function getTmdUrl(
+    baseUrl: string,
+    titleId: string,
+    version?: number
+): string {
+    return buildDownloadUrl(
+        baseUrl,
+        titleId,
+        version === undefined ? 'tmd' : `tmd.${version.toString()}`
+    );
 }
 
 export function getContentUrl(
@@ -213,6 +228,7 @@ export type NusTitleMetadata = {
     titleKey: Buffer | null;
     titleKeyPassword: string | null;
     metaJson: Record<string, unknown> | null;
+    icon: { data: Buffer; extension: 'png' | 'tga' } | null;
 };
 
 export type ChildTitleMetadata = {
@@ -392,128 +408,16 @@ function createGeneratedTikTemplate(): Buffer {
 const TITLE_CERT_AUTHORITY_OFFSET = 0x350;
 const TITLE_CERT_AUTHORITY_SIZE = 0x300;
 
-const THREE_DS_P12_DOWNLOAD_URLS_BASE64 = [
-    'aHR0cHM6Ly9naXRodWIuY29tL2xhcnNlbnYvTmludGVuZG9DZXJ0cy9yYXcvcmVmcy9oZWFkcy9tYXN0ZXIvY3RyLWNvbW1vbi0xLnAxMg==',
-    'aHR0cHM6Ly93ZWIuYXJjaGl2ZS5vcmcvMjAyNjA3MDcyMDQxMzkvaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2xhcnNlbnYvTmludGVuZG9DZXJ0cy9yZWZzL2hlYWRzL21hc3Rlci9jdHItY29tbW9uLTEucDEy',
-] as const;
-
-const THREE_DS_CLIENT_CERT_PASSWORD = 'alpine';
-
 let defaultCertPromise: Promise<Buffer> | null = null;
-let threeDSDownloadOptionsPromise: Promise<DownloadOptions> | null = null;
 
 type NusMetadataOptions = {
     baseUrl: string;
-    downloadOptions?: DownloadOptions;
+    downloadOptions: DownloadOptions;
+    logMetadata?: boolean;
+    extractIcon?: boolean;
 };
 
-export function getThreeDSP12DownloadUrls(): string[] {
-    return THREE_DS_P12_DOWNLOAD_URLS_BASE64.map((encodedUrl) =>
-        Buffer.from(encodedUrl, 'base64').toString('utf8')
-    );
-}
-
-export async function readThreeDSDownloadOptions(): Promise<DownloadOptions> {
-    if (!threeDSDownloadOptionsPromise) {
-        threeDSDownloadOptionsPromise = readThreeDSP12DownloadOptions();
-    }
-
-    return threeDSDownloadOptionsPromise;
-}
-
-async function readThreeDSP12DownloadOptions(): Promise<DownloadOptions> {
-    const filePath = path.join(getUserAppRoot(), 'ctr-common-1.p12');
-
-    try {
-        const p12 = await readFile(filePath);
-        return readThreeDSP12DownloadOptionsFromBuffer(p12);
-    } catch (error) {
-        if (!isFileNotFoundError(error)) {
-            throw error;
-        }
-    }
-
-    logger.warn(
-        'metadata',
-        [
-            '3DS client certificate was not found in any configured location.',
-            `Downloading a copy now and saving it to: ${filePath}`,
-            'This is a one-time setup step. Future runs will use the saved file instead of downloading it again.',
-        ].join('\n')
-    );
-
-    const errors: string[] = [];
-    for (const url of getThreeDSP12DownloadUrls()) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const p12 = Buffer.from(await response.arrayBuffer());
-            const options = readThreeDSP12DownloadOptionsFromBuffer(p12);
-
-            await mkdir(path.dirname(filePath), { recursive: true });
-            await writeFile(filePath, p12);
-            logger.log(
-                'metadata',
-                `Saved 3DS client certificate to ${filePath}`
-            );
-
-            return options;
-        } catch (error) {
-            errors.push(`${url}: ${formatLogError(error)}`);
-        }
-    }
-
-    throw new Error(
-        `3DS client certificate could not be loaded. ${errors.join('; ')}`
-    );
-}
-
-function readThreeDSP12DownloadOptionsFromBuffer(
-    p12: Buffer
-): Promise<DownloadOptions> {
-    const { cert, key } = readP12ClientCertificate(
-        p12,
-        THREE_DS_CLIENT_CERT_PASSWORD
-    );
-
-    return Promise.resolve({
-        cert,
-        key,
-        allowSelfSignedCertificate: true,
-    });
-}
-
-function readP12ClientCertificate(
-    p12: Buffer,
-    passphrase: string
-): Pick<DownloadOptions, 'cert' | 'key'> {
-    const asn1 = forge.asn1.fromDer(p12.toString('binary'));
-    const parsed = forge.pkcs12.pkcs12FromAsn1(asn1, false, passphrase);
-    const keyBag = getP12Bag(parsed, forge.pki.oids.pkcs8ShroudedKeyBag);
-    const certBag = getP12Bag(parsed, forge.pki.oids.certBag);
-
-    if (!keyBag?.key) {
-        throw new Error('3DS client certificate P12 is missing a private key');
-    }
-    if (!certBag?.cert) {
-        throw new Error('3DS client certificate P12 is missing a certificate');
-    }
-
-    return {
-        cert: forge.pki.certificateToPem(certBag.cert),
-        key: forge.pki.privateKeyToPem(keyBag.key),
-    };
-}
-
-function getP12Bag(
-    p12: forge.pkcs12.Pkcs12Pfx,
-    bagType: string
-): forge.pkcs12.Bag | null {
-    return p12.getBags({ bagType })[bagType]?.[0] ?? null;
-}
+export { loadThreeDSClientCertificateOptions };
 
 export async function downloadNusBaseMetadata(
     titleId: string,
@@ -530,6 +434,7 @@ export async function downloadNusTitleMetadata(
 ): Promise<NusTitleMetadata | null> {
     const baseUrl = options.baseUrl;
     const downloadOptions = options.downloadOptions;
+    const logMetadata = options.logMetadata !== false;
     const tmdBytes = await downloadOptionalTitleFile(() =>
         downloadTmd(baseUrl, titleId, downloadOptions)
     );
@@ -551,10 +456,12 @@ export async function downloadNusTitleMetadata(
     const ticket = tik ? readTik(tik) : null;
     const fstContent = tmd.contents[0];
     if (!fstContent) {
-        logger.warn(
-            'metadata',
-            `TMD has no first content entry for ${titleId}`
-        );
+        if (logMetadata) {
+            logger.warn(
+                'metadata',
+                `TMD has no first content entry for ${titleId}`
+            );
+        }
         return createBasicNusTitleMetadata(titleId, tmd);
     }
 
@@ -566,17 +473,21 @@ export async function downloadNusTitleMetadata(
                 ticket,
                 tmd,
                 titleId,
+                logMetadata,
+                extractIcon: options.extractIcon === true,
             });
         }
         if (tmd.header.systemType !== 'wiiu') {
-            logger.warn(
-                'metadata',
-                `unsupported ${tmd.header.systemType} TMD for ${titleId}`
-            );
+            if (logMetadata) {
+                logger.warn(
+                    'metadata',
+                    `unsupported ${tmd.header.systemType} TMD for ${titleId}`
+                );
+            }
             return createBasicNusTitleMetadata(titleId, tmd);
         }
 
-        const commonKey = Buffer.from(await loadKeys('wiiu'), 'hex');
+        const commonKey = Buffer.from(await loadWiiUCommonKey(), 'hex');
         const encryptedFst = await downloadContent(
             baseUrl,
             titleId,
@@ -598,6 +509,16 @@ export async function downloadNusTitleMetadata(
             titleId,
             titleKey,
         });
+        const icon = options.extractIcon
+            ? await extractWiiUTitleIcon(
+                  decryptedFst,
+                  tmd,
+                  titleKey,
+                  baseUrl,
+                  titleId,
+                  downloadOptions
+              )
+            : null;
 
         return {
             ...createBasicNusTitleMetadata(titleId, tmd),
@@ -608,12 +529,15 @@ export async function downloadNusTitleMetadata(
             titleKey,
             titleKeyPassword,
             metaJson: meta.raw,
+            icon,
         };
     } catch (error) {
-        logger.warn(
-            'metadata',
-            `failed to enrich metadata for ${titleId}: ${formatLogError(error)}`
-        );
+        if (logMetadata) {
+            logger.warn(
+                'metadata',
+                `failed to enrich metadata for ${titleId}: ${formatLogError(error)}`
+            );
+        }
         return createBasicNusTitleMetadata(titleId, tmd);
     }
 }
@@ -624,19 +548,24 @@ async function downloadThreeDSNusTitleMetadata({
     ticket,
     tmd,
     titleId,
+    logMetadata,
+    extractIcon,
 }: {
     baseUrl: string;
-    downloadOptions?: DownloadOptions;
+    downloadOptions: DownloadOptions;
     ticket: Tik | null;
     tmd: Tmd;
     titleId: string;
+    logMetadata: boolean;
+    extractIcon: boolean;
 }): Promise<NusTitleMetadata> {
     const resolved = await resolveThreeDSMetadataFromTitle(
         tmd,
         baseUrl,
         titleId,
         ticket,
-        downloadOptions
+        downloadOptions,
+        logMetadata
     );
 
     return {
@@ -647,6 +576,10 @@ async function downloadThreeDSNusTitleMetadata({
         companyCode: resolved.metadata.companyCode,
         titleKey: resolved.titleKey,
         titleKeyPassword: resolved.titleKeyPassword,
+        icon:
+            extractIcon && resolved.iconPng
+                ? { data: resolved.iconPng, extension: 'png' }
+                : null,
     };
 }
 
@@ -656,11 +589,7 @@ async function downloadOptionalTitleFile(
     try {
         return await download();
     } catch (error) {
-        if (
-            isHttpErrorStatus(error, 403) ||
-            isHttpErrorStatus(error, 404) ||
-            isHttpErrorStatus(error, 503)
-        ) {
+        if (isHttpErrorStatus(error, [403, 404, 503])) {
             return null;
         }
         throw error;
@@ -681,6 +610,7 @@ function createBasicNusTitleMetadata(
         titleKey: null,
         titleKeyPassword: null,
         metaJson: null,
+        icon: null,
     };
 }
 
@@ -694,10 +624,12 @@ type ThreeDSContentMetadata = {
     publisher: string | null;
     region: string | null;
     productCode: string | null;
+    iconPng: Buffer | null;
 };
 
 type ThreeDSResolvedMetadata = {
     metadata: NUSTitleInformation;
+    iconPng: Buffer | null;
     titleKey: Buffer;
     titleKeyPassword: string | null;
 };
@@ -712,7 +644,7 @@ async function enrichNusTitleMetadata({
 }: {
     baseUrl: string;
     decryptedFst: Buffer;
-    downloadOptions?: DownloadOptions;
+    downloadOptions: DownloadOptions;
     tmd: Tmd;
     titleId: string;
     titleKey: Buffer;
@@ -757,7 +689,7 @@ async function extractThreeDSMetadataFromTitle(
     titleKey: Buffer,
     baseUrl: string,
     titleId: string,
-    downloadOptions?: DownloadOptions
+    downloadOptions: DownloadOptions
 ): Promise<NUSTitleInformation | null> {
     const failures: string[] = [];
 
@@ -809,10 +741,14 @@ async function resolveThreeDSMetadataFromTitle(
     baseUrl: string,
     titleId: string,
     ticket: Tik | null,
-    downloadOptions?: DownloadOptions
+    downloadOptions: DownloadOptions,
+    logMetadata: boolean
 ): Promise<ThreeDSResolvedMetadata> {
     const failures: string[] = [];
-    const ticketTitleKey = await resolveThreeDSTicketTitleKey(ticket);
+    const ticketTitleKey = await resolveThreeDSTicketTitleKey(
+        ticket,
+        logMetadata
+    );
 
     for (const content of tmd.contents) {
         const encryptedContent = await downloadOptionalThreeDSContent(
@@ -838,6 +774,7 @@ async function resolveThreeDSMetadataFromTitle(
             if (result.ok) {
                 return {
                     metadata: createThreeDSNusMetadata(result.metadata),
+                    iconPng: result.metadata.iconPng,
                     titleKey: ticketTitleKey,
                     titleKeyPassword: null,
                 };
@@ -869,6 +806,7 @@ async function resolveThreeDSMetadataFromTitle(
             if (result.ok) {
                 return {
                     metadata: createThreeDSNusMetadata(result.metadata),
+                    iconPng: result.metadata.iconPng,
                     titleKey: generatedMatch.titleKey,
                     titleKeyPassword: generatedMatch.password,
                 };
@@ -889,14 +827,15 @@ async function resolveThreeDSMetadataFromTitle(
 }
 
 async function resolveThreeDSTicketTitleKey(
-    ticket: Tik | null
+    ticket: Tik | null,
+    logMetadata: boolean
 ): Promise<Buffer | null> {
     if (!ticket || ticket.commonKeyIndex === null) {
         return null;
     }
 
     try {
-        const keys = await loadKeys('3ds');
+        const keys = await loadThreeDSKeys();
         const commonKeyY = keys.commonKeyYs[ticket.commonKeyIndex];
         if (!keys.slot0x3dKeyX || !commonKeyY) {
             return null;
@@ -908,10 +847,12 @@ async function resolveThreeDSTicketTitleKey(
         );
         return decryptTitleKey(ticket.encryptedKey, commonKey, ticket.titleId);
     } catch (error) {
-        logger.warn(
-            'metadata',
-            `failed to decrypt 3DS ticket title key: ${formatLogError(error)}`
-        );
+        if (logMetadata) {
+            logger.warn(
+                'metadata',
+                `failed to decrypt 3DS ticket title key: ${formatLogError(error)}`
+            );
+        }
         return null;
     }
 }
@@ -933,7 +874,7 @@ async function downloadOptionalThreeDSContent(
     baseUrl: string,
     titleId: string,
     content: TmdContent,
-    downloadOptions?: DownloadOptions
+    downloadOptions: DownloadOptions
 ): Promise<Buffer | null> {
     const contentBaseUrls = [
         baseUrl,
@@ -1034,10 +975,10 @@ function inspectThreeDSContentMetadata(
         };
     }
 
-    const title = getPreferredValue(
-        smdhResult.metadata.titles,
-        SMDH_TITLE_ENGLISH_INDEX
-    );
+    const region =
+        normalizeRegion(null, ncch.productCode) ||
+        normalizeRegion(smdhResult.metadata.region, null);
+    const title = getPreferredSmdhTitle(smdhResult.metadata.titles, region);
     return {
         ok: true,
         metadata: {
@@ -1048,6 +989,7 @@ function inspectThreeDSContentMetadata(
                 ncch.productCode
             ),
             productCode: ncch.productCode,
+            iconPng: readSmdhLargeIconPng(iconResult.file),
         },
     };
 }
@@ -1067,9 +1009,9 @@ export async function getUpdateMetadata(
     baseTitleId: string,
     options: NusMetadataOptions
 ): Promise<ChildTitleMetadata> {
-    return getChildTitleMetadata(
+    return getOptionalRelatedTitleMetadata(
         baseTitleId,
-        replaceTitleKind(baseTitleId, TitleKinds.Update),
+        TitleKinds.Update,
         options
     );
 }
@@ -1078,11 +1020,32 @@ export async function getDlcMetadata(
     baseTitleId: string,
     options: NusMetadataOptions
 ): Promise<ChildTitleMetadata> {
-    return getChildTitleMetadata(
+    return getOptionalRelatedTitleMetadata(
         baseTitleId,
-        replaceTitleKind(baseTitleId, TitleKinds.DLC),
+        TitleKinds.DLC,
         options
     );
+}
+
+function getOptionalRelatedTitleMetadata(
+    baseTitleId: string,
+    kind: TitleKinds,
+    options: NusMetadataOptions
+): Promise<ChildTitleMetadata> {
+    try {
+        return getChildTitleMetadata(
+            baseTitleId,
+            replaceTitleKind(baseTitleId, kind),
+            options
+        );
+    } catch {
+        return Promise.resolve({
+            titleId: baseTitleId,
+            childTitleId: baseTitleId,
+            exists: false,
+            titleVersion: null,
+        });
+    }
 }
 
 export function createGeneratedTik({
@@ -1180,7 +1143,7 @@ export async function extractMetaXmlFromTitle(
     titleKey: Buffer,
     baseUrl: string,
     titleId: string,
-    downloadOptions?: DownloadOptions
+    downloadOptions: DownloadOptions
 ): Promise<Buffer | null> {
     return extractMetaXmlFromContentReader(
         decryptedFst,
@@ -1190,6 +1153,62 @@ export async function extractMetaXmlFromTitle(
         (content) =>
             downloadContent(baseUrl, titleId, content.id, downloadOptions)
     );
+}
+
+async function extractWiiUTitleIcon(
+    decryptedFst: Buffer,
+    tmd: Tmd,
+    titleKey: Buffer,
+    baseUrl: string,
+    titleId: string,
+    downloadOptions: DownloadOptions
+): Promise<{ data: Buffer; extension: 'tga' } | null> {
+    const iconEntry = parseFstEntries(decryptedFst, tmd).find(
+        (entry) =>
+            !entry.isDirectory &&
+            ['meta/iconTex.tga', 'iconTex.tga'].includes(entry.fullPath)
+    );
+    if (!iconEntry) {
+        return null;
+    }
+
+    const content = tmd.contents[iconEntry.contentId];
+    if (!content) {
+        return null;
+    }
+    const encryptedContent = await downloadContent(
+        baseUrl,
+        titleId,
+        content.id,
+        downloadOptions
+    );
+    const decrypt = (iv: Buffer): Buffer =>
+        iconEntry.extractWithHash
+            ? decryptHashedContent(encryptedContent, titleKey, iv)
+            : decryptContentWithIv(encryptedContent, titleKey, iv);
+
+    for (const iv of [
+        createContentIv(content.index),
+        createTitleKeyIv(tmd.header.titleId),
+        Buffer.alloc(16),
+    ]) {
+        const icon = extractFileFromContent(decrypt(iv), iconEntry);
+        if (icon && isTga(icon)) {
+            return { data: icon, extension: 'tga' };
+        }
+    }
+
+    return null;
+}
+
+function isTga(value: Buffer): boolean {
+    if (value.length < 18) {
+        return false;
+    }
+    const imageType = value[2];
+    const width = value.readUInt16LE(12);
+    const height = value.readUInt16LE(14);
+    return [2, 10].includes(imageType) && width > 0 && height > 0;
 }
 
 export async function extractMetaXmlFromContentReader(

@@ -1,5 +1,6 @@
 import { TitleKinds, type TitlePlatform } from './titles.js';
 import { type ActionState } from './action.js';
+import { isErrorStatus } from './error.js';
 
 export type DownloadQueueItemDetails = {
     id: string;
@@ -30,8 +31,11 @@ export type DownloadQueueItem = DownloadQueueItemDetails & {
     installedSourcePath: string | null;
 };
 
-export function isHttpErrorStatus(error: unknown, status: number): boolean {
-    return error instanceof HttpError && error.status === status;
+export function isHttpErrorStatus(
+    error: unknown,
+    statuses?: number | number[]
+): error is HttpError {
+    return isErrorStatus(error, HttpError, statuses);
 }
 
 export class HttpError extends Error {

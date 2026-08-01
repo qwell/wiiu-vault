@@ -1,7 +1,8 @@
-dist/
+images/
 
+.cache/
+dist/
 **/*.d.ts
-.eslintcache
 
 # npm
 node_modules/

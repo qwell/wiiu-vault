@@ -2,6 +2,7 @@ import path from 'node:path';
 import { lstat, readFile, readdir } from 'node:fs/promises';
 
 import { mapConcurrent } from './utils.js';
+import { isNodeErrorCode, NodeErrorWithCode } from './error.js';
 
 const DIRECTORY_SIZE_CONCURRENCY = 8;
 
@@ -35,16 +36,22 @@ export async function readOptionalFile(
     }
 }
 
-export function isFileNotFoundError(error: unknown): boolean {
+export function isFileNotFoundError(
+    error: unknown
+): error is NodeErrorWithCode<'ENOENT'> {
     return isNodeErrorCode(error, 'ENOENT');
 }
 
-export function isFileExistsError(error: unknown): boolean {
-    return isNodeErrorCode(error, 'EEXIST');
+export function isFileNotEmptyError(
+    error: unknown
+): error is NodeErrorWithCode<'ENOTEMPTY'> {
+    return isNodeErrorCode(error, 'ENOTEMPTY');
 }
 
-function isNodeErrorCode(error: unknown, code: string): boolean {
-    return error instanceof Error && 'code' in error && error.code === code;
+export function isFileExistsError(
+    error: unknown
+): error is NodeErrorWithCode<'EEXIST'> {
+    return isNodeErrorCode(error, 'EEXIST');
 }
 
 export function isSameOrNestedPath(left: string, right: string): boolean {

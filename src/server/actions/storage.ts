@@ -30,6 +30,9 @@ import { type TitleIdentity, type TitlePlatform } from '../../shared/titles.js';
 import { getConfig } from '../routes/config.js';
 import {
     getPathFileSizes,
+    isFileExistsError,
+    isFileNotEmptyError,
+    isFileNotFoundError,
     isSameOrNestedPath,
     type PathFileSize,
 } from '../../shared/file.js';
@@ -1854,10 +1857,14 @@ async function removeEmptyStorageParentDirectory(
     try {
         await rmdir(parentPath);
     } catch (error) {
-        const code = (error as NodeJS.ErrnoException).code;
-        if (code === 'ENOENT' || code === 'ENOTEMPTY' || code === 'EEXIST') {
+        if (
+            isFileExistsError(error) ||
+            isFileNotEmptyError(error) ||
+            isFileNotFoundError(error)
+        ) {
             return;
         }
+
         throw error;
     }
 }

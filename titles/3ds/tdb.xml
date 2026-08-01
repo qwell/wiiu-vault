@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datafile xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="3dstdb.xsd">
-	<TDB3DS version="20260714185825" games="4785"/>
+	<TDB3DS version="20260801173719" games="4785"/>
 	<!--
  GameTDB: 3DS, Database started in 2015 (https://www.gametdb.com)
  Never modify this file manually, it will get overwritten when you update. You can add games and fixes on the website.
@@ -30613,39 +30613,39 @@ Crea Sims, los exclusivos personajes de la saga de Los Sims, con personalidades 
 		<rom version="0" name="The Sims 3: Pets (Japan) (JA).3ds" size="536870912" crc="05de6e3e" md5="b35c821a60846277642486c907eeedfa" sha1="df9a50a068f66856428ae9cb2a64b60e768ff81a"/>
 		<case color="000000"/>
 	</game>
-	<game name="The Sims 3: Pets (Europe) (EN,FR,DE,ES,IT,NL)">
+	<game name="The Sims 3 Pets (Europe) (EN,FR,DE,ES,IT,NL)">
 		<id>AS4P</id>
 		<type>3DS</type>
 		<region>PAL</region>
 		<languages>EN,FR,DE,ES,IT,NL</languages>
 		<locale lang="EN">
-			<title>The Sims 3: Pets</title>
+			<title>The Sims 3 Pets</title>
 			<synopsis>The Sims™ 3 Pets expansion pack includes many new animals such as horses, cats, dogs, snakes, lizards, birds and turtles. The player creates their pet in a similar fashion to the 'Create A Sim' feature with many customisation abilities. The player may choose from a selection of breeds for each pet such as Labradors and Kelpies (dogs).
 
 There are now traits for pets allowing them to have their own personalities and identities. Pets can now be controlled similar to sims and have their own skills, quests and interactions. Cats and dogs can learn hunting and collecting skills and horses can be jumped or raced at the all new equestrian centre.</synopsis>
 		</locale>
 		<locale lang="FR">
-			<title>Les Sims™ 3: Animaux &amp; cie</title>
+			<title>Les Sims™ 3 Animaux &amp; cie</title>
 			<synopsis/>
 		</locale>
 		<locale lang="DE">
-			<title>Die Sims™ 3: Einfach Tierisch</title>
+			<title>Die Sims™ 3 Einfach Tierisch</title>
 			<synopsis/>
 		</locale>
 		<locale lang="ES">
-			<title>Los Sims™ 3: ¡Vaya fauna!</title>
+			<title>Los Sims™ 3 ¡Vaya fauna!</title>
 			<synopsis>Los Sims 3: iVaya fauna! te permitirá jugar de la forma que prefieras; tanto si eres un creador que quiere personalizar su Sim para que se parezca a tu mascota, como si eres de los que prefieren conseguir muchas recompensas, de los que les gusta experimentar y crear el mayor caos posible en la vida de sus Sims o de los que les gusta contar sus historias a sus amigos. Podrás crear, controlar, y jugar con la vida de tus mascotas.</synopsis>
 		</locale>
 		<locale lang="IT">
-			<title>The Sims™ 3: Animali &amp; Co.</title>
+			<title>The Sims™ 3 Animali &amp; Co.</title>
 			<synopsis/>
 		</locale>
 		<locale lang="NL">
-			<title>De Sims™ 3: Beestenbende</title>
+			<title>De Sims™ 3 Beestenbende</title>
 			<synopsis/>
 		</locale>
 		<locale lang="FI">
-			<title>The Sims 3: Pets</title>
+			<title>The Sims 3 Pets</title>
 			<synopsis>Luo simeillesi omat täydelliset lemmikit! Valinnanvaraa riittää aina koirista kissoihin, ruhtinaallisiin ratsuihin ja monenlaiseen muuhun vipeltäjään. Tuttuun tapaan voit itse päättää niin lemmikkien ulkonäöstä kuin niiden luonteestakin. Persoonallisilla lemmikeillä riittää luonteenpiirteitä, mm. älykäs, urhea, ystävällinen, vesipelkoinen, oikukas, härö, lempeä, nopea ja ketterä. Määritä lemmikin persoonallisuus juuri mieleiseksesi. Ota siis lemmikit komentoosi ja koe maailma kaikenkarvaisten kaverien näkökulmasta. Rikastuta simiesi elämää uudella perheenjäsenellä!</synopsis>
 		</locale>
 		<developer>The Sims</developer>
@@ -30658,7 +30658,7 @@ There are now traits for pets allowing them to have their own personalities and 
 		</rating>
 		<wi-fi players="0"/>
 		<input players="1"/>
-		<rom version="0" name="The Sims 3: Pets (Europe) (EN,FR,DE,ES,IT,NL).3ds" size="536870912" crc="38e0e4bb" md5="8c96791b4d484b75917ed7bc0862e3a7" sha1="3b39f793410be42e8e89c366c86e57610e7ddad5"/>
+		<rom version="0" name="The Sims 3 Pets (Europe) (EN,FR,DE,ES,IT,NL).3ds" size="536870912" crc="38e0e4bb" md5="8c96791b4d484b75917ed7bc0862e3a7" sha1="3b39f793410be42e8e89c366c86e57610e7ddad5"/>
 	</game>
 	<game name="Spider-Man: Edge of Time (USA) (EN)">
 		<id>AS7E</id>
@@ -40613,6 +40613,57 @@ com apenas uma cópia do jogo!</synopsis>
 		<rom version="0" name="Sumikko Gurashi: Koko ga Ochitsukundesu (Japan) (EN,JA).3ds" size="268435456" crc="f04b9077" md5="4d78cba8fabb12e4526d11316152e94c" sha1="2f1c9c1841389de1df80a1cc6d33e7f1a81a4894"/>
 		<rom version="2" name="Sumikko Gurashi: Koko ga Ochitsukundesu (Japan) (EN,JA) (v2).3ds" size="268435456" crc="a6936522" md5="8e1db6b0ba8422b39a8c3a9a6b544f13" sha1="7d75798e4b181a76a590df7464de85db4b261a5f"/>
 		<case versions="2"/>
+	</game>
+	<game name="Corpse Party (USA) (EN)">
+		<id>BCPE</id>
+		<type>3DS</type>
+		<region>NTSC-U</region>
+		<languages>EN</languages>
+		<locale lang="EN">
+			<title>Corpse Party</title>
+			<synopsis>Kisaragi Academy student Mayu Suzumoto is transferring to a new high school, leaving behind a sizable group of friends and countless lovely memories. To help her cope with this move, her friend Ayumi has devised a seemingly innocent plan: the whole group will come together to perform a charm she found on the internet called “Sachiko Ever After,” which is supposed to bind all of its participants together as friends to the end.
+
+This does not go as expected.
+
+Following an intense earthquake, the group awakens to find themselves separated and trapped in an alternate reality version of Heavenly Host Elementary School, a tragedy-stricken institution that once stood on the site of their own school but was torn down long ago. Here, the vengeful spirits of elementary-aged children threaten their lives and their sanity, and the only hope of survival - much less escape - is to uncover the chilling details surrounding the murders of those trapped before them.</synopsis>
+		</locale>
+		<locale lang="FR">
+			<title>Corpse Party</title>
+			<synopsis>Mayu Suzumoto, étudiant de l'Académie Kisaragi, est transféré à un nouveau lycée, laissant derrière lui un groupe important d'amis et d'innombrables beaux souvenirs. Pour l'aider à faire face à ce mouvement, sa amie Ayumi a mis au point un plan apparemment innocent: l'ensemble du groupe se réuniront pour effectuer un charme qu'elle a trouvé sur l'Internet appelé &quot;Sachiko Ever After,&quot; qui est censé lier tous ses participants ensemble comme des amis à la fin.
+
+Cela ne va pas comme prévu.
+
+Après un tremblement de terre intense, le groupe se réveille pour se trouver séparés et piégés dans une version alternative de la réalité du Heavenly Host Elementary School, une institution qui se trouvait sur le site de leur propre école, mais a été démoli il y a longtemps. Ici, les esprits vengeurs des enfants d'âge primaire menacent leur vie et leur santé mentale. Le seul espoir de survivre est de découvrir les détails effrayant de entourant les meurtres de ceux qui sont piégés devant eux.</synopsis>
+		</locale>
+		<locale lang="ES">
+			<title>Corpse Party</title>
+			<synopsis>Mayu Suzumoto está transfiriendo a una nueva escuela secundaria, dejando a sus amigos y recuerdos. Para ayudar a hacer frente a este movimiento, su amiga Ayumi ha ideado un plan: el grupo entero se reunirán para realizar un ritual que encontró en internet llamado &quot;Sachiko siempre&quot;, que se supone que se unen todos sus participantes juntos como amigos hasta el final.
+
+Esto no produce los resultados esperados.
+
+Tras un intenso terremoto, el grupo se despierta para encontrarse a sí mismos separados y atrapado en una versión alternativa de la realidad &quot;Heavenly Host Escuela Primaria,&quot; una institución tragedia del pánico que una vez estuvo en el sitio de su propia escuela, pero fue derribada hace mucho tiempo. Aquí, los espíritus vengativos de los niños pequeños amenazan su vida y su cordura, y la única esperanza de supervivencia - mucho menos de escape - es descubrir los detalles escalofriantes que rodean los asesinatos de los que están atrapados ante ellos.</synopsis>
+		</locale>
+		<locale lang="PT">
+			<title>Corpse Party</title>
+			<synopsis>Mayu Suzumoto está transferindo para uma nova escola secundária, deixando seus amigos e memórias. Para ajudá-la a lidar com este movimento, seu amigo Ayumi elaborou um plano: todo o grupo se unirão para realizar um ritual que ela encontrou na internet chamado &quot;Sachiko Ever After&quot;, que é suposto para ligar todos os seus participantes juntos como amigos até o fim.
+
+Isso não saem como o esperado.
+
+Na sequência de um sismo intenso, o grupo desperta para encontrar-se separado e preso em uma versão de realidade alternativa de &quot;Heavenly Host Elementary School,&quot; uma instituição atingidas pela tragédia que ficava no site da sua própria escola, mas foi demolido há muito tempo. Aqui, os espíritos vingativos de crianças pequenas ameaçam suas vidas e sua sanidade, e a única esperança de sobrevivência - e muito menos de fuga - é descobrir os detalhes de refrigeração que cercam o assassinato de pessoas presas antes deles.</synopsis>
+		</locale>
+		<developer>5pb</developer>
+		<publisher>XSEED Games</publisher>
+		<date year="2016" month="10" day="25"/>
+		<genre>action,adventure,role-playing,action rpg</genre>
+		<rating type="ESRB" value="M">
+			<descriptor>blood</descriptor>
+			<descriptor>violence</descriptor>
+			<descriptor>strong language</descriptor>
+			<descriptor>suggestive themes</descriptor>
+		</rating>
+		<wi-fi players="0"/>
+		<input players="1"/>
+		<rom version="0" name="Corpse Party (USA) (EN).3ds" size="1073741824" crc="16b0cd23" md5="2741b79956fa28effca247d234084afb" sha1="178640261f18e31ee2c84c15fea51a9b0487c072"/>
 	</game>
 	<game name="Corpse Party: Blood Covered: Repeated Fear (Japan) (EN,JA)">
 		<id>BCPJ</id>
@@ -52884,6 +52935,7 @@ Confira o tema inspirado neste jogo, na loja de temas. Basta tocar no ícone no 
 		<wi-fi players="0"/>
 		<input players="1"/>
 		<rom version="0" name="Zelda Jeonseol Sindeul-ui Triforce 2 (Korea) (KO).3ds" size="1073741824" crc="20d70f1e" md5="8a8e46e612493dd6dbb865c62b1a59d3" sha1="82898359eaae09a45818d402cfa8b9958a59e2cd"/>
+		<case versions="2"/>
 	</game>
 	<game name="The Legend of Zelda: A Link Between Worlds (Europe) (EN,FR,DE,ES,IT)">
 		<id>BZLP</id>
@@ -65673,6 +65725,7 @@ Ver.1.05  (2021.3.24 배포)
 		<input players="1"/>
 		<rom version="0" name="Super Mario Maker for Nintendo 3DS (Korea) (KO).3ds" size="536870912" crc="6583b8c3" md5="0c7e40284fe171626eabc70fc78828b5" sha1="628cc1ed576bbdf64a297d099da6051b545ed979"/>
 		<rom version="1" name="Super Mario Maker for Nintendo 3DS (Korea) (KO) (v1).3ds" size="536870912" crc="b02897df" md5="086a78ccfabebcc6c992ae8e91274982" sha1="1c8f719671b42f2c8dc55f2edf87582cd59c6ab8"/>
+		<case versions="2"/>
 	</game>
 	<game name="Fire Emblem Echoes: Tto Hanaui Yeongungwang (Korea) (KO)">
 		<id>AJJK</id>
@@ -74663,6 +74716,7 @@ Mas, como os fãs do Yoshi sabem, o importante são os colecionáveis, e a procu
 		<wi-fi players="0"/>
 		<input players="1"/>
 		<rom version="0" name="Yoshi New Island (Korea) (KO).3ds" size="536870912" crc="b2ee92e8" md5="9a67787c25ffee17c8e7d8c57622f1f9" sha1="0246a8e207520df5838ed288e0953d57e2050672"/>
+		<case versions="2"/>
 	</game>
 	<game name="Tousouchuu: Shijou Saikyou no Hunter-tachi Kara Nigekire! (Japan) (EN,JA)">
 		<id>ATCJ</id>
@@ -79191,6 +79245,7 @@ Um 9º mundo, com 8 níveis completamente novos, pode ser desbloqueado agora. Se
 		<wi-fi players="0"/>
 		<input players="1"/>
 		<rom version="0" name="Donkey Kong Returns 3D (Korea) (KO).3ds" size="4294967296" crc="acc67813" md5="a5e25a77cfc857260cc8aa5fc99e5b94" sha1="898e68b8d278555b254ddbe457190287d0e85dfe"/>
+		<case versions="2"/>
 	</game>
 	<game name=" (Europe) (EN)">
 		<id>AYTZ</id>
@@ -82785,50 +82840,6 @@ Um grande clássico videogame, finalmente disponível para Nintendo 3DS.</synops
 		<wi-fi players="0"/>
 		<input players="1"/>
 		<rom version="" name="Candy Match 3 (USA) (EN).3ds"/>
-	</game>
-	<game name="Corpse Party (USA) (EN)">
-		<id>BCPE</id>
-		<type>3DSWare</type>
-		<region>NTSC-U</region>
-		<languages>EN</languages>
-		<locale lang="EN">
-			<title>Corpse Party</title>
-			<synopsis>Kisaragi Academy student Mayu Suzumoto is transferring to a new high school, leaving behind a sizable group of friends and countless lovely memories. To help her cope with this move, her friend Ayumi has devised a seemingly innocent plan: the whole group will come together to perform a charm she found on the internet called “Sachiko Ever After,” which is supposed to bind all of its participants together as friends to the end.
-
-This does not go as expected.
-
-Following an intense earthquake, the group awakens to find themselves separated and trapped in an alternate reality version of Heavenly Host Elementary School, a tragedy-stricken institution that once stood on the site of their own school but was torn down long ago. Here, the vengeful spirits of elementary-aged children threaten their lives and their sanity, and the only hope of survival - much less escape - is to uncover the chilling details surrounding the murders of those trapped before them.</synopsis>
-		</locale>
-		<locale lang="FR">
-			<title>Corpse Party</title>
-			<synopsis>Mayu Suzumoto, étudiant de l'Académie Kisaragi, est transféré à un nouveau lycée, laissant derrière lui un groupe important d'amis et d'innombrables beaux souvenirs. Pour l'aider à faire face à ce mouvement, sa amie Ayumi a mis au point un plan apparemment innocent: l'ensemble du groupe se réuniront pour effectuer un charme qu'elle a trouvé sur l'Internet appelé &quot;Sachiko Ever After,&quot; qui est censé lier tous ses participants ensemble comme des amis à la fin.
-
-Cela ne va pas comme prévu.
-
-Après un tremblement de terre intense, le groupe se réveille pour se trouver séparés et piégés dans une version alternative de la réalité du Heavenly Host Elementary School, une institution qui se trouvait sur le site de leur propre école, mais a été démoli il y a longtemps. Ici, les esprits vengeurs des enfants d'âge primaire menacent leur vie et leur santé mentale. Le seul espoir de survivre est de découvrir les détails effrayant de entourant les meurtres de ceux qui sont piégés devant eux.</synopsis>
-		</locale>
-		<locale lang="ES">
-			<title>Corpse Party</title>
-			<synopsis>Mayu Suzumoto está transfiriendo a una nueva escuela secundaria, dejando a sus amigos y recuerdos. Para ayudar a hacer frente a este movimiento, su amiga Ayumi ha ideado un plan: el grupo entero se reunirán para realizar un ritual que encontró en internet llamado &quot;Sachiko siempre&quot;, que se supone que se unen todos sus participantes juntos como amigos hasta el final.
-
-Esto no produce los resultados esperados.
-
-Tras un intenso terremoto, el grupo se despierta para encontrarse a sí mismos separados y atrapado en una versión alternativa de la realidad &quot;Heavenly Host Escuela Primaria,&quot; una institución tragedia del pánico que una vez estuvo en el sitio de su propia escuela, pero fue derribada hace mucho tiempo. Aquí, los espíritus vengativos de los niños pequeños amenazan su vida y su cordura, y la única esperanza de supervivencia - mucho menos de escape - es descubrir los detalles escalofriantes que rodean los asesinatos de los que están atrapados ante ellos.</synopsis>
-		</locale>
-		<locale lang="PT">
-			<title>Corpse Party</title>
-			<synopsis>Mayu Suzumoto está transferindo para uma nova escola secundária, deixando seus amigos e memórias. Para ajudá-la a lidar com este movimento, seu amigo Ayumi elaborou um plano: todo o grupo se unirão para realizar um ritual que ela encontrou na internet chamado &quot;Sachiko Ever After&quot;, que é suposto para ligar todos os seus participantes juntos como amigos até o fim.
-
-Isso não saem como o esperado.
-
-Na sequência de um sismo intenso, o grupo desperta para encontrar-se separado e preso em uma versão de realidade alternativa de &quot;Heavenly Host Elementary School,&quot; uma instituição atingidas pela tragédia que ficava no site da sua própria escola, mas foi demolido há muito tempo. Aqui, os espíritos vingativos de crianças pequenas ameaçam suas vidas e sua sanidade, e a única esperança de sobrevivência - e muito menos de fuga - é descobrir os detalhes de refrigeração que cercam o assassinato de pessoas presas antes deles.</synopsis>
-		</locale>
-		<publisher>Marvelous (XSEED)</publisher>
-		<date year="2016" month="10" day="25"/>
-		<rating type="ESRB" value=""/>
-		<wi-fi players="0"/>
-		<input players="1"/>
-		<rom version="0" name="Corpse Party (USA) (EN).3ds" size="1073741824" crc="16b0cd23" md5="2741b79956fa28effca247d234084afb" sha1="178640261f18e31ee2c84c15fea51a9b0487c072"/>
 	</game>
 	<game name="Corpse Party: Blood Covered: Repeated Fear (Korea) (KO)">
 		<id>BCPK</id>
@@ -93220,6 +93231,7 @@ Enquanto descobre cada nova atividade divertidamente aleatória, você é atraí
 		<wi-fi players="0"/>
 		<input players="1"/>
 		<rom version="0" name="Rhythm Sesang: The Best+ (Korea) (KO).3ds" size="536870912" crc="fb6bbc6c" md5="9c4502ccfe0926665a77415ebe49c5bc" sha1="b131e612bc7529909d01766adfb134503541ff98"/>
+		<case versions="2"/>
 	</game>
 	<game name="Paddington: Adventures in London (USA) (EN)">
 		<id>BPLE</id>

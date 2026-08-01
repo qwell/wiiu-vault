@@ -7,8 +7,7 @@ const TITLE_ID_PATTERN = /^[a-f0-9]{16}$/;
 const DISC_PRODUCT_CODE_PATTERN = /^[A-Z0-9]{4}(?:[A-Z0-9]{2})?$/;
 const WII_U_PRODUCT_CODE_PATTERN = /^WUP-[PN]-([A-Z0-9]{4})$/;
 const THREE_DS_PRODUCT_CODE_PATTERN =
-    /^(?:(?:CTR|KTR)-[A-Z0-9]-)?([A-Z0-9]{4})$/;
-
+    /^(?:(?:CTR|KTR|TWL)-[A-Z0-9]-)?([A-Z0-9]{4})$/;
 export enum TitleKinds {
     vWii = 'vWii',
     Base = 'Base',
@@ -35,17 +34,28 @@ const WII_U_TITLE_PREFIX_BY_KIND: Record<TitleKinds, string> = {
     [TitleKinds.Unknown]: '00000000',
 };
 
-const THREE_DS_TITLE_PREFIX_BY_KIND: Record<TitleKinds, string | null> = {
+const THREE_DS_TITLE_PREFIX_BY_KIND: Record<
+    TitleKinds,
+    readonly string[] | null
+> = {
     [TitleKinds.vWii]: null,
-    [TitleKinds.Base]: '00040000',
-    [TitleKinds.Demo]: '00040002',
+    [TitleKinds.Base]: ['00040000', '00048004'],
+    [TitleKinds.Demo]: ['00040002'],
     [TitleKinds.FCT]: null,
     [TitleKinds.SystemApp]: null,
     [TitleKinds.SystemData]: null,
     [TitleKinds.SystemApplet]: null,
-    [TitleKinds.Update]: '0004000e',
-    [TitleKinds.DLC]: '0004008c',
-    [TitleKinds.Unknown]: '00000000',
+    [TitleKinds.Update]: ['0004000e'],
+    [TitleKinds.DLC]: ['0004008c'],
+    [TitleKinds.Unknown]: ['00000000'],
+};
+
+const THREE_DS_TITLE_NAMESPACE_BY_PREFIX: Readonly<Record<string, string>> = {
+    '00040000': 'ctr',
+    '00040002': 'ctr',
+    '0004000e': 'ctr',
+    '0004008c': 'ctr',
+    '00048004': 'twl',
 };
 
 export const PARENT_KINDS = [
@@ -214,7 +224,7 @@ function getTitlePrefix(platform: TitlePlatform, kind: TitleKinds): string {
 
     switch (platform) {
         case '3ds':
-            prefix = THREE_DS_TITLE_PREFIX_BY_KIND[kind];
+            prefix = THREE_DS_TITLE_PREFIX_BY_KIND[kind]?.[0];
             break;
         case 'wiiu':
             prefix = WII_U_TITLE_PREFIX_BY_KIND[kind];
@@ -283,6 +293,22 @@ export function replaceTitleKind(titleId: string, kind: TitleKinds): string {
 
     if (!title) {
         throw new Error(`Cannot replace title kind: ${titleId} ${kind}`);
+    }
+
+    if (kind === title.kind) {
+        return title.titleId;
+    }
+
+    if (title.platform === '3ds') {
+        const sourcePrefix = title.titleId.slice(0, 8);
+        const namespace = THREE_DS_TITLE_NAMESPACE_BY_PREFIX[sourcePrefix];
+        const targetPrefix = THREE_DS_TITLE_PREFIX_BY_KIND[kind]?.find(
+            (prefix) => THREE_DS_TITLE_NAMESPACE_BY_PREFIX[prefix] === namespace
+        );
+        if (!targetPrefix) {
+            throw new Error(`Cannot replace title kind: ${titleId} ${kind}`);
+        }
+        return `${targetPrefix}${title.family}`.toLowerCase();
     }
 
     return getTitleId(title.platform, title.family, kind);
@@ -468,8 +494,8 @@ export function identifyThreeDSTitle(titleId: string): TitleIdentity | null {
 
     const prefix = titleIdNormalized.slice(0, 8);
     const kind =
-        (Object.entries(THREE_DS_TITLE_PREFIX_BY_KIND).find(
-            ([, titlePrefix]) => titlePrefix === prefix
+        (Object.entries(THREE_DS_TITLE_PREFIX_BY_KIND).find(([, prefixes]) =>
+            prefixes?.includes(prefix)
         )?.[0] as TitleKinds | undefined) ?? null;
 
     if (!kind) {

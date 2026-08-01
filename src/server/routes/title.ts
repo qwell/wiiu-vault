@@ -5,7 +5,7 @@ import {
     getDlcMetadata,
     getUpdateMetadata,
     type NusTitleMetadata,
-    readThreeDSDownloadOptions,
+    loadThreeDSClientCertificateOptions,
 } from '../nus.js';
 import { THREE_DS_NUS_BASE_URL, WII_U_NUS_BASE_URL } from '../nus.js';
 import {
@@ -27,6 +27,7 @@ import {
 import { HttpError } from '../../shared/download.js';
 import logger from '../../shared/logger.js';
 import { formatLogError } from '../../shared/utils.js';
+import { isErrorType } from '../../shared/error.js';
 
 type NusMetadataOptions = Parameters<typeof downloadNusBaseMetadata>[1];
 
@@ -93,6 +94,7 @@ async function handleWiiUTitleLookup(
     const { titleId } = title;
     const nusOptions = {
         baseUrl: WII_U_NUS_BASE_URL,
+        downloadOptions: {},
     };
 
     const metadata = await getOptionalBaseMetadata(titleId, nusOptions);
@@ -132,6 +134,7 @@ async function handleWiiUTitleLookup(
             dlcMetadata.exists && dlcMetadata.titleVersion !== null
                 ? [dlcMetadata.titleVersion]
                 : [],
+        availableOnCdn: metadata !== null,
     };
     res.json(response);
 }
@@ -149,7 +152,7 @@ async function handleThreeDSTitleLookup(
         return;
     }
 
-    const downloadOptions = await readThreeDSDownloadOptions();
+    const downloadOptions = await loadThreeDSClientCertificateOptions();
     const nusOptions = {
         baseUrl: THREE_DS_NUS_BASE_URL,
         downloadOptions,
@@ -200,7 +203,7 @@ function handleTitleLookupError(res: Response, error: unknown): void {
         'server',
         `Failed to load full title metadata: ${formatLogError(error)}`
     );
-    if (error instanceof HttpError) {
+    if (isErrorType(error, HttpError)) {
         res.status(error.status).json({
             error: 'Failed to load full title metadata',
             message: error.details ?? error.message,
@@ -221,7 +224,7 @@ async function getOptionalChildMetadata(
     try {
         return await readMetadata();
     } catch (error) {
-        if (error instanceof HttpError || error instanceof TypeError) {
+        if (isErrorType(error, HttpError) || isErrorType(error, TypeError)) {
             logger.warn(
                 'server',
                 `Skipping ${kind} metadata for ${titleId}: ${formatLogError(error)}`
@@ -245,7 +248,7 @@ async function getOptionalBaseMetadata(
     try {
         return await downloadNusBaseMetadata(titleId, options);
     } catch (error) {
-        if (error instanceof HttpError || error instanceof TypeError) {
+        if (isErrorType(error, HttpError) || isErrorType(error, TypeError)) {
             logger.warn(
                 'server',
                 `Skipping base metadata for ${titleId}: ${formatLogError(error)}`

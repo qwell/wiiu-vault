@@ -114,7 +114,7 @@ export function parseRegion(value: string): RegionNames | '' {
 function getProductCodeRegion(productCode: string): RegionNames | null {
     const code = productCode ?? '';
     const fullCodeMatch =
-        /^(?:WUP|CTR|KTR)-[A-Z0-9]+-[A-Z0-9]{3}([A-Z0-9])(?:-\d{2})?$/i.exec(
+        /^(?:WUP|CTR|KTR|TWL)-[A-Z0-9]+-[A-Z0-9]{3}([A-Z0-9])(?:-\d{2})?$/i.exec(
             code
         );
     const shortCodeMatch = /^[A-Z0-9]{3}([A-Z0-9])$/i.exec(code);

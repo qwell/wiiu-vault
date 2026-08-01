@@ -30,6 +30,7 @@ import {
     readGameTdbMedia,
 } from '../gametdb.js';
 import { readCachedTitleMedia, type CachedImage } from '../image-cache.js';
+import { loadWiiCommonKeys } from '../keys.js';
 import { inspectWiiDiscStructure, verifyWiiDisc } from '../formats/disc.js';
 import { type RandomAccessReader } from '../formats/disc.js';
 import { readWbfsHeader } from '../formats/wbfs.js';
@@ -62,10 +63,6 @@ import {
 const LIBRARY_SCAN_CONCURRENCY = 8;
 const WII_DISC_IMAGE_EXTENSIONS = new Set(['.iso', '.wbfs', '.rvz']);
 type WiiDiscReader = RandomAccessReader & { sparse: boolean };
-const WII_COMMON_KEYS = [
-    Buffer.from('6+QqIl6Fk+RI2cVFc4Gq9w==', 'base64'),
-    Buffer.from('Y7grtPRhTi4T8v77ukybfg==', 'base64'),
-];
 const WII_DISC_TITLE_ID_OFFSET = 0x00; // [0] = systemType, [1-2] = titleId, [3] = region
 const WII_DISC_TITLE_ID_LENGTH = 0x06;
 const WII_DISC_VERSION_OFFSET = 0x07;
@@ -1040,7 +1037,7 @@ async function verifyDiscImage(
 
         return await verifyWiiDisc(
             reader,
-            WII_COMMON_KEYS,
+            loadWiiCommonKeys(),
             signal,
             reader.sparse
         );
