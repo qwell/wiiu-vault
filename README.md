@@ -177,11 +177,11 @@ yarn release
 yarn generate:titles
 ```
 
-`yarn generate:titles` is only needed when refreshing the checked-in title data. By default it reads `titles/3ds/nus.json` and `titles/wiiu/nus.json`, rebuilds `titles/titles.json`, and supplements `titles/icons.json`. It downloads Nintendo metadata directly; the ROM Rack server does not need to be running.
+`yarn generate:titles` is only needed when refreshing the checked-in title data. By default it reads `titles/3ds/catalog.json` and `titles/wiiu/catalog.json`, rebuilds `titles/titles.json`, and supplements `titles/icons.json`. Metadata is downloaded directly.
 
 Generation options:
 
-- `--refresh-catalog`: Refresh Nintendo Samurai/Ninja catalog membership while preserving cached CDN metadata.
+- `--refresh-catalog`: Refresh Samurai/Ninja catalog membership while preserving cached CDN metadata.
 - `--refresh-metadata`: Recheck cached NUS metadata and CDN availability.
 - `--refresh-versions`: Rebuild historical NUS version information.
 - `--refresh-tdb`: Download current Wii, Wii U, and 3DS GameTDB XML files.
@@ -255,8 +255,8 @@ Files in `titles/`:
 - `titles.json`: Generated primary title database.
 - `icons.json`: Generated title icon URLs.
 
-- `wiiu/nus.json`: Cached Wii U catalog, localized metadata, CDN availability, and version data.
-- `3ds/nus.json`: Cached 3DS catalog, localized metadata, CDN availability, and version data.
+- `wiiu/catalog.json`: Cached Wii U catalog, localized metadata, CDN availability, and version data.
+- `3ds/catalog.json`: Cached 3DS catalog, localized metadata, CDN availability, and version data.
 
 - `wii/tdb.xml`: Source Wii TDB XML from [GameTDB](https://www.gametdb.com/wiitdb.zip), used for Wii and GameCube supplemental title data and UI details.
 - `wiiu/tdb.xml`: Source Wii U TDB XML from [GameTDB](https://www.gametdb.com/wiiutdb.zip), used by the UI for title details.

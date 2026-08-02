@@ -701,11 +701,11 @@ const wiiTdbFile = path.join(titlesDir, 'wii/tdb.xml');
 
 const wiiUTdbFile = path.join(titlesDir, 'wiiu/tdb.xml');
 const wiiUBrewFile = path.join(titlesDir, 'wiiu/wiiubrew.csv');
-const wiiUNusFile = path.join(titlesDir, 'wiiu/nus.json');
+const wiiUNusFile = path.join(titlesDir, 'wiiu/catalog.json');
 
 const threeDSTdbFile = path.join(titlesDir, '3ds/tdb.xml');
 const threeDSHShopFile = path.join(titlesDir, '3ds/hshop.json');
-const threeDSNusFile = path.join(titlesDir, '3ds/nus.json');
+const threeDSNusFile = path.join(titlesDir, '3ds/catalog.json');
 
 function stringFieldRecord<K extends string>(
     value: unknown,
