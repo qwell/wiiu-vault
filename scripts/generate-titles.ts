@@ -614,6 +614,12 @@ const tagayaVersionListUrl =
     'https://tagaya.wup.shop.nintendo.net/tagaya/versionlist/ZZZ/ZZ/list/%s.versionlist';
 const threeDSVersionListUrl =
     'https://tagaya-ctr.cdn.nintendo.net/tagaya/versionlist';
+
+// Maybe useful later?
+// https://ninja.ctr.shop.nintendo.net/ninja/ws/{countryCode}/title/{eShopId}/ec_info
+// https://tagaya-wup.cdn.nintendo.net/tagaya/versionlist/ZZZ/ZZ/list/%s.versionlist
+// https://samurai.wup.shop.nintendo.net/samurai/ws/{countryCode}/titles?shop_id=2&limit=10000
+
 const ninjaIdPairBatchSize = 100;
 
 const nusDatabases = new Map<TitleLookupPlatform, NusDatabase>();
@@ -647,15 +653,6 @@ const legacyNusKeyNames: { [key: string]: string } = {
 const wiiUTdbZipUrl = 'https://www.gametdb.com/wiiutdb.zip';
 const threeDSTdbZipUrl = 'https://www.gametdb.com/3dstdb.zip';
 const wiiTdbZipUrl = 'https://www.gametdb.com/wiitdb.zip';
-
-// Maybe useful later?
-// https://ninja.ctr.shop.nintendo.net/ninja/ws/titles/id_pair?ns_uid[]=
-// https://ninja.ctr.shop.nintendo.net/ninja/ws/titles/id_pair?title_id[]=
-// https://ninja.ctr.shop.nintendo.net/ninja/ws/{countryCode}/title/{eShopId}/ec_info
-// https://samurai.wup.shop.nintendo.net/samurai/ws/{countryCode}/titles?shop_id=2&limit=10000
-// https://samurai.wup.shop.nintendo.net/samurai/ws/{countryCode}/title/{eShopId}
-// https://tagaya.wup.shop.nintendo.net/tagaya/versionlist/ZZZ/ZZ/latest_version
-// https://tagaya-wup.cdn.nintendo.net/tagaya/versionlist/ZZZ/ZZ/list/{latestVersion}.versionlist
 
 const userAgent = 'ROM Rack';
 
@@ -1125,9 +1122,18 @@ function parseNinjaIdPairs(xml: string): NinjaIdPair[] {
     return pairs;
 }
 
-function ninjaIdPairRequestUrl(nsUids: readonly string[]): string {
+function ninjaNsUidPairRequestUrl(nsUids: readonly string[]): string {
     const parameters = new URLSearchParams({
         'ns_uid[]': nsUids.join(','), // I don't know, that's just how it works.
+    });
+
+    return `${ninjaIdPairUrl}?${parameters.toString()}`;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function ninjaTitleIdPairRequestUrl(titleIds: readonly string[]): string {
+    const parameters = new URLSearchParams({
+        'title_id[]': titleIds.join(','), // I don't know, that's just how it works.
     });
 
     return `${ninjaIdPairUrl}?${parameters.toString()}`;
@@ -1139,7 +1145,10 @@ async function loadNinjaIdPairBatch(
 ): Promise<NinjaIdPair[]> {
     try {
         return parseNinjaIdPairs(
-            await downloadSourceText(ninjaIdPairRequestUrl(nsUids), certificate)
+            await downloadSourceText(
+                ninjaNsUidPairRequestUrl(nsUids),
+                certificate
+            )
         );
     } catch (error) {
         if (isHttpErrorStatus(error, 400) && nsUids.length > 1) {
