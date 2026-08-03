@@ -1012,11 +1012,24 @@ async function readDownloadedArchive(
         await writeCacheFile();
         return { archivePath, productCodes };
     })().catch((error: unknown) => {
-        mediaArchives.delete(key);
+        if (mediaArchives.get(key) === pending) {
+            mediaArchives.delete(key);
+        }
         throw error;
     });
 
-    mediaArchives.set(key, pending);
+    if (!existing || !force) {
+        mediaArchives.set(key, pending);
+    } else {
+        void pending.then(
+            (archive) => {
+                if (mediaArchives.get(key) === existing) {
+                    mediaArchives.set(key, Promise.resolve(archive));
+                }
+            },
+            () => undefined
+        );
+    }
     return pending;
 }
 
