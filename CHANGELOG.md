@@ -1,5 +1,35 @@
 # Changelog
 
+## [v0.3.0] - 2026-08-03
+
+### Added
+
+- Added GameCube library support, including scanning, metadata, verification, storage operations, and SD-card layouts.
+- Added RVZ support for Wii and GameCube titles.
+- Added library-wide organization for title directories and ROM filenames, including previews, conflict detection, progress reporting, cancellation, and retry support.
+- Added library-scan progress and controls to the action bar.
+- Added automatic title verification after copying titles to FAT32 storage.
+- Added deeper 3DS CIA verification, including decrypted content hash validation.
+- Added support for localized 3DS and Wii U metadata sourced from Samurai and CDN data.
+- Added historical title-version generation and expanded title catalog refresh options.
+
+### Changed
+
+- Refactored platform and format handling into platform-specific adapters with shared scanning, verification, storage, and metadata workflows.
+- Improved title metadata generation to discover and validate substantially more 3DS and Wii U titles directly against catalog and CDN data.
+- Improved GameTDB archive caching and media lookup behavior.
+- Prevented expired media caches from triggering unnecessary bulk refreshes.
+- Improved Wii U ticket parsing and generated-ticket handling.
+- Updated download controls so they appear only for titles and platforms with supported download formats.
+- Updated storage, title-validation, and WebSocket operations to use platform-qualified title identities.
+- Updated supported-platform, configuration, key-file, release, API, and title-generation documentation.
+
+### Fixed
+
+- Fixed Korean-region detection for NTSC-K titles.
+- Fixed Virtual Console classification in affected title metadata.
+- Improved error detection and reporting across filesystem, HTTP, metadata, and platform workflows.
+
 ## [v0.2.1] - 2026-07-12
 
 ### Added
