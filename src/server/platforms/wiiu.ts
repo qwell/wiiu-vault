@@ -845,7 +845,9 @@ async function findTitleDirs(root: string): Promise<string[]> {
         platform: 'wiiu',
         includeDirectory: (entries) =>
             entries.some(
-                (entry) => entry.isFile() && entry.name === TMD_TITLE_FILE
+                (entry) =>
+                    (entry.isFile() || entry.isSymbolicLink()) &&
+                    entry.name === TMD_TITLE_FILE
             ),
     });
 }
