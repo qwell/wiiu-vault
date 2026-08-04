@@ -92,7 +92,7 @@ type GameTdbArchiveExtraction = {
 };
 
 type GameTdbArchiveRefresh = {
-    mediaKeys: Set<string>;
+    mediaKeysByPlatform: Map<TitlePlatform, Set<string>>;
     pending: Promise<void>;
 };
 
@@ -376,6 +376,7 @@ function getMediaArchivePath(
 ): string {
     return path.join(
         mediaCacheRoot,
+        type,
         `GameTDB-${platforms[platform].archivePlatform ?? platform}-${type}-${region}.zip`
     );
 }
@@ -1086,14 +1087,36 @@ async function extractArchive(
             continue;
         }
 
+        const extension = path.extname(filename.filename);
+        const outputPath = path.join(
+            outputDir,
+            `${matchedMediaKey}${extension}`
+        );
         await writeMediaFile(
-            path.join(
-                outputDir,
-                `${matchedMediaKey}${path.extname(filename.filename)}`
-            ),
+            outputPath,
             await readLocalZipEntryData(archivePath, entry),
             overwrite
         );
+        if (overwrite) {
+            await Promise.all(
+                GAME_TDB_MEDIA_EXTENSIONS.filter(
+                    (cachedExtension) => cachedExtension !== extension
+                ).map((cachedExtension) =>
+                    fs
+                        .unlink(
+                            path.join(
+                                outputDir,
+                                `${matchedMediaKey}${cachedExtension}`
+                            )
+                        )
+                        .catch((error: unknown) => {
+                            if (!isFileNotFoundError(error)) {
+                                throw error;
+                            }
+                        })
+                )
+            );
+        }
         extracted += 1;
     }
 
@@ -1113,6 +1136,36 @@ async function extractArchive(
         );
     }
     return productCodes;
+}
+
+async function readCachedMediaKeys(
+    platform: TitlePlatform,
+    type: GameTdbMediaType
+): Promise<Set<string>> {
+    let entries;
+    try {
+        entries = await fs.readdir(getMediaCacheDir(type, platform), {
+            withFileTypes: true,
+        });
+    } catch (error) {
+        if (isFileNotFoundError(error)) {
+            return new Set();
+        }
+
+        throw error;
+    }
+
+    const mediaKeys = new Set<string>();
+    for (const entry of entries) {
+        if (!entry.isFile()) {
+            continue;
+        }
+        const media = getMediaCacheFilename(platform, entry.name);
+        if (media) {
+            mediaKeys.add(media.mediaKey);
+        }
+    }
+    return mediaKeys;
 }
 
 async function getExistingArchiveAgeMs(
@@ -1208,14 +1261,21 @@ function refreshMediaArchiveInBackground(
     const key = getArchiveIndexKey(step.platform, step.type, step.region);
     const existing = mediaRefreshes.get(key);
     if (existing) {
+        let existingMediaKeys = existing.mediaKeysByPlatform.get(step.platform);
+        if (!existingMediaKeys) {
+            existingMediaKeys = new Set();
+            existing.mediaKeysByPlatform.set(step.platform, existingMediaKeys);
+        }
         for (const mediaKey of mediaKeys) {
-            existing.mediaKeys.add(mediaKey);
+            existingMediaKeys.add(mediaKey);
         }
         return;
     }
 
+    const mediaKeysByPlatform = new Map<TitlePlatform, Set<string>>();
+    mediaKeysByPlatform.set(step.platform, new Set(mediaKeys));
     const refresh: GameTdbArchiveRefresh = {
-        mediaKeys: new Set(mediaKeys),
+        mediaKeysByPlatform,
         pending: Promise.resolve(),
     };
     mediaRefreshes.set(key, refresh);
@@ -1230,14 +1290,36 @@ function refreshMediaArchiveInBackground(
             step.region,
             true
         );
-        await extractArchive(
-            step.platform,
-            step.type,
-            step.region,
-            archive.archivePath,
-            refresh.mediaKeys,
-            null,
-            true
+        const archivePlatforms = TITLE_PLATFORM_IDS.filter(
+            (platform) =>
+                getArchiveIndexKey(platform, step.type, step.region) === key
+        );
+        await Promise.all(
+            archivePlatforms.map(async (platform) => {
+                const cachedMediaKeys = await readCachedMediaKeys(
+                    platform,
+                    step.type
+                );
+                let mediaKeys = refresh.mediaKeysByPlatform.get(platform);
+                if (!mediaKeys) {
+                    mediaKeys = new Set();
+                    refresh.mediaKeysByPlatform.set(platform, mediaKeys);
+                }
+                for (const mediaKey of cachedMediaKeys) {
+                    mediaKeys.add(mediaKey);
+                }
+                if (mediaKeys.size > 0) {
+                    await extractArchive(
+                        platform,
+                        step.type,
+                        step.region,
+                        archive.archivePath,
+                        mediaKeys,
+                        null,
+                        true
+                    );
+                }
+            })
         );
     })()
         .catch((error: unknown) => {
