@@ -9,10 +9,13 @@ Work in Progress
 - [Features](#features)
 - [Supported Platforms](#supported-platforms)
 - [Prerequisites](#prerequisites)
-- [Release](#release)
+- [Installing](#installing)
 - [Configuration](#configuration)
+    - [Keys](#keys)
 - [Development](#development)
+- [Available Scripts](#available-scripts)
 - [API](#api)
+- [WebSocket API](#websocket-api)
 - [Title Data](#title-data)
 - [Contributing](#contributing)
 - [License](#license)
@@ -44,6 +47,17 @@ Work in Progress
 For packaged releases, no system Node.js or Yarn installation is required. The packaged launch scripts download and verify a Node.js runtime on first run.
 
 Development from source requires [Node 24](https://nodejs.org/) and [Yarn](https://yarnpkg.com/).
+
+## Installing
+
+For a packaged release:
+
+1. Download the latest release zip from GitHub at https://github.com/qwell/romrack/releases/latest.
+2. Extract the release zip.
+3. Run `romrack.exe` on Windows or `./romrack` on macOS/Linux.
+4. Set your library directories in Settings, or edit the generated `~/.romrack/config.json`.
+
+The default configuration listens only on `127.0.0.1:3000`, attempts to open the app in your browser, and scans `~/.romrack` for every supported platform.
 
 ## Configuration
 
@@ -89,17 +103,6 @@ ROM Rack looks for these key files only when a format needs them:
 
 GameCube and Wii disc images do not require separate key files.
 
-## Release
-
-From a packaged release:
-
-1. Download the latest release zip from GitHub.
-2. Extract the release zip.
-3. Run `romrack.exe` on Windows or `./romrack` on macOS/Linux.
-4. Set your library directories in Settings, or edit the generated `~/.romrack/config.json`.
-
-The default configuration listens only on `127.0.0.1:3000`, opens the app in your browser, and scans `~/.romrack` for every supported platform.
-
 ## Development
 
 Clone the repository.
@@ -128,6 +131,12 @@ yarn start
 ```
 
 ## Available Scripts
+
+- `hygiene`: Run yarn lint and yarn format.
+
+```bash
+yarn hygiene
+```
 
 - `lint`: Run ESLint to check for code quality issues.
 
